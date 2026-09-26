@@ -70,4 +70,7 @@ with courses_tab:
         rows = visible(grouped.get(code, []))
         label = f"{code} · {title}" + (f" · {grade:.0f}%" if grade is not None else "")
         with st.expander(f"{label} ({len(rows)} upcoming)"):
-            table(rows) if rows else st.caption("Nothing upcoming.")
+            if rows:  # not a one-line ternary: Streamlit "magic" would st.write() its None
+                table(rows)
+            else:
+                st.caption("Nothing upcoming.")
