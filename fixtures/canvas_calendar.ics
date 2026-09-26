@@ -1,0 +1,47 @@
+BEGIN:VCALENDAR
+PRODID:-//Instructure//Canvas//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+X-WR-CALNAME:user's Calendar
+BEGIN:VEVENT
+DTSTAMP:20260101T000000Z
+DTSTART:20260926T235900Z
+DTEND:20260926T235900Z
+UID:event-assignment-1001@canvas.instructure.com
+SUMMARY:Problem Set 2 [CPSC 110 101]
+URL;VALUE=URI:https://canvas.ubc.ca/courses/1/assignments/1001
+DESCRIPTION:Due Friday.
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20260101T000000Z
+DTSTART:20261001T183000Z
+DTEND:20261001T203000Z
+UID:event-calendar-event-2002@canvas.instructure.com
+SUMMARY:Midterm 1 [MATH 100 101]
+URL;VALUE=URI:https://canvas.ubc.ca/calendar?event_id=2002&include_contexts=course_3
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20260101T000000Z
+DTSTART;VALUE=DATE:20261005
+DTEND;VALUE=DATE:20261006
+UID:event-assignment-3003@canvas.instructure.com
+SUMMARY:Pre-lecture quiz 5 [CPSC 121 101]
+URL;VALUE=URI:https://canvas.ubc.ca/courses/2/quizzes/3003
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20260101T000000Z
+DTSTART:20261008T235900Z
+DTEND:20261008T235900Z
+UID:event-assignment-4004@canvas.instructure.com
+SUMMARY:Essay 1 draft [ENGL 110 005]
+URL;VALUE=URI:https://canvas.ubc.ca/courses/4/assignments/4004
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20260101T000000Z
+DTSTART:20261010T170000Z
+DTEND:20261010T180000Z
+UID:event-calendar-event-5005@canvas.instructure.com
+SUMMARY:Study group (no course tag)
+URL;VALUE=URI:https://canvas.ubc.ca/calendar?event_id=5005
+END:VEVENT
+END:VCALENDAR
