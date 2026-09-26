@@ -1,0 +1,145 @@
+{
+ "products": [
+  {
+   "id": 10423933436178,
+   "title": "Human Resource Management - 2026 Release",
+   "handle": "human-resource-management-2026-release",
+   "product_type": "Course Books",
+   "vendor": "Mcgraw Hill Ryerson Ltd",
+   "variants": [
+    {
+     "id": 52692680048914,
+     "title": "Default Title",
+     "sku": "9781266288753",
+     "price": "159.95",
+     "available": true
+    }
+   ]
+  },
+  {
+   "id": 10240476053778,
+   "title": "UBC Nursing Flaunt Ladies Scrub Top - Navy",
+   "handle": "ubc-nursing-flaunt-ladies-scrub-top-navy",
+   "product_type": "Clothing",
+   "vendor": "Greentown Canada Incorporated",
+   "variants": [
+    {
+     "id": 51687428882706,
+     "title": "XXS",
+     "sku": "40073016474",
+     "price": "39.95",
+     "available": true
+    },
+    {
+     "id": 51687428915474,
+     "title": "XS",
+     "sku": "40073016475",
+     "price": "39.95",
+     "available": true
+    },
+    {
+     "id": 51687428948242,
+     "title": "S",
+     "sku": "40073018274",
+     "price": "39.95",
+     "available": true
+    },
+    {
+     "id": 51687428981010,
+     "title": "M",
+     "sku": "40073016477",
+     "price": "39.95",
+     "available": true
+    },
+    {
+     "id": 51687429013778,
+     "title": "L",
+     "sku": "40073016478",
+     "price": "39.95",
+     "available": true
+    },
+    {
+     "id": 51687429046546,
+     "title": "XL",
+     "sku": "40073016479",
+     "price": "39.95",
+     "available": true
+    },
+    {
+     "id": 51687429112082,
+     "title": "2XL",
+     "sku": "40073016480",
+     "price": "39.95",
+     "available": true
+    },
+    {
+     "id": 51687429079314,
+     "title": "5XL",
+     "sku": "40073019384",
+     "price": "41.95",
+     "available": false
+    }
+   ]
+  },
+  {
+   "id": 10400000000001,
+   "title": "Discrete Mathematics With Applications 5/E",
+   "handle": "discrete-mathematics-with-applications-5e",
+   "product_type": "Course Books",
+   "vendor": "Cengage",
+   "variants": [
+    {
+     "id": 52600000000001,
+     "title": "Default Title",
+     "sku": "9781337694193",
+     "price": "302.88",
+     "available": true
+    }
+   ]
+  },
+  {
+   "id": 10436762337554,
+   "title": "UBC Autumn T-Shirt - Limited Edition",
+   "handle": "ubc-autumn-t-shirt",
+   "product_type": "Clothing",
+   "vendor": "Hotline Apparel Systems",
+   "variants": [
+    {
+     "id": 52721446158610,
+     "title": "S",
+     "sku": "40073026543",
+     "price": "24.95",
+     "available": true
+    },
+    {
+     "id": 52721446191378,
+     "title": "M",
+     "sku": "40073026544",
+     "price": "24.95",
+     "available": true
+    },
+    {
+     "id": 52721446224146,
+     "title": "L",
+     "sku": "40073026545",
+     "price": "24.95",
+     "available": true
+    },
+    {
+     "id": 52721446256914,
+     "title": "XL",
+     "sku": "40073026546",
+     "price": "24.95",
+     "available": true
+    },
+    {
+     "id": 52714217439506,
+     "title": "2XL",
+     "sku": "40073026547",
+     "price": "24.95",
+     "available": true
+    }
+   ]
+  }
+ ]
+}
