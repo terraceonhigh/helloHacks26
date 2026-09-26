@@ -1,17 +1,115 @@
+/* THEME: Comprador (provisional, FLUID).
+   Tokens only; expect revision when Terrace's design lands (#14).
+   Change values here, not ad hoc in components: no hex codes below the
+   :root blocks. Palette = the contrast-checked values live on terrace.zone's
+   style.css (same as .streamlit/config.toml on main). Fonts are self-hosted
+   from /fonts (OFL-1.1, see NOTICES.md); never load a font CDN. */
+
+@font-face {
+  font-family: "Bona Nova";
+  src: url("/fonts/bona-nova-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Bona Nova";
+  src: url("/fonts/bona-nova-400italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Bona Nova";
+  src: url("/fonts/bona-nova-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IM Fell Double Pica SC";
+  src: url("/fonts/im-fell-double-pica-sc-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Syne Mono";
+  src: url("/fonts/syne-mono-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light dark;
+
+  --font-body: "Bona Nova", Georgia, "Times New Roman", serif;
+  --font-brand: "IM Fell Double Pica SC", "Bona Nova", Georgia, serif;
+  --font-mono: "Syne Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --page-bg: #f4ebe1;
+  --bg: #f4ebe1;
+  --surface: #f6ebe5;
+  --text: #281f1a;
+  --muted: #6d5d55;
+  --border: #e7d8d0;
+  --accent: #b84028;
+  --accent-h: #98331f;
+  --on-accent: #fdf9f7;
+  --link: #3d6f7b;
+  --link-h: #2b5964;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page-bg: #1c1612;
+    --bg: #211b17;
+    --surface: #2c2420;
+    --text: #ebe0d6;
+    --muted: #b3a69e;
+    --border: #3d332e;
+    --accent: #da7662;
+    --accent-h: #e88f7d;
+    --on-accent: #1c1612;
+    --link: #7bb3c1;
+    --link-h: #98cad7;
+  }
+}
+
+html {
+  background: var(--page-bg);
+}
+
 body {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-body);
   max-width: 900px;
   margin: 2rem auto;
   padding: 0 1rem;
-  color: #1a1a1a;
+  background: var(--bg);
+  color: var(--text);
 }
 
 h1 {
   margin-bottom: 0;
+  font-family: var(--font-brand);
+  font-weight: 400;
+}
+
+code, pre {
+  font-family: var(--font-mono);
+}
+
+a {
+  color: var(--link);
+}
+
+a:hover {
+  color: var(--link-h);
 }
 
 .caption {
-  color: #666;
+  color: var(--muted);
   margin-top: 0.25rem;
 }
 
@@ -23,20 +121,36 @@ h1 {
 
 .tabs button {
   padding: 0.4rem 0.9rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  background: #fff;
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: inherit;
   cursor: pointer;
 }
 
+.tabs button:hover {
+  border-color: var(--accent);
+}
+
 .tabs button.active {
-  background: #1a1a1a;
-  color: #fff;
-  border-color: #1a1a1a;
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
+.tabs button.active:hover {
+  background: var(--accent-h);
+  border-color: var(--accent-h);
 }
 
 .toggle {
   margin-bottom: 1rem;
+}
+
+.toggle input {
+  accent-color: var(--accent);
 }
 
 table {
@@ -47,15 +161,19 @@ table {
 th, td {
   text-align: left;
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  color: var(--muted);
 }
 
 tr.overdue td {
-  color: #b3261e;
+  color: var(--accent);
 }
 
 .empty {
-  color: #666;
+  color: var(--muted);
   padding: 1rem 0;
 }
 
