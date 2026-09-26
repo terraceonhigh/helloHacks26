@@ -161,10 +161,6 @@ export default function Page() {
   return (
     <main>
       <h1>UBC Hub</h1>
-      <p className="caption">
-        Gotham for students: every provider, one pane of glass.{" "}
-        {isLocalMode() ? "(Local mode: real Canvas/PrairieLearn data.)" : "(Sample data.)"}
-      </p>
 
       {isLocalMode() && <ConnectBar onConnected={load} />}
       {loadError && <p className="connect-error">Couldn&apos;t load: {loadError}</p>}
