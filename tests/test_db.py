@@ -54,3 +54,30 @@ def test_courses_and_by_course_grouping():
     assert set(grouped) == {"CPSC 121", "ENGL 112"}
     assert [row[3] for row in grouped["CPSC 121"]] == ["Quiz 2"]
     assert [row[3] for row in grouped["ENGL 112"]] == ["Essay 1"]
+
+
+def test_connect_migrates_a_db_from_before_done_existed(tmp_path):
+    import sqlite3
+
+    path = tmp_path / "old.db"
+    legacy = sqlite3.connect(path)
+    legacy.executescript("""
+        CREATE TABLE courses (id INTEGER PRIMARY KEY, code TEXT NOT NULL, term TEXT NOT NULL,
+                               title TEXT NOT NULL, grade REAL, UNIQUE(code, term));
+        CREATE TABLE items (id INTEGER PRIMARY KEY, course_id INTEGER, category TEXT NOT NULL,
+                             kind TEXT NOT NULL, title TEXT NOT NULL, due TEXT, url TEXT NOT NULL,
+                             source TEXT NOT NULL, UNIQUE(source, url));
+        CREATE TABLE textbooks (id INTEGER PRIMARY KEY, course_id INTEGER, title TEXT NOT NULL,
+                                 isbn TEXT NOT NULL, required INTEGER NOT NULL, price REAL,
+                                 url TEXT NOT NULL, UNIQUE(course_id, isbn));
+    """)  # schema exactly as it was before `done` (pre-#27), on a real file, not sample data
+    legacy.execute("INSERT INTO courses (code, term, title) VALUES ('CPSC 121', '2026W1', 'x')")
+    legacy.execute("INSERT INTO items (course_id, category, kind, title, due, url, source) "
+                    "VALUES (1, 'task', 'assignment', 'old row', '2026-01-01T00:00:00', 'https://x', 'canvas')")
+    legacy.commit()
+    legacy.close()
+
+    conn = db.connect(path)  # this used to raise "no such column: items.done" (#21, #27)
+    rows = db.upcoming(conn)
+    assert rows[0][3] == "old row"
+    assert rows[0][6] is None

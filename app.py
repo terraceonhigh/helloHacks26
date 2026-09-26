@@ -3,8 +3,9 @@ from datetime import datetime, timedelta, timezone
 
 import streamlit as st
 
-from hub import canvas, db
-from hub.models import Course, Item, category_for
+from hub import canvas, db, prairielearn
+from hub.logic import sort_items
+from hub.models import Course, Item, category_for, classify_urgency, status_of
 
 st.set_page_config(page_title="UBC Hub")
 st.title("UBC Hub")
@@ -30,24 +31,35 @@ def sample_conn():
 
 with st.sidebar:
     demo = st.toggle("Sample data", value=True, help="Off = your own Canvas data from this laptop's hub.db")
-    if not demo and st.button("Connect Canvas", help="Opens a browser window: sign in with CWL + Duo yourself"):
-        with st.spinner("Waiting for you to sign in to Canvas…"):
-            db.save(db.connect(), *canvas.fetch())
+    if not demo:
+        col1, col2 = st.columns(2)
+        if col1.button("Connect Canvas", help="Opens a browser window: sign in with CWL + Duo yourself"):
+            with st.spinner("Waiting for you to sign in to Canvas…"):
+                db.save(db.connect(), *canvas.fetch())
+        if col2.button("Connect PrairieLearn", help="Opens a browser window: sign in with CWL + Duo yourself"):
+            with st.spinner("Waiting for you to sign in to PrairieLearn…"):
+                db.save(db.connect(), *prairielearn.fetch())
     n = st.slider("Show next", 5, 50, 10)
     hide_overdue = st.toggle("Hide overdue", value=False)
 
 conn = sample_conn() if demo else db.connect()
 now = datetime.now(timezone.utc)
 
+def overdue(r):
+    item = Item(course=r[0], category=r[1], kind=r[2], title=r[3],
+                due=datetime.fromisoformat(r[4]), url=r[5], source="", done=bool(r[6]) if r[6] is not None else None)
+    return status_of(item, now) == "overdue"
+
+
 def visible(rows):
-    # ponytail: overdue = due < now, computed here from the due string. Swap for the backend's
-    # due-status field when it lands.
-    return [r for r in rows if not hide_overdue or datetime.fromisoformat(r[4]) >= now]
+    """Hide overdue if asked, then rank most urgent first. Shared by every tab."""
+    return sort_items([r for r in rows if not hide_overdue or not overdue(r)], now)
 
 
 def table(rows):
     st.dataframe(
-        [{"Due": datetime.fromisoformat(r[4]).astimezone(), "Course": r[0], "What": r[3], "Kind": r[2], "Link": r[5]}
+        [{"Urgency": classify_urgency(r[3], datetime.fromisoformat(r[4]), now).capitalize(),
+          "Due": datetime.fromisoformat(r[4]).astimezone(), "Course": r[0], "What": r[3], "Kind": r[2], "Link": r[5]}
          for r in rows],
         column_config={"Due": st.column_config.DatetimeColumn(format="ddd MMM D, h:mm a"),
                        "Link": st.column_config.LinkColumn(display_text="open")},
@@ -58,7 +70,7 @@ def table(rows):
 *category_tabs, courses_tab = st.tabs(["All", "Tasks", "Deadlines", "Materials", "Courses"])
 for tab, category in zip(category_tabs, [None, "task", "deadline", "material"]):
     with tab:
-        rows = visible(db.upcoming(conn, category))[:n]  # MVP ranking: soonest first
+        rows = visible(db.upcoming(conn, category))[:n]
         if rows:
             table(rows)
         else:

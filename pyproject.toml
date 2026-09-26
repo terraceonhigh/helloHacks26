@@ -13,7 +13,11 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pytest"]
+dev = [
+    "joblib>=1.6.0",
+    "pytest",
+    "scikit-learn>=1.9.1",
+]
 
 [tool.uv]
 package = false

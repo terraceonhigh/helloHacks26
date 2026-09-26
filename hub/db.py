@@ -55,6 +55,13 @@ def connect(path=PATH):
     conn = sqlite3.connect(path)
     conn.execute("PRAGMA foreign_keys = ON")
     conn.executescript(SCHEMA)
+    # CREATE TABLE IF NOT EXISTS doesn't add columns to a table that already
+    # exists - a hub.db from before `done` landed would crash on it (#27,
+    # #21) with "no such column: items.done". Guarded, so this is a no-op
+    # once every db has the column.
+    cols = {row[1] for row in conn.execute("PRAGMA table_info(items)")}
+    if "done" not in cols:
+        conn.execute("ALTER TABLE items ADD COLUMN done INTEGER")
     return conn
 
 
