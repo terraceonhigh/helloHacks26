@@ -1,0 +1,7 @@
+[
+  {"course_key": "UBCV,2026W1,CPSC,CPSC121,101", "title": "Discrete Mathematics with Applications, 5/E", "isbn": "9781337694193", "required": true, "price_new": 302.88, "price_used": null, "price_digital": 84.91, "store_url": null},
+  {"course_key": "UBCV,2026W1,CPSC,CPSC110,101", "title": "How to Design Programs, 2/E", "isbn": "9780262534802", "required": false, "price_new": 95.50, "price_used": 71.60, "price_digital": null, "store_url": null},
+  {"course_key": "UBCV,2026W1,MATH,MATH100,101", "title": "CLP-1 Differential Calculus (course notes)", "isbn": "0000000000001", "required": true, "price_new": 25.00, "price_used": null, "price_digital": null, "store_url": null},
+  {"course_key": "UBCV,2026W1,ENGL,ENGL110,005", "title": "The Norton Introduction to Literature, 14/E", "isbn": "9780393886269", "required": true, "price_new": 128.95, "price_used": 96.70, "price_digital": 64.00, "store_url": null},
+  {"course_key": "UBCV,2026W1,ENGL,ENGL110,005", "title": "They Say / I Say, 6/E", "isbn": "9781324060840", "required": false, "price_new": 42.95, "price_used": null, "price_digital": 27.50, "store_url": null}
+]

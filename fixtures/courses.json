@@ -1,0 +1,60 @@
+[
+  {
+    "key": "UBCV,2026W1,CPSC,CPSC110,101",
+    "code": "CPSC 110",
+    "section": "101",
+    "term": "2026W1",
+    "title": "Computation, Programs, and Programming",
+    "grade": 91.2,
+    "instructor": "Instructor A",
+    "schedule": [
+      {"day": "Mon", "start": "09:00", "end": "10:00", "room": "WESB 100"},
+      {"day": "Wed", "start": "09:00", "end": "10:00", "room": "WESB 100"},
+      {"day": "Fri", "start": "09:00", "end": "10:00", "room": "WESB 100"}
+    ],
+    "sources": ["workday", "canvas"]
+  },
+  {
+    "key": "UBCV,2026W1,CPSC,CPSC121,101",
+    "code": "CPSC 121",
+    "section": "101",
+    "term": "2026W1",
+    "title": "Models of Computation",
+    "grade": 84.5,
+    "instructor": "Instructor B",
+    "schedule": [
+      {"day": "Tue", "start": "11:00", "end": "12:30", "room": "DMP 110"},
+      {"day": "Thu", "start": "11:00", "end": "12:30", "room": "DMP 110"}
+    ],
+    "sources": ["workday", "canvas"]
+  },
+  {
+    "key": "UBCV,2026W1,MATH,MATH100,101",
+    "code": "MATH 100",
+    "section": "101",
+    "term": "2026W1",
+    "title": "Differential Calculus with Applications to Physical Sciences and Engineering",
+    "grade": 77.0,
+    "instructor": "Instructor C",
+    "schedule": [
+      {"day": "Mon", "start": "13:00", "end": "14:00", "room": "LSK 200"},
+      {"day": "Wed", "start": "13:00", "end": "14:00", "room": "LSK 200"},
+      {"day": "Fri", "start": "13:00", "end": "14:00", "room": "LSK 200"}
+    ],
+    "sources": ["workday", "canvas"]
+  },
+  {
+    "key": "UBCV,2026W1,ENGL,ENGL110,005",
+    "code": "ENGL 110",
+    "section": "005",
+    "term": "2026W1",
+    "title": "Approaches to Literature and Culture",
+    "grade": null,
+    "instructor": "Instructor D",
+    "schedule": [
+      {"day": "Tue", "start": "14:00", "end": "15:30", "room": "BUCH A101"},
+      {"day": "Thu", "start": "14:00", "end": "15:30", "room": "BUCH A101"}
+    ],
+    "sources": ["workday"]
+  }
+]
