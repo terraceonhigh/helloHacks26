@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   connectCanvas,
   connectPrairieLearn,
+  displayLabel,
   fetchCourses,
   fetchUpcoming,
   isDone,
@@ -61,11 +62,11 @@ function ConnectBar({ onConnected }) {
   );
 }
 
-function ItemsTable({ items }) {
+function ItemsTable({ items, sampleMode }) {
   if (items.length === 0) {
     return (
       <p className="empty">
-        {isLocalMode() ? "Nothing yet. Connect Canvas or PrairieLearn above." : "Nothing upcoming."}
+        {sampleMode ? "Nothing upcoming." : "Nothing yet. Connect Canvas or PrairieLearn above."}
       </p>
     );
   }
@@ -85,7 +86,7 @@ function ItemsTable({ items }) {
       <tbody>
         {items.map((item) => (
           <tr key={item.id} className={isOverdue(item, now) ? "overdue" : ""}>
-            <td>{item.urgency ?? "—"}</td>
+            <td>{displayLabel(item.urgency)}</td>
             <td>{formatDue(item.due)}</td>
             <td>{item.course}</td>
             <td>{item.title}</td>
@@ -100,11 +101,11 @@ function ItemsTable({ items }) {
   );
 }
 
-function CoursesTab({ courses, items }) {
+function CoursesTab({ courses, items, sampleMode }) {
   if (courses.length === 0) {
     return (
       <p className="empty">
-        {isLocalMode() ? "Nothing yet. Connect Canvas above." : "No courses."}
+        {sampleMode ? "No courses." : "Nothing yet. Connect Canvas above."}
       </p>
     );
   }
@@ -118,7 +119,10 @@ function CoursesTab({ courses, items }) {
           <p className="course-meta">
             {course.term} &middot; Grade: {course.grade == null ? "—" : `${course.grade}%`}
           </p>
-          <ItemsTable items={sortItems(items.filter((i) => i.course === course.code))} />
+          <ItemsTable
+            items={sortItems(items.filter((i) => i.course === course.code))}
+            sampleMode={sampleMode}
+          />
         </section>
       ))}
     </div>
@@ -129,24 +133,38 @@ export default function Page() {
   const [tab, setTab] = useState("all");
   const [showN, setShowN] = useState(10);
   const [hideOverdue, setHideOverdue] = useState(false);
+  // On by default, matching app.py's st.toggle("Sample data", value=True) -
+  // NEXT_PUBLIC_HUB_API only decides whether local mode is *possible* (so
+  // whether this toggle/the Connect buttons show at all); this state decides
+  // what's actually fetched right now, live, without restarting anything.
+  const [sampleMode, setSampleMode] = useState(true);
   const [items, setItems] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loadError, setLoadError] = useState(null);
 
-  async function load() {
+  async function load(useSample) {
     try {
-      const [nextItems, nextCourses] = await Promise.all([fetchUpcoming(), fetchCourses()]);
+      const [nextItems, nextCourses] = await Promise.all([
+        fetchUpcoming(useSample),
+        fetchCourses(useSample),
+      ]);
       setItems(nextItems);
       setCourses(nextCourses);
       setLoadError(null);
     } catch (e) {
+      // Clear stale data on failure - otherwise a failed fetch after
+      // switching modes leaves the previous mode's rows on screen under the
+      // new mode's caption, which is misleading.
+      setItems([]);
+      setCourses([]);
       setLoadError(e.message);
     }
   }
 
   useEffect(() => {
-    load();
-  }, []);
+    load(sampleMode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sampleMode]);
 
   const now = new Date();
   // Completed items never show, regardless of Hide overdue (matches app.py's
@@ -163,10 +181,21 @@ export default function Page() {
       <h1>UBC Hub</h1>
       <p className="caption">
         Gotham for students: every provider, one pane of glass.{" "}
-        {isLocalMode() ? "(Local mode: real Canvas/PrairieLearn data.)" : "(Sample data.)"}
+        {sampleMode ? "(Sample data.)" : "(Local mode: real Canvas/PrairieLearn data.)"}
       </p>
 
-      {isLocalMode() && <ConnectBar onConnected={load} />}
+      {isLocalMode() && (
+        <label className="toggle sample-toggle">
+          <input
+            type="checkbox"
+            checked={sampleMode}
+            onChange={(e) => setSampleMode(e.target.checked)}
+          />{" "}
+          Sample data
+        </label>
+      )}
+
+      {isLocalMode() && !sampleMode && <ConnectBar onConnected={() => load(false)} />}
       {loadError && <p className="connect-error">Couldn&apos;t load: {loadError}</p>}
 
       <div className="tabs">
@@ -202,9 +231,9 @@ export default function Page() {
       )}
 
       {tab === "courses" ? (
-        <CoursesTab courses={courses} items={activeItems} />
+        <CoursesTab courses={courses} items={activeItems} sampleMode={sampleMode} />
       ) : (
-        <ItemsTable items={visible} />
+        <ItemsTable items={visible} sampleMode={sampleMode} />
       )}
     </main>
   );

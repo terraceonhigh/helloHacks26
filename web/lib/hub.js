@@ -79,18 +79,22 @@ function normaliseApiItem(row, i) {
   };
 }
 
-export async function fetchUpcoming() {
+// useSample forces sample data even when a local API is configured - this is
+// the "Sample data" toggle (app.py parity), not just the env var. The env
+// var controls whether local mode is *possible* at all (and so whether the
+// toggle/Connect buttons show); the toggle controls what's actually fetched.
+export async function fetchUpcoming(useSample) {
   const base = apiBase();
-  if (!base) return sampleItems();
+  if (!base || useSample) return sampleItems();
   const res = await fetch(`${base}/api/upcoming`);
   if (!res.ok) throw new Error(`GET /api/upcoming failed: ${res.status}`);
   const rows = await res.json();
   return rows.map(normaliseApiItem);
 }
 
-export async function fetchCourses() {
+export async function fetchCourses(useSample) {
   const base = apiBase();
-  if (!base) return SAMPLE_COURSES;
+  if (!base || useSample) return SAMPLE_COURSES;
   const res = await fetch(`${base}/api/courses`);
   if (!res.ok) throw new Error(`GET /api/courses failed: ${res.status}`);
   return res.json();
@@ -139,4 +143,12 @@ export function isOverdue(item, now) {
 export function isDone(item) {
   if (item.status) return item.status === "done";
   return Boolean(item.done);
+}
+
+// Display only - app.py capitalises urgency/status labels ("Overdue", not
+// "overdue"); values themselves stay lowercase everywhere else (comparisons,
+// URGENCY_ORDER, the backend's own strings).
+export function displayLabel(value) {
+  if (!value) return "—";
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
