@@ -6,6 +6,7 @@ import streamlit as st
 from hub import canvas, db
 from hub.logic import sort_items
 from hub.models import Course, Item, category_for, classify_urgency
+from hub.urgency_model import predict_urgency
 
 st.set_page_config(page_title="UBC Hub")
 st.title("UBC Hub")
@@ -34,7 +35,10 @@ with st.sidebar:
             db.save(db.connect(), *canvas.fetch())
     n = st.slider("Show next", 5, 50, 10)
     hide_overdue = st.toggle("Hide overdue", value=False)
+    use_ml = st.toggle("ML urgency classifier (experimental)", value=False,
+                        help="Trained model (scripts/train_urgency_classifier.py) instead of the keyword heuristic")
 
+urgency_fn = predict_urgency if use_ml else classify_urgency
 conn = sample_conn() if demo else db.connect()
 now = datetime.now(timezone.utc)
 
@@ -43,12 +47,12 @@ for tab, category in zip(st.tabs(["All", "Tasks", "Deadlines", "Materials"]), [N
         # ponytail: overdue = due < now, computed here from the due string. Swap for the backend's
         # due-status field when it lands.
         rows = [r for r in db.upcoming(conn, category) if not hide_overdue or datetime.fromisoformat(r[4]) >= now]
-        rows = sort_items(rows, now)[:n]
+        rows = sort_items(rows, now, urgency_fn)[:n]
         if not rows:
             st.info("Nothing upcoming." if demo else "Nothing yet. Connect Canvas in the sidebar.")
             continue
         st.dataframe(
-            [{"Urgency": classify_urgency(r[3], datetime.fromisoformat(r[4]), now).capitalize(),
+            [{"Urgency": urgency_fn(r[3], datetime.fromisoformat(r[4]), now).capitalize(),
               "Due": datetime.fromisoformat(r[4]).astimezone(), "Course": r[0], "What": r[3], "Kind": r[2], "Link": r[5]}
              for r in rows],
             column_config={"Due": st.column_config.DatetimeColumn(format="ddd MMM D, h:mm a"),

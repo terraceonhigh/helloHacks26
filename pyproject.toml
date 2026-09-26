@@ -10,13 +10,13 @@ dependencies = [
     "openpyxl",
     "icalendar",
     "playwright>=1.63.0",
+    "scikit-learn>=1.9.1",
+    "joblib>=1.6.0",
 ]
 
 [dependency-groups]
 dev = [
-    "joblib>=1.6.0",
     "pytest",
-    "scikit-learn>=1.9.1",
 ]
 
 [tool.uv]
