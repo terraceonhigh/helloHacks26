@@ -14,8 +14,15 @@ def test_save_and_upcoming():
     conn = db.connect(":memory:")
     db.save(conn, [COURSE], [QUIZ], [BOOK])
     rows = db.upcoming(conn)
-    assert rows == [("CPSC 121", "deadline", "quiz", "Quiz 2", "2026-09-30T06:59:00", "https://x/q/1")]
+    assert rows == [("CPSC 121", "deadline", "quiz", "Quiz 2", "2026-09-30T06:59:00", "https://x/q/1", None)]
     assert conn.execute("SELECT isbn FROM textbooks").fetchall() == [("123",)]
+
+
+def test_done_round_trips_through_sqlite():
+    conn = db.connect(":memory:")
+    done_item = Item(**{**QUIZ.__dict__, "done": True})
+    db.save(conn, [COURSE], [done_item])
+    assert db.upcoming(conn)[0][6] is True or db.upcoming(conn)[0][6] == 1  # sqlite has no real bool
 
 
 def test_save_is_idempotent_and_updates():

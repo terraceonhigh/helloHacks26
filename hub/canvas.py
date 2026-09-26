@@ -36,6 +36,16 @@ def to_course(c):
     )
 
 
+def done_from_submissions(p):
+    # Verified against a real planner/items response: "submissions" is a dict
+    # (submitted/excused/graded/...) for anything gradeable, or a bare `false`
+    # for announcements/events - nothing to report there, so None not False.
+    submissions = p.get("submissions")
+    if not isinstance(submissions, dict):
+        return None
+    return bool(submissions.get("submitted") or submissions.get("excused"))
+
+
 def to_item(p, course_codes):
     due = p.get("plannable_date")
     kind = KINDS.get(p.get("plannable_type"), "assignment")
@@ -47,6 +57,7 @@ def to_item(p, course_codes):
         due=datetime.fromisoformat(due) if due else None,
         url=BASE + p.get("html_url", ""),
         source="canvas",
+        done=done_from_submissions(p),
     )
 
 

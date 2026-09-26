@@ -1,6 +1,6 @@
 """Shared model every adapter returns. Keep it tiny (see issue #1)."""
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Literal
 
 Category = Literal["task", "deadline", "material"]
@@ -41,9 +41,30 @@ class Item:
     category: Category
     kind: str  # specific label within the category, e.g. "quiz", "reading" - free-form, new providers can add one without touching this file
     title: str
-    due: datetime | None
+    due: datetime | None  # always tz-aware if set - never mix naive and aware across adapters
     url: str
     source: str
+    done: bool | None = None  # completed/submitted, if the source can tell us. None = unknown/not applicable
+
+
+Status = Literal["done", "overdue", "soon", "upcoming"]
+SOON_WINDOW = timedelta(hours=48)  # matches docs/design.md's "due-in-48h" pinning/amber rule
+
+
+def status_of(item: Item, now: datetime | None = None) -> Status:
+    """Where an item sits right now. Never stored - "overdue"/"soon" are pure
+    functions of `due` vs `now`, recomputed on every read (hub.db doesn't
+    persist this), so it's never stale."""
+    now = now or datetime.now(timezone.utc)
+    if item.done:
+        return "done"
+    if item.due is None:
+        return "upcoming"
+    if item.due < now:
+        return "overdue"
+    if item.due - now <= SOON_WINDOW:
+        return "soon"
+    return "upcoming"
 
 
 @dataclass

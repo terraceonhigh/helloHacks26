@@ -1,4 +1,4 @@
-from hub.canvas import to_course, to_item, unwrap
+from hub.canvas import done_from_submissions, to_course, to_item, unwrap
 
 
 def test_unwrap_strips_guard():
@@ -18,3 +18,13 @@ def test_mapping():
     assert (event.kind, event.category) == ("event", "deadline")
     assignment = to_item({"plannable_type": "discussion_topic", "plannable": {}}, {})
     assert (assignment.kind, assignment.category) == ("assignment", "task")
+
+
+def test_done_from_submissions():
+    # Real shapes seen from planner/items: a dict for anything gradeable,
+    # a bare `false` for announcements/events - nothing to report there.
+    assert done_from_submissions({"submissions": {"submitted": True, "excused": False}}) is True
+    assert done_from_submissions({"submissions": {"submitted": False, "excused": True}}) is True
+    assert done_from_submissions({"submissions": {"submitted": False, "excused": False}}) is False
+    assert done_from_submissions({"submissions": False}) is None
+    assert done_from_submissions({}) is None
