@@ -14,7 +14,7 @@ URL to Vercel.
 1. In Chromium, open `chrome://extensions`, enable Developer mode, and load
    `extension/` as an unpacked extension.
 2. Sign in to `https://canvas.ubc.ca` yourself in a normal tab.
-3. Open the **UBC Hub Sync** popup, select Canvas, and press **Sync selected provider**. The
+3. Open the **Lauds Sync** popup, select Canvas, and press **Sync selected provider**. The
    popup reports whether capture and Vercel normalization succeeded. If no Canvas tab is open, it
    opens one; sign in there and press Sync again.
 
@@ -72,7 +72,7 @@ it never opens an individual assessment or quiz link.
 ## Hosted upload contract
 
 The extension is prepared to POST normalized rows to
-`https://hello-hacks26.vercel.app/api/sync` with a Hub-specific bearer key set
+`https://hello-hacks26.vercel.app/api/sync` with a Lauds-specific bearer key set
 in its popup. That key is distinct from all LMS credentials. The upload route
 and durable hosted database are **not deployed yet**. Do not put a key in the
 extension until the route, key provisioning, and store exist. Without a key,

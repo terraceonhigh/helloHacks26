@@ -1,0 +1,32 @@
+{
+ "PagingInfo": {
+  "Bookmark": "70001",
+  "HasMoreItems": false
+ },
+ "Items": [
+  {
+   "OrgUnit": {
+    "Id": 70001,
+    "Type": {
+     "Id": 3,
+     "Code": "Course Offering",
+     "Name": "Course Offering"
+    },
+    "Name": "MATH_V 100A ALL SECTIONS 2026W1 Differential Calculus (Demo)",
+    "Code": "MATH_V 100A ALL SECTIONS 2026W1",
+    "HomeUrl": "https://brightspace.example.edu/d2l/home/70001",
+    "ImageUrl": null
+   },
+   "Access": {
+    "IsActive": true,
+    "StartDate": null,
+    "EndDate": null,
+    "CanAccess": true,
+    "ClasslistRoleName": "Student",
+    "LISRoles": [],
+    "LastAccessed": null
+   },
+   "PinDate": null
+  }
+ ]
+}

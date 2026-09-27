@@ -2,7 +2,14 @@
 //   - Local mode: NEXT_PUBLIC_HUB_API is set -> talk to Jacky's hub/api.py
 //     over http://127.0.0.1:<port>, which returns rows already ranked and
 //     annotated with status/urgency from hub.models (never recomputed here).
-//   - Sample mode (hosted Vercel default): no API reachable, fixed fake data.
+//   - Hosted (no local API), Sample on: rows come from the hosted GET
+//     /api/demo (web/api/demo.py): a fake "Demo Student" run through the
+//     real hub/ adapters and fusion. If that fails, the fixed SAMPLE_ROWS
+//     below, so the page never breaks.
+//   - Hosted, Sample off: nothing fake, ever. Only the student's real
+//     sources (the hosted store's synced rows via fetchHostedStore(), the
+//     Canvas calendar feed, a Workday import) - page.js merges those in;
+//     these fetchers return nothing.
 
 const URGENCY_ORDER = ["overdue", "critical", "high", "medium", "low"];
 
@@ -128,9 +135,43 @@ function normaliseApiItem(row, i) {
 // the "Sample data" toggle (app.py parity), not just the env var. The env
 // var controls whether local mode is *possible* at all (and so whether the
 // toggle/Connect buttons show); the toggle controls what's actually fetched.
+// Hosted Sample mode only (no local API): GET /api/demo once per page load,
+// shared by fetchUpcoming/fetchAnnouncements/fetchCourses. Resolves to null
+// on any failure so each caller falls back to its built-in sample data -
+// never throws. `fetchImpl` is injectable for tests.
+let demoPromise = null;
+
+export function fetchDemo(fetchImpl = globalThis.fetch) {
+  if (!demoPromise) {
+    demoPromise = (async () => {
+      try {
+        const res = await fetchImpl("/api/demo");
+        if (!res.ok) return null;
+        const body = await res.json();
+        if (!body || !Array.isArray(body.items)) return null;
+        return {
+          items: body.items.map(normaliseApiItem),
+          announcements: Array.isArray(body.announcements) ? body.announcements.map(normaliseApiItem) : [],
+          courses: Array.isArray(body.courses) ? body.courses : SAMPLE_COURSES,
+          meetings: Array.isArray(body.schedule) ? body.schedule.map(normaliseApiMeeting) : [],
+        };
+      } catch {
+        return null;
+      }
+    })();
+  }
+  return demoPromise;
+}
+
+// Test-only: forget the cached /api/demo response.
+export function resetDemoCache() {
+  demoPromise = null;
+}
+
 export async function fetchUpcoming(useSample) {
   const base = apiBase();
-  if (!base || useSample) return sampleItems();
+  if (!base) return useSample ? ((await fetchDemo())?.items ?? sampleItems()) : [];
+  if (useSample) return sampleItems();
   const res = await fetch(`${base}/api/upcoming`);
   if (!res.ok) throw new Error(`GET /api/upcoming failed: ${res.status}`);
   const rows = await res.json();
@@ -139,11 +180,13 @@ export async function fetchUpcoming(useSample) {
 
 // Announcements never carry a due date (they're informational, not a task -
 // see hub/canvas.py's to_item()), so they're a separate feed from
-// fetchUpcoming() rather than items mixed into it. Sample mode has none -
-// none of SAMPLE_ROWS is announcement-shaped, so there's nothing to fake.
+// fetchUpcoming() rather than items mixed into it. The hosted demo carries
+// its own; the SAMPLE_ROWS fallback has none - none of them is
+// announcement-shaped, so there's nothing to fake.
 export async function fetchAnnouncements(useSample) {
   const base = apiBase();
-  if (!base || useSample) return [];
+  if (!base) return useSample ? ((await fetchDemo())?.announcements ?? []) : [];
+  if (useSample) return [];
   const res = await fetch(`${base}/api/announcements`);
   if (!res.ok) throw new Error(`GET /api/announcements failed: ${res.status}`);
   const rows = await res.json();
@@ -152,10 +195,30 @@ export async function fetchAnnouncements(useSample) {
 
 export async function fetchCourses(useSample) {
   const base = apiBase();
-  if (!base || useSample) return SAMPLE_COURSES;
+  if (!base) return useSample ? ((await fetchDemo())?.courses ?? SAMPLE_COURSES) : [];
+  if (useSample) return SAMPLE_COURSES;
   const res = await fetch(`${base}/api/courses`);
   if (!res.ok) throw new Error(`GET /api/courses failed: ${res.status}`);
   return res.json();
+}
+
+// /api/schedule's row shape (hub/api.py's _schedule, snake_case) -> the
+// camelCase Meeting shape web/lib/workday.js's import produces, so the
+// Schedule and Calendar views read both the same way.
+function normaliseApiMeeting(row) {
+  return {
+    course: row.course, kind: row.kind, days: row.days,
+    startTime: row.start_time, endTime: row.end_time, location: row.location,
+    termStart: row.term_start, termEnd: row.term_end, source: row.source,
+  };
+}
+
+// The demo student's recurring class meetings - hosted Sample mode only.
+// Local mode's /api/schedule isn't wired into web/ yet, and Sample off never
+// shows anything fake, so both get [] (a Workday import still works as before).
+export async function fetchDemoMeetings(useSample) {
+  if (apiBase() || !useSample) return [];
+  return (await fetchDemo())?.meetings ?? [];
 }
 
 export async function connectCanvas() {
@@ -323,25 +386,74 @@ export function mergeMeetings(base, incoming) {
 
 // Canvas calendar-feed connect (#47) - works with no local backend at all,
 // so it's the only Canvas path that also works on the hosted Vercel site.
-// The feed URL is a secret (works like a password): kept in the browser's
-// own localStorage only, sent straight to /api/feed (Jacky's route, still
-// landing - see the board), never logged. Response shape isn't final yet;
-// this accepts either a bare item array or {items: [...]}.
-export async function fetchCanvasFeed(url) {
-  // Local mode's /api/feed lives on hub/api.py (a different origin, :8000),
-  // not this page's own origin - same reason every other local-mode call
-  // here goes through apiBase(). Hosted mode has no separate API origin
-  // (Vercel serves /api/feed itself), so the relative path is correct there.
+// The feed URL is a secret (works like a password): after one successful
+// POST it lives only in an httpOnly cookie scoped to /api/feed (see
+// hub/ics.py's feed_request()), so no script on this page can read it back.
+// Accepts either a bare item array or {items: [...]}.
+//
+// Local mode's /api/feed lives on hub/api.py (a different origin, :8000,
+// same site), so the cookie needs credentials "include" there; hosted mode
+// is this page's own origin, so "same-origin" is enough.
+function feedRequest(method, body, fetchImpl) {
   const base = apiBase();
-  const res = await fetch(base ? `${base}/api/feed` : "/api/feed", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ url }),
-  });
+  const init = { method, credentials: base ? "include" : "same-origin" };
+  if (body !== undefined) {
+    init.headers = { "Content-Type": "application/json" };
+    init.body = JSON.stringify(body);
+  }
+  return fetchImpl(base ? `${base}/api/feed` : "/api/feed", init);
+}
+
+async function feedRows(res) {
   const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body.error || `POST /api/feed failed: ${res.status}`);
+  if (!res.ok) throw new Error(body.error || `/api/feed failed: ${res.status}`);
   const rows = Array.isArray(body) ? body : (body.items ?? []);
   return rows.map(normaliseApiItem);
+}
+
+// Connect: POST the pasted URL once. The server sets the cookie only if the
+// fetch worked; the caller should drop the URL right after.
+export async function connectCanvasFeed(url, fetchImpl = globalThis.fetch) {
+  return feedRows(await feedRequest("POST", { url }, fetchImpl));
+}
+
+// Refresh from the cookie. null = nothing connected (404), not an error.
+export async function refreshCanvasFeed(fetchImpl = globalThis.fetch) {
+  const res = await feedRequest("GET", undefined, fetchImpl);
+  if (res.status === 404) return null;
+  return feedRows(res);
+}
+
+// Disconnect: the server clears the cookie. Never throws.
+export async function disconnectCanvasFeed(fetchImpl = globalThis.fetch) {
+  try {
+    await feedRequest("DELETE", undefined, fetchImpl);
+  } catch {
+    // the UI has already forgotten the items; nothing else to undo
+  }
+}
+
+// One-time move off the old localStorage key: POST it so the server can set
+// the cookie, deleting the key first whatever happens, so the secret never
+// lingers in browser-readable storage. Resolves once the POST settles.
+export const LEGACY_FEED_KEY = "gather-canvas-feed-url";
+
+export async function migrateLegacyFeedUrl(storage, fetchImpl = globalThis.fetch) {
+  let url = null;
+  try {
+    url = storage.getItem(LEGACY_FEED_KEY);
+    // Removed before the POST, not after, so even a tab closed mid-request
+    // doesn't leave the secret behind.
+    storage.removeItem(LEGACY_FEED_KEY);
+  } catch {
+    // storage unavailable (private window, blocked site data)
+  }
+  if (!url) return;
+  try {
+    await connectCanvasFeed(url, fetchImpl);
+  } catch {
+    // a dead or expired link: dropped either way
+  }
 }
 
 // Hosted store (web/api/sync.py, items.py, session.py) - the extension syncs

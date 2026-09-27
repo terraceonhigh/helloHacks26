@@ -7,9 +7,9 @@ from hub import canvas, db, export_ics, key_dates, piazza, prairielearn, workday
 from hub.logic import sort_items
 from hub.models import Course, Item, category_for, classify_urgency, status_of
 
-st.set_page_config(page_title="UBC Hub", layout="wide")
-st.title("UBC Hub")
-st.caption("Gotham for students: every provider, one pane of glass.")
+st.set_page_config(page_title="Lauds", layout="wide")
+st.title("Lauds")
+st.caption("The first thing you check in the morning.")
 
 # One glance at "Urgency" as text still means reading every row - a marker
 # column makes the ranking visible without reading anything (hub.models

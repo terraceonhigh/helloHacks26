@@ -26,6 +26,9 @@ jobs:
     # Hobby daily deploy cap. Upgrade: put `push` back here if we move to Pro.
     if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    environment:                       # shows the live site under "Deployments" on the repo page
+      name: production
+      url: https://hello-hacks26-terraceonhigh.vercel.app/
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}

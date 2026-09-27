@@ -1,4 +1,4 @@
-# AGENTS.md: UBC Hub (helloHacks26)
+# AGENTS.md: Lauds (helloHacks26)
 
 Standing instructions for any coding agent (Claude Code, Codex, Copilot, Cursor…) working in this repo. Read this file fully before doing anything.
 
@@ -27,7 +27,7 @@ If a task seems to conflict with this section, this section wins. Stop and ask T
 
 ## What we're building
 
-UBC Hub is a read-only dashboard that answers "what do I need to do this week?" by fusing a student's data from every provider they connect. The first providers are Canvas, Workday and the UBC Bookstore.
+Lauds is a read-only dashboard that answers "what do I need to do this week?" by fusing a student's data from every provider they connect. The first providers are Canvas, Workday and the UBC Bookstore.
 
 - **[docs/design.md](docs/design.md)** covers the what and why: scope, architecture, data model, screens and phases. Stay inside **Phase 0** unless a human says otherwise.
 - **[docs/api-standards.md](docs/api-standards.md)** has every endpoint, auth rule and source. Check it before guessing at an API.
@@ -84,13 +84,13 @@ git switch <your-branch>
 
 # 5. Install Python + dependencies (first run takes a minute)
 uv sync
-uv run playwright install chromium   # the browser Hub opens so you can log in to Canvas yourself
+uv run playwright install chromium   # the browser Lauds opens so you can log in to Canvas yourself
 
 # 6. Run the app: it opens at http://localhost:8501
 uv run streamlit run app.py
 ```
 
-If step 6 shows "UBC Hub … your setup works", you're done. Windows users: install uv from https://docs.astral.sh/uv/ and use the same `uv` commands.
+If step 6 shows "Lauds … your setup works", you're done. Windows users: install uv from https://docs.astral.sh/uv/ and use the same `uv` commands.
 
 ## Daily workflow
 
@@ -119,7 +119,7 @@ When an issue is done, open a PR from your branch into `main` (`gh pr create`) a
    - The repo is **public**. If a secret gets committed, tell Terrace immediately and revoke it in Canvas. Deleting the commit is not enough.
 4. **Only use your own data.** Canvas API policy forbids collecting other people's tokens. Test with your own token or with `fixtures/`.
 5. **Be polite to the Bookstore.** Only public, logged-out pages. Cache per term, and never hammer it in a loop. Never touch cart, checkout or account pages.
-6. **Behind CWL:** the student logs in themselves in the browser window Hub opens. Hub reads only the site's JSON with that session (never its HTML), never sees the password, and keeps the session only on that laptop (`~/.ubc-hub/`, mode 600), never in the repo. HTML scraping is for public, logged-out pages only.
+6. **Behind CWL:** the student logs in themselves in the browser window Lauds opens. Lauds reads only the site's JSON with that session (never its HTML), never sees the password, and keeps the session only on that laptop (`~/.ubc-hub/`, mode 600), never in the repo. HTML scraping is for public, logged-out pages only.
 
 ## Agent coordination protocol
 

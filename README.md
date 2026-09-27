@@ -1,4 +1,7 @@
 # helloHacks26
+
+**▶ Try it live: [hello-hacks26-terraceonhigh.vercel.app](https://hello-hacks26-terraceonhigh.vercel.app/)**. No install needed; it opens on sample data.
+
 Single pane of glass for students: Canvas, Workday, the UBC Bookstore, and beyond in one place
 
 # Core value proposition: 

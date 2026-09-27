@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "UBC Hub Sync",
+  "name": "Lauds Sync",
   "version": "0.1.0",
   "description": "Capture tasks from connected education providers in your browser.",
   "permissions": ["alarms", "scripting", "storage"],

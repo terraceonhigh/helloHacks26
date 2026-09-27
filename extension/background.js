@@ -26,11 +26,11 @@ async function saveCapture(provider, capture) {
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify(capture)
   });
-  if (!normalized.ok) throw new Error(`Hub normalization failed (${normalized.status})`);
+  if (!normalized.ok) throw new Error(`Lauds normalization failed (${normalized.status})`);
   const model = await normalized.json();
   if (model.source !== provider.id || model.stored !== false
       || !Array.isArray(model.courses) || !Array.isArray(model.items)) {
-    throw new Error("Hub returned an invalid normalized capture");
+    throw new Error("Lauds returned an invalid normalized capture");
   }
   const {latestModels = {}} = await chrome.storage.local.get("latestModels");
   latestModels[provider.id] = model;
@@ -46,7 +46,7 @@ async function saveCapture(provider, capture) {
     headers: {"Content-Type": "application/json", Authorization: `Bearer ${syncKey}`},
     body: JSON.stringify(model)
   });
-  if (!response.ok) throw new Error(`Hub upload failed (${response.status})`);
+  if (!response.ok) throw new Error(`Lauds upload failed (${response.status})`);
   await setStatus(`${provider.label} uploaded at ${new Date().toLocaleString()}`);
 }
 

@@ -27,7 +27,7 @@ import os
 import re
 import time
 from datetime import date, datetime, timezone
-from urllib.parse import urlparse
+from urllib.parse import quote, unquote, urlparse
 from zoneinfo import ZoneInfo
 
 import requests
@@ -213,3 +213,64 @@ def to_dict(item, now):
         "status": status_of(item, now),
         "urgency": classify_urgency(item.title, item.due, now),
     }
+
+
+# --- /api/feed's cookie (both implementations: hub/api.py, web/api/feed.py) ---
+# The feed URL is a secret, so the browser never keeps it anywhere a script
+# can read (it used to sit in localStorage). After one successful POST it
+# lives only in an httpOnly cookie scoped to /api/feed, so the page's own JS
+# never sees it and no other route receives it. Kept here, next to
+# fetch_untrusted(), so the two HTTP front ends can't drift (rule 1).
+FEED_COOKIE = "lauds_feed"
+FEED_COOKIE_MAX_AGE = 2_592_000  # 30 days
+_FEED_COOKIE_ATTRS = "HttpOnly; Secure; SameSite=Strict; Path=/api/feed"
+
+
+def feed_cookie(url):
+    """Set-Cookie value that stores `url` (url-encoded)."""
+    return f"{FEED_COOKIE}={quote(url, safe='')}; {_FEED_COOKIE_ATTRS}; Max-Age={FEED_COOKIE_MAX_AGE}"
+
+
+def clear_feed_cookie():
+    """Set-Cookie value that deletes the feed cookie (Disconnect)."""
+    return f"{FEED_COOKIE}=; {_FEED_COOKIE_ATTRS}; Max-Age=0"
+
+
+def feed_url_from_cookie(cookie_header):
+    """The feed URL from a request's Cookie header, or None."""
+    for part in (cookie_header or "").split(";"):
+        name, sep, value = part.strip().partition("=")
+        if sep and name == FEED_COOKIE and value:
+            return unquote(value)
+    return None
+
+
+def feed_request(method, cookie_header, body=None, now=None):
+    """The whole /api/feed behaviour, minus HTTP plumbing. Returns
+    (status, payload or None, Set-Cookie value or None).
+
+    - POST {url}: fetch it; only on success, set the cookie.
+    - GET: fetch the URL from the cookie; 404 if there isn't one.
+    - DELETE: clear the cookie.
+    Error payloads never contain the URL (see fetch_untrusted())."""
+    if method == "DELETE":
+        return 204, None, clear_feed_cookie()
+    if method == "GET":
+        url = feed_url_from_cookie(cookie_header)
+        if not url:
+            return 404, {"error": "no feed connected"}, None
+    else:
+        url = (body or {}).get("url", "")
+        if not isinstance(url, str):
+            return 400, {"error": "that isn't an allowed Canvas calendar-feed host"}, None
+    try:
+        items = fetch_untrusted(url, "canvas")
+    except ValueError as e:
+        return 400, {"error": str(e)}, None
+    except Exception:  # ponytail: one broad catch at the boundary - a bad/expired/slow
+        # feed shouldn't 500 the server. Generic text: never echo anything that
+        # might carry the URL.
+        return 502, {"error": "couldn't load the feed"}, None
+    now = now or datetime.now(timezone.utc)
+    payload = [to_dict(i, now) for i in items]
+    return 200, payload, feed_cookie(url) if method == "POST" else None

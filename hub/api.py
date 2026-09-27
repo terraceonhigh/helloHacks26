@@ -105,13 +105,22 @@ class Handler(BaseHTTPRequestHandler):
         origin = self._cors_origin()
         if origin:
             self.send_header("Access-Control-Allow-Origin", origin)
+            # web/ sends the /api/feed cookie cross-origin (:3000 -> :8000,
+            # same site), which needs credentials allowed - only ever for
+            # this one exact origin.
+            self.send_header("Access-Control-Allow-Credentials", "true")
             self.send_header("Vary", "Origin")
 
-    def _json(self, payload, status=200):
-        body = json.dumps(payload).encode()
+    def _json(self, payload, status=200, set_cookie=None, no_store=False):
+        body = b"" if payload is None else json.dumps(payload).encode()
         self.send_response(status)
-        self.send_header("Content-Type", "application/json")
+        if payload is not None:
+            self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
+        if no_store:
+            self.send_header("Cache-Control", "no-store")
+        if set_cookie:
+            self.send_header("Set-Cookie", set_cookie)
         self._cors_headers()
         self.end_headers()
         self.wfile.write(body)
@@ -123,7 +132,8 @@ class Handler(BaseHTTPRequestHandler):
         origin = self._cors_origin()
         if origin:
             self.send_header("Access-Control-Allow-Origin", origin)
-            self.send_header("Access-Control-Allow-Methods", "GET, POST")
+            self.send_header("Access-Control-Allow-Methods", "GET, POST, DELETE")
+            self.send_header("Access-Control-Allow-Credentials", "true")
             self.send_header("Access-Control-Allow-Headers", "Content-Type")
             self.send_header("Vary", "Origin")
         self.send_header("Content-Length", "0")
@@ -138,6 +148,8 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/api/courses":
             conn = db.connect()
             self._json([{"code": c, "term": t, "title": ti, "grade": g} for c, t, ti, g in db.courses(conn)])
+        elif path == "/api/feed":
+            self._feed_reply("GET", self.headers.get("Cookie"))
         elif path == "/api/calendar/kinds":
             kinds = export_ics.known_kinds(_all_items(db.connect()))
             self._json([{"kind": k, "color": export_ics.color_for_kind(k)} for k in kinds])
@@ -183,6 +195,18 @@ class Handler(BaseHTTPRequestHandler):
         else:
             self._json({"error": "not found"}, status=404)
 
+    def do_DELETE(self):
+        if not self._check_origin():
+            return
+        if urlparse(self.path).path == "/api/feed":
+            self._feed_reply("DELETE", None)
+        else:
+            self._json({"error": "not found"}, status=404)
+
+    def _feed_reply(self, method, cookie_header, body=None):
+        status, payload, set_cookie = ics.feed_request(method, cookie_header, body)
+        self._json(payload, status=status, set_cookie=set_cookie, no_store=True)
+
     def _read_json_body(self):
         """Same guard on both /api/feed implementations (this one and the
         Vercel function, #47): a POST carrying a feed URL - someone's secret
@@ -216,22 +240,16 @@ class Handler(BaseHTTPRequestHandler):
 
     def _feed(self):
         """POST /api/feed: {url} -> that feed's items, parsed fresh, nothing
-        saved. url is never logged - see hub/ics.py's fetch_untrusted() for
-        the host allowlist and size/time limits shared with the Vercel
-        function (rule 1: one function, not two)."""
+        saved to hub.db. On success the URL goes into an httpOnly cookie
+        (GET /api/feed refreshes from it, DELETE clears it). url is never
+        logged - hub/ics.py's feed_request() holds the behaviour, host
+        allowlist and size/time limits shared with the Vercel function
+        (rule 1: one function, not two)."""
         try:
-            url = self._read_json_body().get("url", "")
+            body = self._read_json_body()
         except ValueError as e:
-            return self._json({"error": str(e)}, status=400)
-        try:
-            items = ics.fetch_untrusted(url, "canvas")
-        except ValueError as e:
-            return self._json({"error": str(e)}, status=400)
-        except Exception as e:  # ponytail: same broad catch as _connect() - a bad/expired/
-            # slow feed shouldn't take the server down.
-            return self._json({"error": str(e)}, status=502)
-        now = datetime.now(timezone.utc)
-        self._json([ics.to_dict(i, now) for i in items])
+            return self._json({"error": str(e)}, status=400, no_store=True)
+        self._feed_reply("POST", None, body)
 
     def _connect(self, fetch_fn):
         """Opens a browser window for the student to sign in themselves
@@ -272,6 +290,13 @@ class Handler(BaseHTTPRequestHandler):
 
     def log_message(self, fmt, *args):
         pass  # ponytail: quiet by default; flip this back on if you need to debug requests
+
+    # Never log a request: /api/feed's Cookie header carries a secret.
+    def log_request(self, code="-", size="-"):
+        pass
+
+    def log_error(self, fmt, *args):
+        pass
 
 
 def serve(port=8000):

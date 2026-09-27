@@ -93,7 +93,7 @@ def to_ics(items, kind=None):
     cal = Calendar()
     cal.add("prodid", "-//UBC Hub//ubchub//EN")
     cal.add("version", "2.0")
-    cal.add("x-wr-calname", f"UBC Hub: {_label_for(kind)}" if kind else "UBC Hub")
+    cal.add("x-wr-calname", f"Lauds: {_label_for(kind)}" if kind else "Lauds")
     for item in items:
         if item.due is None:
             continue

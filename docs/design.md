@@ -1,4 +1,4 @@
-# UBC Hub: design spec
+# Lauds: design spec
 
 > **Code wins.** Where this doc and `main` disagree, the code on `main` and AGENTS.md (*Jacky's standard*) are right, and this doc is stale. Fix it here when you notice.
 
@@ -10,16 +10,16 @@ Answers Jacky's design prompt ([handoff/jacky-design-prompt.md](handoff/jacky-de
 
 ## 1. Product vision and scope
 
-**UBC Hub is a read-only aggregator.** The student connects each source themselves; Hub pulls from it, normalises the data, and shows one answer to "what do I need to do this week?"
+**Lauds is a read-only aggregator.** The student connects each source themselves; Lauds pulls from it, normalises the data, and shows one answer to "what do I need to do this week?"
 
 - **Not a middleware or single sign-on layer.** We never hold CWL credentials. Proxying CWL sessions is the riskiest option legally and technically (see §7).
-- **Not a replacement.** Hub never writes back to Canvas or Workday. Every item links out to where the student acts on it.
+- **Not a replacement.** Lauds never writes back to Canvas or Workday. Every item links out to where the student acts on it.
 
 What realistic integration looks like with what UBC gives students today:
 
 | Source | How we get it | Why |
 |---|---|---|
-| Canvas | The student signs in themselves in a browser window Hub opens (Playwright); Hub reuses that session to read the same `/api/v1` JSON Canvas's own pages use. The **.ics calendar feed** as a fallback | UBC no longer lets students create Personal Access Tokens |
+| Canvas | The student signs in themselves in a browser window Lauds opens (Playwright); Lauds reuses that session to read the same `/api/v1` JSON Canvas's own pages use. The **.ics calendar feed** as a fallback | UBC no longer lets students create Personal Access Tokens |
 | Workday | The student uploads the **View My Courses** Excel export (schedule). **Billing and tuition due dates** are next, via a Workday export or statement upload **[unverified which export]** | API access needs UBC CIO approval, which isn't realistic for us |
 | Bookstore | Anonymous GETs on the textbook lookup plus Shopify `products.json` | Public, no login |
 | **Syllabus** | The student uploads the syllabus (PDF, DOCX or pasted text). An LLM extracts every dated item (exams, due dates, readings, *where* and *how* to submit) into Items, each with an excerpt from the syllabus as a citation | **Real pain point:** one prof never put due dates on Canvas, and the PrairieLearn deadlines were only at the bottom of the syllabus. Canvas isn't the source of truth, and the syllabus often is |
@@ -30,7 +30,7 @@ What realistic integration looks like with what UBC gives students today:
 | UBCGrades, UBCExplorer, RateMyProfessors | Later: course-selection season only | Not part of "this week" |
 | Lecture recordings and transcripts (Panopto, Kaltura) | Later, and only via official download buttons the student can already use | Behind CWL; see the scraping policy below |
 
-**Output, not just input: an iCal export.** Hub publishes one merged `.ics` file of every Item, which the student subscribes to from Apple, Google or Outlook Calendar. Most students already live in a calendar app. Hub feeding it is the cheapest way to become the daily habit.
+**Output, not just input: an iCal export.** Lauds publishes one merged `.ics` file of every Item, which the student subscribes to from Apple, Google or Outlook Calendar. Most students already live in a calendar app. Lauds feeding it is the cheapest way to become the daily habit.
 
 **Scraping policy:** we parse HTML only on public, logged-out pages (the Bookstore). Behind CWL we only read Canvas's JSON with the student's own session, never HTML, and we never see the CWL password.
 
@@ -52,10 +52,10 @@ These come from Terrace's own coursework tooling. We borrow the patterns; none o
 
 ### 1. First run (under 2 minutes)
 
-1. Open Hub and go to Setup.
-2. Upload the Workday .xlsx. Hub shows "Found 5 courses: CPSC 121 101, …".
+1. Open Lauds and go to Setup.
+2. Upload the Workday .xlsx. Lauds shows "Found 5 courses: CPSC 121 101, …".
 3. Click "Connect Canvas" and sign in with CWL + Duo in the window that opens, or paste the Calendar Feed URL instead.
-4. Hub looks up textbooks for each section automatically.
+4. Lauds looks up textbooks for each section automatically.
 5. Land on the dashboard.
 
 ### 2. Morning check-in: "What's due today?"
@@ -79,7 +79,7 @@ These come from Terrace's own coursework tooling. We borrow the patterns; none o
 
 ### 4b. Syllabus drop: "What did Canvas miss?"
 
-- Upload a syllabus. Hub lists every dated item it found, each with the sentence it came from.
+- Upload a syllabus. Lauds lists every dated item it found, each with the sentence it came from.
 - New ones (not already in Canvas) are highlighted: "3 PrairieLearn deadlines found only in the syllabus".
 - One click adds them to the dashboard and the iCal export.
 
@@ -287,7 +287,7 @@ Past attempts fall short in three ways:
 - **Notion templates** are manual copying.
 - **Scraper scripts** need a terminal and die with their author.
 
-Hub wins if it does three things well:
+Lauds wins if it does three things well:
 
 1. **Joins data rather than just listing it.** No existing tool connects *your Workday sections* to *your Canvas deadlines* to *your textbooks* by section. The shared `course_key` is the product.
 2. **Is faster than opening Canvas.** The dashboard has to load in under 2 s from cache and answer "what's due" in one glance, or the habit never forms.

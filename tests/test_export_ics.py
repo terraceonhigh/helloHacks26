@@ -100,8 +100,8 @@ def test_to_ics_with_a_kind_and_no_matches_is_a_valid_empty_calendar():
 def test_to_ics_calendar_name_reflects_the_kind_filter():
     combined = ICalendar.from_ical(to_ics([ITEM_A]))
     exam_only = ICalendar.from_ical(to_ics([ITEM_A], kind="exam"))
-    assert str(combined.get("x-wr-calname")) == "UBC Hub"
-    assert str(exam_only.get("x-wr-calname")) == "UBC Hub: Exam"
+    assert str(combined.get("x-wr-calname")) == "Lauds"
+    assert str(exam_only.get("x-wr-calname")) == "Lauds: Exam"
 
 
 def test_known_kinds_lists_distinct_kinds_with_a_due_date_only():
