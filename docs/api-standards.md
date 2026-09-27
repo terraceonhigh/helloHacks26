@@ -124,3 +124,61 @@ Researched 2026-09-26. **This is a research snapshot, not how we build.** The te
 | Gradescope / iClicker | LTI only; grades flow into the Canvas gradebook ([iClicker @ UBC](https://lthub.ubc.ca/2023/04/21/improvement-to-how-iclicker-cloud-works-with-canvas/)) | Read them via Canvas |
 | PrairieLearn | No student-facing API. Own CWL-backed login (same flow the browser-login adapters already use for Canvas), then the per-course-instance "assessments" page lists each assessment with a due date. **[page markup unverified — nobody on the team has pulled up a real UBC PrairieLearn course instance to confirm the HTML/route shape yet]** | Via our own browser-session adapter (`hub/site.py`), same pattern as Canvas — once someone verifies the page |
 | Kaltura | Kaltura Session from a partner secret or appToken [docs](https://developer.kaltura.com/api-docs/VPaaS-API-Getting-Started/Kaltura_API_Authentication_and_Security.html) | No |
+
+## Google Classroom, detail
+
+The one candidate in this table that's a genuinely complete, documented REST
+API a student can self-serve end to end - no admin, no scrape, real OAuth2.
+Real, current facts below were fetched from developers.google.com on
+2026-09-26; anything not independently re-confirmed this pass is marked
+**[unverified]**.
+
+- **Style:** REST/JSON at `https://classroom.googleapis.com/v1/`.
+  [courses](https://developers.google.com/workspace/classroom/reference/rest/v1/courses),
+  [courses.courseWork](https://developers.google.com/workspace/classroom/reference/rest/v1/courses.courseWork),
+  [courses.courseWork.studentSubmissions](https://developers.google.com/workspace/classroom/reference/rest/v1/courses.courseWork.studentSubmissions)
+- **Auth:** OAuth2, "installed app" / loopback-IP-redirect flow (Google's own
+  flow for a desktop/CLI app - open a browser to a consent URL, catch the
+  redirect on `http://127.0.0.1:<port>`, exchange the code for tokens).
+  Authorization endpoint `https://accounts.google.com/o/oauth2/v2/auth`,
+  token endpoint `https://oauth2.googleapis.com/token`.
+  [native-app flow](https://developers.google.com/identity/protocols/oauth2/native-app)
+  - The student creates their own "Desktop app" OAuth client in Google Cloud
+    Console (own `client_id`/`client_secret`) - same "bring your own
+    credentials" rule this project already applies to Canvas PATs.
+  - `access_type=offline` at consent time returns a `refresh_token`, so the
+    student doesn't re-consent every run.
+  - Scopes: `classroom.courses.readonly`, `classroom.coursework.me.readonly`.
+    [auth guide](https://developers.google.com/workspace/classroom/guides/auth)
+- **Endpoints used:**
+
+  | Need | Path |
+  |---|---|
+  | Courses | `GET /v1/courses` |
+  | Coursework (assignments, due dates) | `GET /v1/courses/{courseId}/courseWork` |
+  | The student's own submission status, in one call for the whole course | `GET /v1/courses/{courseId}/courseWork/-/studentSubmissions?userId=me` (the `-` wildcard for `courseWorkId` spans every coursework item in that course) |
+
+- **Due dates:** `dueDate` is a `google.type.Date` (`year`/`month`/`day`);
+  `dueTime` is a `google.type.TimeOfDay` (`hours`/`minutes`/`seconds`/`nanos`).
+  Classroom's own docs describe `dueTime` as being in UTC - not the course's
+  own timezone, and not a single ISO datetime string.
+- **Submission state -> done:** `state` is a documented enum -
+  `TURNED_IN`/`RETURNED` map to done, `CREATED`/`RECLAIMED_BY_STUDENT` to not
+  done, and `STUDENT_EDITED_AFTER_TURN_IN`/`STATE_UNSPECIFIED` map to unknown
+  (genuinely ambiguous, not guessed).
+- **Pagination:** `studentSubmissions.list` documents `pageToken` /
+  `nextPageToken`; `courses.list` and `courses.courseWork.list` are assumed
+  to share that shape since it's Google's standard list-method convention
+  across its APIs, but that specific assumption is **[unverified]** (not
+  independently fetched page-by-page this pass).
+- **[unverified]:** the exact `CourseWorkType` enum member spellings
+  (`ASSIGNMENT`, `SHORT_ANSWER_QUESTION`, `MULTIPLE_CHOICE_QUESTION`,
+  `COURSE_WORK_TYPE_UNSPECIFIED`) - the reference page confirms the field but
+  didn't return its enum list on fetch.
+- **Implementation:** `hub/google_classroom.py`. Unlike Canvas/PrairieLearn,
+  it does not go through `hub/site.py` (that's a browser-cookie pattern;
+  Classroom needs a real Bearer token) - it's its own small OAuth2 client
+  using `requests` plus a short-lived stdlib `http.server` to catch the
+  redirect, saving the token to `~/.ubc-hub/google_classroom-token.json`
+  (same directory and 0600 permission convention as `hub/site.py`'s saved
+  sessions).
