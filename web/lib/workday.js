@@ -31,7 +31,7 @@ function findHeaderRow(rows) {
   return [null, null];
 }
 
-function courseFromListing(listing, term) {
+export function courseFromListing(listing, term) {
   // Mirrors Python's str.partition(" - "): first occurrence only, empty
   // title (falls back to the raw listing) when there's no " - " at all.
   const idx = listing.indexOf(" - ");

@@ -5,40 +5,46 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { parseWorkdayCourses } from "./workday.js";
+import { courseFromListing, parseWorkdayCourses } from "./workday.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const FIXTURE = path.join(here, "..", "..", "fixtures", "workday_view_my_courses.xlsx");
+
+const EXPECTED_CODES = [
+  "BMEG 210", "BMEG 245", "APSC 160", "MECH 260", "BMEG 257",
+  "BMEG 201", "ANTH 100", "AMNE 151", "BMEG 230",
+];
 
 function load() {
   return parseWorkdayCourses(readFileSync(FIXTURE), "2026W1");
 }
 
-test("parses all course rows", () => {
-  const courses = load();
-  assert.deepEqual(
-    courses.map((c) => c.code),
-    ["FAKE 100", "FAKE 200", "FAKE 300"]
-  );
+test("parses all unique course rows", () => {
+  assert.deepEqual(load().map((c) => c.code), EXPECTED_CODES);
 });
 
 test("fields from first row", () => {
-  const [fake100] = load();
-  assert.equal(fake100.term, "2026W1");
-  assert.equal(fake100.title, "Introduction to Fake Studies");
+  const [bmeg210] = load();
+  assert.equal(bmeg210.term, "2026W1");
+  assert.equal(bmeg210.title, "Thermodynamics in Biomedical Engineering");
   // Real Workday "Course Listing" text never embeds a section number (it
   // lives in a separate column this parser doesn't read) - always null.
-  assert.equal(fake100.section, null);
+  assert.equal(bmeg210.section, null);
 });
 
 test("duplicate component rows dedupe to one course", () => {
   // Real exports have one row per meeting component (Lecture, Lab,
-  // Discussion...), each repeating the same Course Listing text.
+  // Discussion...), each repeating the same Course Listing text. BMEG 210
+  // has 2 rows (Lecture + Discussion) and BMEG 230 has 3 in this export.
   const codes = load().map((c) => c.code);
-  assert.equal(codes.filter((c) => c === "FAKE 100").length, 1);
+  assert.equal(codes.filter((c) => c === "BMEG 210").length, 1);
+  assert.equal(codes.filter((c) => c === "BMEG 230").length, 1);
 });
 
 test("no separator falls back to raw listing as title", () => {
-  const fake300 = load()[2];
-  assert.equal(fake300.title, "fake300");
+  // Doesn't occur in the real export (every real listing has " - "), so
+  // this exercises the fallback directly rather than via a fixture.
+  const course = courseFromListing("FOO101", "2026W1");
+  assert.equal(course.code, "FOO 101");
+  assert.equal(course.title, "FOO101");
 });
