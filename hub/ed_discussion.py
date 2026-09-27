@@ -185,9 +185,16 @@ def _run(session):
     for entry in user_info.get("courses", []):
         if entry.get("course", {}).get("status") == "archived":
             continue
-        course = to_course(entry)
+        try:
+            course = to_course(entry)
+            course_id = entry["course"]["id"]
+        except (KeyError, TypeError):
+            # A malformed entry (e.g. missing the "course" sub-object
+            # entirely) must not take down every other course's data with
+            # it -- same "one bad row shouldn't nuke everything" fix
+            # applied to hub/google_classroom.py's fetch() on review.
+            continue
         courses.append(course)
-        course_id = entry["course"]["id"]
         try:
             threads_resp = _get_json(session, f"courses/{course_id}/threads", limit=30, sort="new")
         except Exception:
@@ -196,8 +203,11 @@ def _run(session):
             # failure without crashing the dashboard".
             continue
         for thread in threads_resp.get("threads", []):
-            if is_deadline_relevant(thread):
-                items.append(to_item(thread, course.code))
+            try:
+                if is_deadline_relevant(thread):
+                    items.append(to_item(thread, course.code))
+            except (KeyError, TypeError):
+                continue  # one malformed thread shouldn't drop the rest
     return courses, items
 
 

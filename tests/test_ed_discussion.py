@@ -188,6 +188,24 @@ def test_fetch_skips_archived_courses_and_keeps_only_deadline_relevant_items(mon
     assert all(i.due is None for i in items)
 
 
+def test_fetch_skips_one_malformed_course_entry_but_keeps_the_rest(monkeypatch):
+    # The concrete bug fixed on review: to_course()/entry["course"]["id"]
+    # raised for an entry missing the "course" sub-object entirely, and
+    # that exception propagated out of _run() -> fetch()'s outer except,
+    # discarding every other course and item along with it.
+    malformed_entry = {"role": {"role": "student"}, "lab": None}  # no "course" key at all
+    fake = FakeSession({
+        "user": FakeResponse(200, {"courses": [ACTIVE_COURSE_ENTRY, malformed_entry]}),
+        "courses/4242/threads": FakeResponse(200, {"threads": [PINNED_THREAD]}),
+    })
+    monkeypatch.setattr("hub.ed_discussion.requests.Session", lambda: fake)
+
+    courses, items = fetch("fake-token")
+
+    assert [c.code for c in courses] == ["CPSC 121"]  # good course survives
+    assert [i.title for i in items] == ["Midterm 1 room assignments"]
+
+
 def test_fetch_returns_empty_on_bad_token(monkeypatch):
     fake = FakeSession({"user": FakeResponse(401, {"code": "bad_token"})})
     monkeypatch.setattr("hub.ed_discussion.requests.Session", lambda: fake)
