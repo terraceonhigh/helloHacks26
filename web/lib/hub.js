@@ -152,3 +152,39 @@ export function displayLabel(value) {
   if (!value) return "—";
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
+
+// --- Processing layer -------------------------------------------------
+// Everything below is pure: given state, compute what to render. page.js
+// owns *when* state changes (fetch, toggle, import); this owns *what the
+// data means* once you have it. Neither of these functions touches React,
+// fetch, or the DOM - they're plain data in, data out, so they're testable
+// on their own and can't reach back into component state by accident.
+
+// Merge courses by code - used both to combine fetched + imported courses
+// for rendering, and to fold a fresh import into what's already imported.
+// Workday never carries a grade, so an existing one (e.g. from Canvas)
+// isn't blanked out by a re-import.
+export function mergeCourses(base, incoming) {
+  const byCode = new Map(base.map((c) => [c.code, c]));
+  for (const c of incoming) {
+    const existing = byCode.get(c.code);
+    byCode.set(c.code, existing ? { ...existing, ...c, grade: c.grade ?? existing.grade } : c);
+  }
+  return Array.from(byCode.values());
+}
+
+// Completed items never show anywhere, regardless of Hide overdue (matches
+// app.py's df2e178 rule) - applied once so every tab and the Courses tab's
+// per-course lists see the same set.
+export function selectActiveItems(items) {
+  return items.filter((item) => !isDone(item));
+}
+
+// The flat item list for a given tab/toggle/limit combination. Expects
+// already-active (non-done) items - see selectActiveItems.
+export function selectVisibleItems(items, { tab, hideOverdue, showN, now }) {
+  return sortItems(items)
+    .filter((item) => tab === "all" || tab === "courses" || item.category === tab)
+    .filter((item) => !hideOverdue || !isOverdue(item, now))
+    .slice(0, showN);
+}

@@ -7,9 +7,11 @@ import {
   displayLabel,
   fetchCourses,
   fetchUpcoming,
-  isDone,
   isLocalMode,
   isOverdue,
+  mergeCourses,
+  selectActiveItems,
+  selectVisibleItems,
   sortItems,
 } from "../lib/hub";
 import { parseWorkdayCourses } from "../lib/workday";
@@ -183,7 +185,13 @@ export default function Page() {
   // what's actually fetched right now, live, without restarting anything.
   const [sampleMode, setSampleMode] = useState(true);
   const [items, setItems] = useState([]);
-  const [courses, setCourses] = useState([]);
+  // Split in two so load() (Sample toggle, Connect) can never clobber a
+  // Workday import, or vice versa - each owns only the state it writes.
+  // What's actually rendered is mergeCourses(fetchedCourses, importedCourses),
+  // computed fresh below, never stored - see lib/hub.js's processing-layer
+  // comment for why that split lives there and not here.
+  const [fetchedCourses, setFetchedCourses] = useState([]);
+  const [importedCourses, setImportedCourses] = useState([]);
   const [loadError, setLoadError] = useState(null);
 
   async function load(useSample) {
@@ -193,31 +201,20 @@ export default function Page() {
         fetchCourses(useSample),
       ]);
       setItems(nextItems);
-      setCourses(nextCourses);
+      setFetchedCourses(nextCourses);
       setLoadError(null);
     } catch (e) {
       // Clear stale data on failure - otherwise a failed fetch after
       // switching modes leaves the previous mode's rows on screen under the
       // new mode's caption, which is misleading.
       setItems([]);
-      setCourses([]);
+      setFetchedCourses([]);
       setLoadError(e.message);
     }
   }
 
   function importWorkdayCourses(imported) {
-    // Merge by code: a re-import (or a course already present from
-    // Canvas/PrairieLearn/sample data) is updated, not duplicated - but
-    // Workday never carries a grade, so don't let it blank out one we
-    // already knew (e.g. from Canvas).
-    setCourses((prev) => {
-      const byCode = new Map(prev.map((c) => [c.code, c]));
-      for (const c of imported) {
-        const existing = byCode.get(c.code);
-        byCode.set(c.code, existing ? { ...existing, ...c, grade: c.grade ?? existing.grade } : c);
-      }
-      return Array.from(byCode.values());
-    });
+    setImportedCourses((prev) => mergeCourses(prev, imported));
   }
 
   useEffect(() => {
@@ -226,14 +223,9 @@ export default function Page() {
   }, [sampleMode]);
 
   const now = new Date();
-  // Completed items never show, regardless of Hide overdue (matches app.py's
-  // df2e178 rule) - filtered once here so it applies to every tab and the
-  // Courses tab's per-course lists alike.
-  const activeItems = items.filter((item) => !isDone(item));
-  const visible = sortItems(activeItems)
-    .filter((item) => tab === "all" || tab === "courses" || item.category === tab)
-    .filter((item) => !hideOverdue || !isOverdue(item, now))
-    .slice(0, showN);
+  const courses = mergeCourses(fetchedCourses, importedCourses);
+  const activeItems = selectActiveItems(items);
+  const visible = selectVisibleItems(activeItems, { tab, hideOverdue, showN, now });
 
   return (
     <main>
