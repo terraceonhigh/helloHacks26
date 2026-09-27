@@ -156,14 +156,17 @@ future improvement, not attempted here.
 Try it:  uv run python -m hub.piazza
 """
 import json
+from dataclasses import dataclass
 from random import random as _random
 from string import ascii_letters as _ascii_letters
 from string import digits as _digits
 from time import time as _time
 
 import requests
+from bs4 import BeautifulSoup
 
 from hub import site
+from hub.logic import normalise_course_code
 from hub.models import Course, Item, category_for
 
 BASE = "https://piazza.com"
@@ -412,6 +415,117 @@ def parse_capture(capture):
             if item is not None:
                 items.append(item)
     return courses, items
+
+
+# ---------------------------------------------------------------------------
+# Recent activity feed: for the dashboard's own sidebar, not the ranked
+# task/deadline list. `to_item` above only ever surfaces a pinned or
+# instructor post - deliberately, since nothing else here carries a due date
+# worth ranking (see module docstring). "What's new on Piazza" is a different
+# question with a different honest answer: ordinary activity, most-recent
+# first, regardless of pin status. Kept as its own small type rather than
+# forced into hub.models.Item - a discussion post isn't a task or a
+# deadline, and the dashboard's ranked list is exactly the wrong place for
+# routine class chatter to show up next to a real assignment.
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class Post:
+    """One recent Piazza post, normalised for the sidebar feed. `course` is
+    canonicalised the same way hub.db._canonical_code collapses every other
+    source's course code ("CPSC121" -> "CPSC 121"), so a post lines up with
+    the same course card Canvas/Workday/Bookstore already built - "associate
+    that with our data", not just a raw Piazza class name."""
+    course: str
+    title: str
+    text: str
+    url: str
+    created: str  # ISO-8601, real per the data dictionary (post["created"])
+
+
+def _canonical_course_code(course):
+    faculty, number, _section = normalise_course_code(course.code)
+    return f"{faculty} {number}" if faculty and number else course.code
+
+
+def _post_text(post):
+    """Plain-text body, real per the data dictionary: a post's original
+    content lives in history[0]["content"] (or the doc's own capitalised
+    "History" - see _history_subject above for the same [unverified] casing
+    gap), stored as HTML. Stripped with BeautifulSoup (already a project
+    dependency, per hub/bookstore.py) rather than adding a new one just for
+    this. Returns "" if genuinely absent, never guessed."""
+    history = post.get("history") or post.get("History") or []
+    if not history:
+        return ""
+    html = history[0].get("content", "") or ""
+    return BeautifulSoup(html, "html.parser").get_text(" ", strip=True)
+
+
+def to_post(post, course_code, nid=""):
+    """One full post dict -> a Post, regardless of pinned/instructor status
+    (unlike to_item: "most recent messages" wants ordinary activity too, not
+    just what's worth a due-date-style callout)."""
+    cid = post.get("id", "")
+    return Post(
+        course=course_code,
+        title=_history_subject(post) or "(untitled post)",
+        text=_post_text(post),
+        url=f"{BASE}/class/{nid}?cid={cid}",
+        created=post.get("created", "") or "",
+    )
+
+
+def _recent_posts_for_network(req, nid, course_code, limit):
+    """Same real feed -> full-post-per-id shape as _posts_for_network (see
+    module docstring's "only gives you an id" section) - every post this
+    time, not just pinned/instructor ones."""
+    feed = _call(req, "network.get_my_feed", nid=nid, data={"limit": limit, "offset": 0, "sort": "updated"})
+    cids = [p.get("id") for p in (feed or {}).get("feed", []) if p.get("id")][:limit]
+    posts = []
+    for cid in cids:
+        post = _call(req, "content.get", nid=nid, data={"cid": cid, "student_view": None})
+        if post:
+            posts.append(to_post(post, course_code, nid))
+    return posts
+
+
+def recent_posts(limit=10):
+    """The student's most recent Piazza activity across every class they're
+    in, most-recent-first, capped to `limit` overall - title, text, and the
+    normalised course it's associated with, for the dashboard's sidebar.
+    Fetches up to `limit` per class (same "no bulk endpoint" constraint as
+    _posts_for_network - see module docstring) then merges and re-sorts by
+    real timestamp, since a global "most recent" isn't the same as each
+    class's own most recent. `created` is a real ISO-8601 string (data
+    dictionary), so a plain string sort already sorts chronologically - no
+    datetime parsing needed. Never raises: any login/parse/network failure
+    returns [] (AGENTS.md: "handle failure without crashing")."""
+    def _run_recent(req):
+        status = _call(req, "user.status", nid=None) or {}
+        networks = status.get("networks", [])
+        posts = []
+        for n in networks:
+            nid = n.get("id")
+            if not nid:
+                continue
+            code = _canonical_course_code(to_course(n))
+            try:
+                posts += _recent_posts_for_network(req, nid, code, limit)
+            except site.NotLoggedIn:
+                raise  # a genuine session expiry: let fetch_with_session retry the whole run
+            except Exception:
+                # Same per-network isolation as _run above: one broken class
+                # must not wipe out every other class's already-fetched posts.
+                continue
+        posts.sort(key=lambda p: p.created, reverse=True)
+        return posts[:limit]
+
+    try:
+        return site.fetch_with_session(SITE, BASE, _run_recent)
+    except Exception:
+        return []
 
 
 # --- Fallback path: piazza-api's real direct email+password flow ----------
