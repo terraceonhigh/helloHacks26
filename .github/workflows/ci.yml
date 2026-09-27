@@ -32,7 +32,7 @@ jobs:
         run: npm ci
         working-directory: web
       - name: Run JS tests
-        run: node --test web/lib/
+        run: node --test 'web/lib/*.test.mjs'   # Node 22 reads a bare dir as a module path; use a glob
 
   deploy:
     needs: pytest                      # only after tests pass
