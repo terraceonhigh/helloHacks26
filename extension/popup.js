@@ -63,7 +63,7 @@ document.querySelector("#save").addEventListener("click", async () => {
   if (hubBaseInput.value.trim()) {
     hubBase = parseCustomOrigin(hubBaseInput.value.trim());
     if (!hubBase) {
-      status.textContent = "Enter a valid HTTPS sync target, e.g. https://hello-hacks26-one.vercel.app";
+      status.textContent = "Enter a valid HTTPS sync target, e.g. https://hello-hacks26.vercel.app";
       return;
     }
     if (hubBase !== DEFAULT_HUB_BASE) {
