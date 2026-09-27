@@ -1,43 +1,36 @@
-from hub.workday import _course_from_listing, parse_workday_courses
+from hub.workday import parse_workday_courses
 
-# A real "View My Courses" export (name/student number replaced with a
-# placeholder in column A; every other column, including every real course,
-# is unmodified - see docs/workday-testing.md).
+# Fully synthetic (fake student, courses, instructors, timetable) - matches
+# the real export's structure (pre-header rows, real column layout, one row
+# per meeting component) without containing anyone's real data. See
+# docs/workday-testing.md.
 FIXTURE = "fixtures/workday_view_my_courses.xlsx"
-
-EXPECTED_CODES = [
-    "BMEG 210", "BMEG 245", "APSC 160", "MECH 260", "BMEG 257",
-    "BMEG 201", "ANTH 100", "AMNE 151", "BMEG 230",
-]
 
 
 def test_parses_all_unique_course_rows():
     courses = parse_workday_courses(FIXTURE, term="2026W1")
-    assert [c.code for c in courses] == EXPECTED_CODES
+    assert [c.code for c in courses] == ["BMEG 000", "BMEG 001", "BMEG 002"]
 
 
 def test_fields_from_first_row():
     courses = parse_workday_courses(FIXTURE, term="2026W1")
-    bmeg210 = courses[0]
-    assert bmeg210.term == "2026W1"
-    assert bmeg210.title == "Thermodynamics in Biomedical Engineering"
+    bmeg000 = courses[0]
+    assert bmeg000.term == "2026W1"
+    assert bmeg000.title == "Fake Thermodynamics"
     # Real Workday "Course Listing" text never embeds a section number (it
     # lives in a separate column this parser doesn't read) - always None.
-    assert bmeg210.section is None
+    assert bmeg000.section is None
 
 
 def test_duplicate_component_rows_dedupe_to_one_course():
     # Real exports have one row per meeting component (Lecture, Lab,
-    # Discussion...), each repeating the same Course Listing text. BMEG 210
-    # has 2 rows (Lecture + Discussion) and BMEG 230 has 3 in this export.
+    # Discussion...), each repeating the same Course Listing text. BMEG 000
+    # has 2 rows (Lecture + Laboratory) in this fixture.
     codes = [c.code for c in parse_workday_courses(FIXTURE, term="2026W1")]
-    assert codes.count("BMEG 210") == 1
-    assert codes.count("BMEG 230") == 1
+    assert codes.count("BMEG 000") == 1
 
 
 def test_no_separator_falls_back_to_raw_listing_as_title():
-    # Doesn't occur in the real export (every real listing has " - "), so
-    # this exercises the fallback directly rather than via a fixture.
-    course = _course_from_listing("FOO101", "2026W1")
-    assert course.code == "FOO 101"
-    assert course.title == "FOO101"
+    courses = parse_workday_courses(FIXTURE, term="2026W1")
+    bmeg002 = courses[2]
+    assert bmeg002.title == "bmeg002"

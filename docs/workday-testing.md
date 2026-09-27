@@ -1,12 +1,11 @@
-# Workday testing: real data, not guesses
+# Workday testing: real data caught real bugs, but the fixture is fake
 
-`hub/workday.py` and `web/lib/workday.js` are tested against a **real** Workday
-"View My Courses" export (`fixtures/workday_view_my_courses.xlsx`), not a
-hand-made guess at the format. This matters: an earlier hand-made fixture
-(built from third-party reference code, before we had a real export to check
-against) turned out to assume a format real Workday never actually produces —
-it silently hid two real bugs that only showed up once we tested against an
-actual export:
+`hub/workday.py` and `web/lib/workday.js` were **validated against a real**
+Workday "View My Courses" export (not committed, kept local), after an
+earlier hand-made fixture (built from third-party reference code, before we
+had a real export to check against) turned out to assume a format real
+Workday never actually produces — it silently hid two real bugs that only
+showed up once we tested against an actual export:
 
 - Both `openpyxl` (`read_only=True`) and the JS `xlsx` library trust the
   sheet's declared dimension (`<dimension ref=...>`), which real Workday
@@ -19,29 +18,33 @@ actual export:
 
 Both are fixed in `hub/workday.py` / `web/lib/workday.js`, with regression
 tests covering each (`tests/test_workday_truncated_dimension.py` /
-`web/lib/workday_truncated.test.mjs` isolate the dimension bug specifically,
-using a synthetic fixture; `tests/test_workday.py` / `web/lib/workday.test.mjs`
-cover the rest against the real export).
+`web/lib/workday_truncated.test.mjs` isolate the dimension bug specifically;
+`tests/test_workday.py` / `web/lib/workday.test.mjs` cover the rest).
 
-## About the fixture
+## About the fixture — corrected
 
-`fixtures/workday_view_my_courses.xlsx` is a **real** export (Sam's own,
-2026W1, Biomedical Engineering), with only column A's "Name (student#) - ..."
-prefix replaced by a placeholder (`"Student (00000000)"`) — every other
-column, every real course code and title, is unmodified. That's a deliberate
-exception to the repo's usual "fixtures must be fake or anonymised" rule,
-made with the data owner's explicit, informed consent (they were told the
-tradeoff and chose to keep the real course data rather than anonymise it
-further).
+An earlier version of this fixture and doc used a **real** export with only
+the student's own name/number redacted. **That was wrong, and Terrace caught
+it:** the export also carries **other people's data that the student can't
+consent to publishing on their behalf** — real instructors' names, and a real
+timetable (meeting times, buildings, rooms). A data owner can consent to
+exposing their own information; they can't waive it for the instructors named
+alongside it. `fixtures/workday_view_my_courses.xlsx` is now **fully
+synthetic** again — made-up courses, sections, times, rooms and instructors,
+matching the real structure (pre-header rows, real column layout, one row per
+component) without containing anyone's real data at all.
+
+The lesson: when a fixture is derived from a real document with more than one
+person's information in it (an export, an email thread, a roster...),
+redacting just the data owner's own identifiers isn't enough — check every
+column/field for third parties before it goes anywhere near a public commit.
 
 ## If you want to test with your own export
 
-1. Download yours: Workday → Academics → Registration & Courses → **View My
-   Courses** → Excel export.
-2. Anonymise column A the same way (a one-off script, not something to
-   automate into the parser — see git history around this file for the
-   approach), or just don't commit it if you'd rather keep it local.
-3. Run `uv run pytest tests/test_workday.py` / `cd web && npm test` against
-   it and compare — if your export's structure differs from what's described
-   above, that's a real finding worth posting to the Agent board (#15) per
-   rule 6, since both parsers would need updating together.
+Test locally against your own real file (`uv run pytest`, `npm test` pointed
+at it via a temporary path override) - that's how the two bugs above were
+actually found. But **don't commit a real export**, anonymised or not, since
+it's very likely to carry other people's names or scheduling data alongside
+yours. If your real export's structure differs from what's described above,
+that's a real finding worth posting to the Agent board (#15) per rule 6, with
+the specific difference described in words - not the file itself.
