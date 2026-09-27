@@ -11,7 +11,19 @@ uv run python tests/regression/check_ui_regression.py --candidate ../figma-expor
 uv run python tests/regression/check_ui_regression.py --candidate https://x.figma.site # a URL
 #   --baseline REF|DIR|URL   (default demo-2026-09-27)
 #   --mode auto|local|sample --out SCREENSHOT_DIR --keep-logs
+#   --tab-alias All=Overview,Tasks=Assignments,Deadlines=Calendar   (the default; '' for none)
 ```
+
+**Redesigns.** Each baseline tab is looked up by its own label, then by its
+`--tab-alias` (the default covers the "Gather" nav from PR #45). A baseline tab
+with no counterpart is a FAIL (`Tab missing: Materials`) and the run carries on.
+Rows come from table rows, else list items holding a link, else the container
+of each item's "Open" link, read from its text (course code, a parseable date,
+an urgency word, a bare lowercase kind, the title). A field the baseline shows
+and the candidate's rows don't (e.g. Kind) is a `Row fields shown` FAIL, and the
+rest is compared without it. A Sample toggle that defaults ON in local mode is
+a FAIL, then it's switched OFF so the fixture comparison still runs. Missing
+controls or elements are findings, never timeouts: element waits cap at 30s.
 
 **Modes.** In local mode (the default when both sides are Next.js apps it can serve)
 it builds a fixture `hub.db` from fake rows, runs this checkout's `hub.api` on it

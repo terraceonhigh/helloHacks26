@@ -52,6 +52,13 @@ ALL_TABS = ITEM_TABS + ["Courses"]
 CONFIGS = [(5, False), (10, False), (50, False), (50, True)]  # (Show next N, Hide overdue)
 CONNECT = ["Connect Canvas", "Connect PrairieLearn"]
 VIEWPORTS = {"desktop": (1280, 800), "tablet": (768, 1024), "mobile": (375, 812)}
+# Baseline tab label -> candidate label, tried after the baseline's own label.
+# Default: the "Gather" redesign (PR #45) renamed the nav.
+TAB_ALIAS_DEFAULT = "All=Overview,Tasks=Assignments,Deadlines=Calendar"
+TAB_ALIAS = {}
+WAIT_MS = 30_000  # cap on any wait for an element; a miss becomes a finding
+URGENCY = {"overdue", "critical", "high", "medium", "low"}
+FIELDS = ("course", "what", "kind")
 NOW = datetime.now(timezone.utc).replace(second=0, microsecond=0)
 CACHE = Path(tempfile.gettempdir()) / "hub-ui-regression"
 # The demo baseline's Connect buttons set background:#fff but no color, so in
@@ -225,18 +232,46 @@ ROW_FN = f"""r => {{
   return {{header: cells.length > 0 && cells.every(hdr),
           cells: cells.map(c => ({{text: c.innerText, href: c.querySelector('a[href]')?.href ?? null}}))}};
 }}"""
+# Row elements under root, most accessible structure first: table rows, then
+# list items holding a link, then the largest container of each "Open" link.
+FIND_ROWS = """root => {
+  const vis = el => el.getClientRects().length > 0;
+  const trs = [...root.querySelectorAll('tr,[role=row]')].filter(vis);
+  if (trs.length) return trs;
+  const lis = [...root.querySelectorAll('li,[role=listitem]')].filter(li => vis(li) && li.querySelector('a[href]'));
+  if (lis.length) return lis;
+  const isOpen = a => /^\\s*open\\s*$/i.test(a.getAttribute('aria-label') || a.innerText || '');
+  const opens = el => [...el.querySelectorAll('a[href]')].filter(isOpen).length;
+  return [...root.querySelectorAll('a[href]')].filter(a => isOpen(a) && vis(a)).map(a => {
+    let el = a;
+    while (el.parentElement && el.parentElement !== root && opens(el.parentElement) === 1) el = el.parentElement;
+    return el;
+  });
+}"""
+PIECES_FN = """r => ({pieces: r.innerText.split(/\\n|·/).map(s => s.trim()).filter(Boolean),
+               href: [...r.querySelectorAll('a[href]')].find(a => /^\\s*open\\s*$/i.test(a.getAttribute('aria-label') || a.innerText || ''))?.href
+                     ?? r.querySelector('a[href]')?.href ?? null})"""
+ROWS_JS = f"""root => {{
+  const rowFn = {ROW_FN}, piecesFn = {PIECES_FN};
+  return ({FIND_ROWS})(root).map(r => (r.tagName === 'TR' || r.getAttribute('role') === 'row') ? rowFn(r) : piecesFn(r));
+}}"""
 COURSES_JS = f"""root => {{
-  const rowFn = {ROW_FN};
+  const rowFn = {ROW_FN}, piecesFn = {PIECES_FN};
+  const rowEls = ({FIND_ROWS})(root), rowSet = new Set(rowEls);
+  const inRow = el => {{ for (let e = el; e && e !== root; e = e.parentElement) if (rowSet.has(e)) return e; return null; }};
   const CODE = /^\\s*([A-Z]{{2,5}}\\s?\\d{{3}}[A-Z]?)\\b/;
   const out = []; let cur = null;
   const w = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
   for (let el = w.currentNode; el; el = w.nextNode()) {{
     const heading = /^H[1-6]$/.test(el.tagName) || el.getAttribute('role') === 'heading';
-    const m = heading && el.innerText.match(CODE);
+    const own = [...el.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
+    const m = (heading || (own && own === [...el.childNodes].find(n => n.nodeType === 3 ? n.textContent.trim() : n.nodeType === 1)
+                           && CODE.test(own.textContent)))
+              && !el.closest('button,[role=button]') && !inRow(el) && el.innerText.match(CODE);
     if (m) {{ cur = {{code: m[1], heading: el.innerText, text: [], rows: []}}; out.push(cur); continue; }}
     if (!cur) continue;
-    if (el.tagName === 'TR' || el.getAttribute('role') === 'row') {{ cur.rows.push(rowFn(el)); continue; }}
-    if (el.closest('table,[role=table],[role=grid]')) continue;
+    if (rowSet.has(el)) {{ cur.rows.push(el.tagName === 'TR' || el.getAttribute('role') === 'row' ? rowFn(el) : piecesFn(el)); continue; }}
+    if (inRow(el) || el.closest('table,[role=table],[role=grid]')) continue;
     for (const n of el.childNodes) if (n.nodeType === 3 && n.textContent.trim()) cur.text.push(n.textContent);
   }}
   return out;
@@ -292,11 +327,46 @@ def parse_due(text):
     return f"{MONTHS[mon[1].lower()]:02d}-{int(day[1]) if day else 0:02d} {hour:02d}:{tm[2]}"
 
 
-def parse_rows(raw):
-    """Raw rows from ROW_FN -> {'rows': [{key, urgency, due, href}]} keyed by
-    header text (column order is free), or {'error': ...}."""
+CODE_RE = re.compile(r"^[A-Z]{2,5} ?\d{3}[A-Z]?$")
+
+
+def parse_pieces(r, course_hint=None):
+    """A non-table row's text pieces -> the same fields a table row gives.
+    Course = a course-code piece, due = a parseable date, urgency = an urgency
+    word, kind = a bare lowercase word, what = the first piece left over (a
+    short prefix of the course code is a badge, not the title). Fields a row
+    doesn't show stay None."""
+    ps = [p for p in r["pieces"] if not re.fullmatch(r"open|—|-", p, re.I)]
+    dashes = sum(p in ("—", "-") for p in r["pieces"])
+    course = next((p for p in ps if CODE_RE.match(p)), course_hint)
+    due = urg = kind = what = None
+    for p in ps:
+        if p == course or (course and len(p) <= 3 and course.startswith(p)):
+            continue
+        if due is None and not parse_due(p).startswith("unparsed:"):
+            due = p
+        elif urg is None and p.lower() in URGENCY:
+            urg = p
+        elif kind is None and re.fullmatch(r"[a-z]+", p):
+            kind = p
+        elif what is None:
+            what = p
+    if dashes and urg is None:
+        urg, dashes = "—", dashes - 1
+    if dashes and due is None:
+        due = "—"
+    return {"key": (course, what, kind), "urgency": urg, "due": parse_due(due or ""), "href": r["href"]}
+
+
+def parse_rows(raw, course=None):
+    """Raw rows (ROW_FN table rows or PIECES_FN rows) -> {'rows': [{key,
+    urgency, due, href}]}, table rows keyed by header text (column order is
+    free), or {'error': ...}."""
     cols, rows = None, []
     for r in raw:
+        if "pieces" in r:
+            rows.append(parse_pieces(r, course))
+            continue
         cells = r["cells"]
         if r["header"]:
             cols = {norm_ws(c["text"]).lower(): i for i, c in enumerate(cells)}
@@ -325,7 +395,30 @@ def control(page, roles, name):
 
 
 def tab_control(page, name):
-    return control(page, ("tab", "button", "link", "radio"), re.compile(rf"^\s*{re.escape(name)}\s*$"))
+    """The baseline label first, then its --tab-alias."""
+    for label in dict.fromkeys([name, TAB_ALIAS.get(name, name)]):
+        ctl = control(page, ("tab", "button", "link", "radio"), re.compile(rf"^\s*{re.escape(label)}\s*$"))
+        if ctl is not None:
+            return ctl
+    return None
+
+
+def tab_label(page, name):
+    ctl = tab_control(page, name)
+    return None if ctl is None else norm_ws(ctl.inner_text()) or name
+
+
+def poll(fn, ms=WAIT_MS, step=250):
+    """fn() until truthy or ms pass; returns the last value, never raises."""
+    deadline = time.time() + ms / 1000
+    while True:
+        try:
+            v = fn()
+        except Exception:
+            v = None
+        if v or time.time() >= deadline:
+            return v
+        time.sleep(step / 1000)
 
 
 def set_show_next(page, n):
@@ -352,68 +445,82 @@ def set_show_next(page, n):
 
 
 def settle(page, ms=300):
-    page.wait_for_load_state("networkidle")
+    try:
+        page.wait_for_load_state("networkidle", timeout=WAIT_MS)
+    except Exception:
+        pass
     page.wait_for_timeout(ms)
 
 
+def click(ctl):
+    try:
+        ctl.click(timeout=WAIT_MS)
+        return True
+    except Exception:
+        return False
+
+
 def extract(page, url, local, shots, label):
+    # goto may wait on next dev's first compile; element waits are capped at WAIT_MS
     page.goto(url, wait_until="domcontentloaded", timeout=240_000)
-    page.get_by_text(re.compile(r"^\s*All\s*$")).first.wait_for(timeout=240_000)
+    meta = {"rendered": bool(poll(lambda: any(tab_control(page, t) for t in ALL_TABS)))}
     settle(page)
-    meta = {}
+    main = page.get_by_role("main")
+    scope = main.first if main.count() else page.locator("body")
     sample = control(page, ("checkbox", "switch"), r"sample")
     meta["sample"] = None if sample is None else sample.is_checked()
-    if sample is not None:
-        sample.set_checked(not local)
-        settle(page)
-    if local:  # wait for the fixture rows to arrive
+    if sample is not None:  # compare like with like: fixture rows in local mode
         try:
-            page.get_by_role("row").nth(1).wait_for(timeout=15_000)
+            sample.set_checked(not local, timeout=WAIT_MS)
         except Exception:
             pass
-    meta["tabs"] = {t: tab_control(page, t) is not None for t in ALL_TABS}
+        settle(page)
+    if local:  # wait for the fixture rows to arrive
+        poll(lambda: scope.evaluate(ROWS_JS))
+    meta["tabs"] = {t: tab_label(page, t) for t in ALL_TABS}
     meta["connect"] = {}
     for name in CONNECT:
         btn = page.get_by_role("button", name=re.compile(re.escape(name), re.I))
         meta["connect"][name] = None if not btn.count() else {
             "visible": btn.first.is_visible(), "label": norm_ws(btn.first.inner_text())}
-    main = page.get_by_role("main")
-    scope = main.first if main.count() else page.locator("body")
     views = {}
     for n, hide in CONFIGS:
         if tab_control(page, "All"):
-            tab_control(page, "All").click()
+            click(tab_control(page, "All"))
         has_n = set_show_next(page, n)
         hide_ctl = control(page, ("checkbox", "switch"), r"hide overdue")
         if hide_ctl is not None:
-            hide_ctl.set_checked(hide)
+            try:
+                hide_ctl.set_checked(hide, timeout=WAIT_MS)
+            except Exception:
+                hide_ctl = None
         err = None if has_n else "Show next control not found"
         if hide and hide_ctl is None:
             err = err or "Hide overdue control not found"
         meta.setdefault("controls", {"Show next": has_n, "Hide overdue": hide_ctl is not None})
         for tab in ITEM_TABS:
             ctl = tab_control(page, tab)
-            if ctl is None:
-                views[(tab, n, hide)] = {"error": f"tab {tab!r} not found"}
+            if ctl is None or not click(ctl):
+                views[(tab, n, hide)] = {"error": f"Tab missing: {tab}"}
                 continue
-            ctl.click()
             page.wait_for_timeout(100)
-            views[(tab, n, hide)] = {"error": err} if err else parse_rows(
-                scope.get_by_role("row").evaluate_all(f"rows => rows.map({ROW_FN})"))
+            views[(tab, n, hide)] = {"error": err} if err else parse_rows(scope.evaluate(ROWS_JS))
     meta["courses"] = None
-    if tab_control(page, "Courses"):
-        tab_control(page, "Courses").click()
+    if tab_control(page, "Courses") and click(tab_control(page, "Courses")):
         page.wait_for_timeout(200)
         meta["courses"] = [{"code": norm_ws(c["code"]), "heading": norm_ws(c["heading"]),
-                            "text": norm_ws(c["heading"] + " " + " ".join(c["text"])), **parse_rows(c["rows"])}
+                            "text": norm_ws(c["heading"] + " " + " ".join(c["text"])),
+                             **parse_rows(c["rows"], norm_ws(c["code"]))}
                            for c in scope.evaluate(COURSES_JS)]
     # visual pass on the All tab, widest config, Hide overdue off
-    if tab_control(page, "All"):
-        tab_control(page, "All").click()
+    if tab_control(page, "All") and click(tab_control(page, "All")):
         set_show_next(page, 50)
         hide_ctl = control(page, ("checkbox", "switch"), r"hide overdue")
         if hide_ctl is not None:
-            hide_ctl.set_checked(False)
+            try:
+                hide_ctl.set_checked(False, timeout=WAIT_MS)
+            except Exception:
+                pass
     vis = {"hscroll": {}, "contrast": {}}
     for scheme in ("light", "dark"):
         page.emulate_media(color_scheme=scheme)
@@ -459,7 +566,7 @@ class Report:
         status = "PASS" if ok else ("WARN" if warn else "FAIL")
         self.cells[(item, col)] = status
         if not ok or note:
-            self.details.append(f"[{status}] {item} / {col}: {detail} {note}".rstrip())
+            self.details.append(f"[{status}] {item} / {col}: " + (note if ok else f"{detail} {note}".rstrip()))
 
     def failed(self):
         return "FAIL" in self.cells.values()
@@ -476,8 +583,24 @@ class Report:
             print("  " + d)
 
 
-def keys(view):
-    return [r["key"] for r in view.get("rows", [])]
+def shown(view):
+    """Which of FIELDS every row of a view shows (a candidate may drop one)."""
+    rows = view.get("rows", [])
+    return tuple(all(r["key"][i] is not None for r in rows) for i in range(len(FIELDS)))
+
+
+def common_fields(b, c):
+    """Fields both sides show -> (mask to compare on, fields the candidate dropped)."""
+    mb, mc = shown(b), shown(c)
+    return tuple(x and y for x, y in zip(mb, mc)), [f for f, x, y in zip(FIELDS, mb, mc) if x and not y]
+
+
+def keys(view, mask=(True,) * len(FIELDS)):
+    return [tuple(k if m else None for k, m in zip(r["key"], mask)) for r in view.get("rows", [])]
+
+
+def pset(ks, mask):
+    return {tuple(k if m else None for k, m in zip(key, mask)) for key in ks}
 
 
 def short(ks):
@@ -501,17 +624,19 @@ def compare_rows(rep, col, b, c, hidden):
         for i in ROW_CHECKS + ["Done items never shown"] * (hidden is not None):
             rep.add(i, col, False, err)
         return
-    bk, ck = keys(b), keys(c)
+    mask, lost = common_fields(b, c)
+    rep.add("Row fields shown", col, not lost, f"candidate rows don't show {lost}; compared without them")
+    bk, ck = keys(b, mask), keys(c, mask)
     rep.add("Row set", col, set(bk) == set(ck),
             f"baseline-only {short(set(bk) - set(ck))}, candidate-only {short(set(ck) - set(bk))}")
     rep.add("Order", col, bk == ck, f"baseline {short(bk)} | candidate {short(ck)}")
-    bm, cm = {r["key"]: r for r in b["rows"]}, {r["key"]: r for r in c["rows"]}
+    bm, cm = dict(zip(bk, b["rows"])), dict(zip(ck, c["rows"]))
     common = [k for k in bk if k in cm]
     for item, field in zip(ROW_CHECKS[2:], ["urgency", "due", "href"]):
         bad = [(k[1], bm[k][field], cm[k][field]) for k in common if bm[k][field] != cm[k][field]]
         rep.add(item, col, not bad, f"(what, baseline, candidate) {bad[:3]}")
     if hidden is not None:
-        leaked = set(ck) & hidden
+        leaked = set(ck) & pset(hidden, mask)
         rep.add("Done items never shown", col, not leaked, f"leaked {short(leaked)}")
 
 
@@ -520,31 +645,38 @@ def compare(bm, bv, cm, cv, hidden):
     b = bv[("All", 50, False)]
     rep.add("Baseline sanity: rows extracted", "Global", bool(keys(b)),
             f"baseline All tab gave {b} - the oracle can't see the baseline's rows")
-    for tab in ITEM_TABS:
+    rep.add("Candidate rendered (a tab appeared)", "Global", cm["rendered"], f"none of {ALL_TABS} within {WAIT_MS // 1000}s")
+    for tab in (t for t in ITEM_TABS if bm["tabs"][t]):
         b50, c50 = bv[(tab, 50, False)], cv[(tab, 50, False)]
         compare_rows(rep, tab, b50, c50, hidden)
         bon, con = bv[(tab, 50, True)], cv[(tab, 50, True)]
         err = view_error(bon, con) or view_error(b50, c50)
-        rep.add("Hide overdue ON: rows+order", tab, not err and keys(bon) == keys(con),
-                err or f"baseline {short(keys(bon))} | candidate {short(keys(con))}")
-        bo = set(keys(b50)) - set(keys(bon))
-        co = None if err else set(keys(c50)) - set(keys(con))
+        m = None if err else common_fields(bon, con)[0]
+        rep.add("Hide overdue ON: rows+order", tab, not err and keys(bon, m) == keys(con, m),
+                err or f"baseline {short(keys(bon, m))} | candidate {short(keys(con, m))}")
+        bo = set(keys(b50, m)) - set(keys(bon, m)) if not err else set()
+        co = None if err else set(keys(c50, m)) - set(keys(con, m))
         rep.add("Overdue set (off minus on)", tab, not err and bo == co,
                 err or f"baseline {sorted(short(bo))} | candidate {sorted(short(co))}")
         for n in (5, 10):
             b, c = bv[(tab, n, False)], cv[(tab, n, False)]
             err = view_error(b, c)
-            rep.add(f"Show next {n}", tab, not err and keys(b) == keys(c),
-                    err or f"baseline {short(keys(b))} | candidate {short(keys(c))}")
+            m = None if err else common_fields(b, c)[0]
+            rep.add(f"Show next {n}", tab, not err and keys(b, m) == keys(c, m),
+                    err or f"baseline {short(keys(b, m))} | candidate {short(keys(c, m))}")
     g = "Global"
     for t in ALL_TABS:
         if bm["tabs"][t]:
-            rep.add(f"Tab present: {t}", g, cm["tabs"][t], "missing in candidate")
+            got = cm["tabs"][t]
+            rep.add(f"Tab present: {t}", g, bool(got), f"Tab missing: {t}",
+                    note="" if not got or got == bm["tabs"][t] else f"(candidate calls it {got!r})")
     for ctl in ("Show next", "Hide overdue"):
         rep.add(f"Control present: {ctl}", g, cm["controls"][ctl] or not bm["controls"][ctl], "missing in candidate")
     desc = lambda s: "absent" if s is None else "default " + ("ON" if s else "OFF")  # noqa: E731
+    extra = ("; baseline local mode shows real data by default, the candidate shows Sample data"
+             " (switched OFF for the rest of the run)") if hidden is not None and cm["sample"] else ""
     rep.add("Sample toggle (presence, default)", g, bm["sample"] == cm["sample"],
-            f"baseline {desc(bm['sample'])} | candidate {desc(cm['sample'])}")
+            f"baseline {desc(bm['sample'])} | candidate {desc(cm['sample'])}{extra}")
     for name in CONNECT:
         b, c = bm["connect"][name], cm["connect"][name]
         if b is None:
@@ -572,6 +704,9 @@ def compare_courses(rep, bc, cc, hidden):
         m = re.search(r"Grade:?\s*([^\s·|]+)", s)
         return m and m[1]
     bad_meta, bad_rows, bad_urg = [], [], []
+    rows = lambda cs: {"rows": [r for c in cs for r in c.get("rows", [])]}  # noqa: E731
+    mask, lost = common_fields(rows(bc), rows(cc))
+    rep.add("Row fields shown", col, not lost, f"candidate rows don't show {lost}; compared without them")
     for b in bc:
         c = cmap.get(b["code"])
         if not c:
@@ -584,13 +719,13 @@ def compare_courses(rep, bc, cc, hidden):
         if "error" in c:
             bad_rows.append((b["code"], c["error"]))
             continue
-        if keys(b) != keys(c):
-            bad_rows.append((b["code"], short(keys(b)), short(keys(c))))
-        cu = {r["key"]: r["urgency"] for r in c["rows"]}
-        bad_urg += [(b["code"], r["key"][1], r["urgency"], cu[r["key"]]) for r in b.get("rows", [])
-                    if r["key"] in cu and cu[r["key"]] != r["urgency"]]
-        if hidden is not None and set(keys(c)) & hidden:
-            bad_rows.append((b["code"], "done items shown", short(set(keys(c)) & hidden)))
+        if keys(b, mask) != keys(c, mask):
+            bad_rows.append((b["code"], short(keys(b, mask)), short(keys(c, mask))))
+        cu = dict(zip(keys(c, mask), (r["urgency"] for r in c["rows"])))
+        bad_urg += [(b["code"], k[1], r["urgency"], cu[k]) for k, r in zip(keys(b, mask), b.get("rows", []))
+                    if k in cu and cu[k] != r["urgency"]]
+        if hidden is not None and set(keys(c, mask)) & pset(hidden, mask):
+            bad_rows.append((b["code"], "done items shown", short(set(keys(c, mask)) & pset(hidden, mask))))
     rep.add("Title/term/grade", col, not bad_meta, f"{bad_meta}")
     rep.add("Per-course rows+order", col, not bad_rows, f"(code, baseline, candidate) {bad_rows}")
     rep.add("Per-course Urgency", col, not bad_urg, f"(code, what, baseline, candidate) {bad_urg[:3]}")
@@ -620,7 +755,10 @@ def main():
                     help="auto: local (fixture via hub.api) when both sides are Next apps we serve, else sample")
     ap.add_argument("--out", help="screenshot dir (default: a new temp dir)")
     ap.add_argument("--keep-logs", action="store_true", help="print where the server logs are")
+    ap.add_argument("--tab-alias", default=TAB_ALIAS_DEFAULT,
+                    help=f"baseline=candidate tab labels, tried after the baseline label (default: {TAB_ALIAS_DEFAULT}; '' for none)")
     args = ap.parse_args()
+    TAB_ALIAS.update(kv.split("=", 1) for kv in args.tab_alias.split(",") if "=" in kv)
 
     base, cand = resolve(args.baseline), resolve(args.candidate)
     local = args.mode == "local" or (args.mode == "auto" and base["server"] == cand["server"] == "next")
