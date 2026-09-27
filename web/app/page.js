@@ -19,9 +19,11 @@ import {
   isOverdue,
   mergeCourses,
   mergeItems,
+  monthGrid,
   selectActiveItems,
   selectConnections,
   selectCourseItems,
+  selectItemsDueOn,
   selectNextUp,
   selectVisibleCourses,
   selectVisibleItems,
@@ -81,6 +83,106 @@ const CUSTOM_COLOR_FIELDS = [
 
 const WEEKDAY_LETTERS = ["M", "T", "W", "T", "F", "S", "S"];
 const MAX_WORKDAY_FILE_BYTES = 5_000_000;
+const MONTH_WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+// The Calendar nav tab's own page: a month grid of every active item's due
+// date, plus the clicked day's items below. Owns its own displayed-month and
+// selected-day state rather than lifting it into App(), since nothing else
+// in the app needs to know which day is selected here.
+function CalendarSection({ items, now }) {
+  const [monthDate, setMonthDate] = useState(new Date(now.getFullYear(), now.getMonth(), 1));
+  const [selectedDay, setSelectedDay] = useState(null);
+
+  const weeks = useMemo(() => monthGrid(monthDate), [monthDate]);
+  const dayItems = useMemo(() => (selectedDay ? selectItemsDueOn(items, selectedDay) : []), [items, selectedDay]);
+
+  function shiftMonth(delta) {
+    setMonthDate((d) => new Date(d.getFullYear(), d.getMonth() + delta, 1));
+    setSelectedDay(null);
+  }
+
+  function goToday() {
+    setMonthDate(new Date(now.getFullYear(), now.getMonth(), 1));
+    setSelectedDay(now);
+  }
+
+  return (
+    <>
+      <div className="flex flex-col gap-4 border-b border-[var(--line)] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div>
+          <div className="text-xl font-bold tracking-tight">
+            {monthDate.toLocaleDateString("en-CA", { month: "long", year: "numeric" })}
+          </div>
+          <div className="mt-1 text-sm text-[var(--muted)]">Deadlines across every connected course</div>
+        </div>
+        <div className="flex items-center gap-1">
+          <AppButton ariaLabel="Previous month" onClick={() => shiftMonth(-1)} className="icon-button">
+            <Icon name="arrow" className="size-4 rotate-180" />
+          </AppButton>
+          <AppButton onClick={goToday} className="filter-button">Today</AppButton>
+          <AppButton ariaLabel="Next month" onClick={() => shiftMonth(1)} className="icon-button">
+            <Icon name="arrow" className="size-4" />
+          </AppButton>
+        </div>
+      </div>
+
+      <div className="p-5 sm:p-6">
+        <div className="grid grid-cols-7 gap-1 text-center">
+          {MONTH_WEEKDAY_LABELS.map((label) => (
+            <div key={label} className="pb-2 text-[0.65rem] font-bold text-[var(--muted)]">{label}</div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 gap-1">
+          {weeks.flat().map(({ date, inMonth }) => {
+            const dueCount = selectItemsDueOn(items, date).length;
+            const isToday = date.toDateString() === now.toDateString();
+            const isSelected = selectedDay && date.toDateString() === selectedDay.toDateString();
+            return (
+              <button
+                key={date.toISOString()}
+                aria-label={date.toDateString()}
+                onClick={() => setSelectedDay(date)}
+                className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-lg border text-sm font-semibold transition-colors ${
+                  isSelected ? "border-[var(--accent)] bg-[var(--accent-soft)]" : "border-transparent hover:bg-[var(--surface-soft)]"
+                } ${inMonth ? "text-[var(--ink)]" : "text-[var(--muted-light)]"} ${isToday ? "text-[var(--accent)]" : ""}`}
+              >
+                <span>{date.getDate()}</span>
+                {dueCount > 0 && <span className="size-1.5 rounded-full bg-[var(--accent)]" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <div className="border-t border-[var(--line)] px-5 py-3 text-sm font-bold sm:px-6">
+          {selectedDay
+            ? selectedDay.toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" })
+            : "Select a day to see what's due"}
+        </div>
+        {selectedDay && dayItems.map((item) => (
+          <div key={item.id} className={`assignment-row ${isOverdue(item, now) ? "due-now" : ""}`}>
+            <span className="course-mark">{item.course.slice(0, 2)}</span>
+            <div className="min-w-0 flex-1">
+              <div className="truncate font-bold">{item.title}</div>
+              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-[var(--muted)]">
+                <span>{item.course}</span><span>·</span><span>{item.kind}</span>
+              </div>
+            </div>
+            <div className="hidden shrink-0 rounded-lg px-3 py-2 text-right sm:block">
+              <div className="text-xs font-bold">{formatDue(item.due)}</div>
+              <div className="mt-0.5 text-[0.7rem] text-[var(--muted)]">{displayLabel(item.urgency)}</div>
+            </div>
+            <a href={item.url} aria-label="Open"><Icon name="arrow" className="size-4 shrink-0 text-[var(--muted-light)]" /></a>
+          </div>
+        ))}
+        {selectedDay && dayItems.length === 0 && (
+          <div className="p-10 text-center text-sm text-[var(--muted)]">Nothing due this day.</div>
+        )}
+      </div>
+    </>
+  );
+}
 
 function SettingsPage({ theme, setTheme, customColors, setCustomColors, connections, sampleMode, onSampleModeChange, onConnected, onWorkdayImported, allCourses, hiddenCourses, onToggleCourseHidden, canvasFeedUrl, feedItemCount, feedError, onConnectFeed, onDisconnectFeed }) {
   const [term, setTerm] = useState("2026W1");
@@ -737,6 +839,8 @@ export default function App() {
                     )}
                   </div>
                 </>
+              ) : activeNav === "Calendar" ? (
+                <CalendarSection items={activeItems} now={now} />
               ) : (
               <>
               <div className="flex flex-col gap-4 border-b border-[var(--line)] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
