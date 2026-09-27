@@ -124,3 +124,51 @@ Researched 2026-09-26. Unmarked claims were checked against the linked source. *
 | Gradescope / iClicker | LTI only; grades flow into the Canvas gradebook ([iClicker @ UBC](https://lthub.ubc.ca/2023/04/21/improvement-to-how-iclicker-cloud-works-with-canvas/)) | Read them via Canvas |
 | PrairieLearn | No student-facing API. Own CWL-backed login (same flow the browser-login adapters already use for Canvas), then the per-course-instance "assessments" page lists each assessment with a due date. **[page markup unverified — nobody on the team has pulled up a real UBC PrairieLearn course instance to confirm the HTML/route shape yet]** | Via our own browser-session adapter (`hub/site.py`), same pattern as Canvas — once someone verifies the page |
 | Kaltura | Kaltura Session from a partner secret or appToken [docs](https://developer.kaltura.com/api-docs/VPaaS-API-Getting-Started/Kaltura_API_Authentication_and_Security.html) | No |
+
+## Ed Discussion (edstem.org) detail
+
+Implemented in `hub/ed_discussion.py`. The table row above cites the PyPI
+listing; this section cites the **actual `edapi` source**, cloned and read
+directly (`git clone https://github.com/smartspot2/edapi`, maintainer
+`smartspot2` — this is the real, maintained Ed Discussion client; there is
+also an `edapi-fork` on PyPI, not used here), not just its description.
+
+- **Auth:** a personal API token the student creates themselves at
+  https://edstem.org/us/settings/api-tokens (the exact URL `edapi`'s own
+  `AUTH_MESSAGE` constant points a user to), sent as
+  `Authorization: Bearer <token>` (`edapi/edapi.py`'s `EdAPI._auth_header`).
+  No OAuth, no admin step — same self-serve shape as a Canvas PAT.
+- **API base:** `https://us.edstem.org/api/` (`edapi/edapi.py`'s
+  `API_BASE_URL`). The student-facing web app is a different host,
+  `https://edstem.org/us/...` (confirmed by e.g. Yale's help page:
+  "Ed Discussion site URLs should look similar to:
+  https://edstem.org/us/courses/1234/discussion/" —
+  https://help.canvas.yale.edu/a/1544915).
+- **My courses:** `GET /api/user` (`EdAPI.get_user_info()`) returns
+  `courses: [{course: {id, code, name, year, session, status}, role, lab}]`
+  (`edapi/types/api_types/endpoints/user.py`, `.../course.py`) — real,
+  confirmed by reading the type definitions field-by-field.
+- **Threads:** `GET /api/courses/<course_id>/threads`
+  (`EdAPI.list_threads()`) returns threads shaped per
+  `edapi/types/api_types/thread.py`'s `API_Thread`: `id` (global post
+  number), `course_id`, `number`, `type` (`"post"` / `"question"` /
+  `"announcement"`, per `edapi/constants.py`'s `ThreadType`), `title`,
+  `content`/`document` (free-text body), `category`/`subcategory` (an
+  instructor-defined discussion category, e.g. "Assignment 1" — **not** a
+  date or a deadline classification), `is_pinned`/`pinned_at`,
+  `created_at`/`updated_at` (post timestamps).
+- **No due-date-shaped field exists anywhere on a thread.** The full
+  `API_Thread` type was read top to bottom; there is no `due`, `deadline`,
+  or `date` field. This confirms the TL;DR table's "Ed Discussion:
+  undocumented API" entry in a specific, checkable way: it isn't merely
+  undocumented, its real (if unofficial) type shapes genuinely carry no
+  date. `hub/ed_discussion.py` therefore surfaces pinned/announcement
+  threads as **undated** `Item`s (`due=None`) — real courses, and a real
+  "this is more than an ordinary post" signal, but never an invented date.
+- **Per-thread web URL:** reasoned, not confirmed by `edapi` (it never
+  builds one — it only calls the API). `hub/ed_discussion.py` uses
+  `https://edstem.org/us/courses/<course_id>/discussion/<thread_id>`, by
+  analogy to the one confirmed web URL shape above. Flagged here as the
+  one inferred piece; it doesn't risk a `hub.db` `(source, url)` collision
+  either way, since `thread["id"]` is documented as unique across all of
+  Ed, not just within one course.
