@@ -1,0 +1,9 @@
+{
+  "uuid": "5f0c1e2a-0e11-4c2b-9a51-2f6a7e0a0113",
+  "type": "Homework",
+  "set": "Machine Problem",
+  "number": "3",
+  "title": "Modern Not Yet Released",
+  "accessControl": [{"beforeRelease":{"listed":true},"dateControl":{"release":{"date":"2026-10-15T00:00:01"},"due":{"date":"2026-10-22T23:59:59"}}}],
+  "zones": []
+}

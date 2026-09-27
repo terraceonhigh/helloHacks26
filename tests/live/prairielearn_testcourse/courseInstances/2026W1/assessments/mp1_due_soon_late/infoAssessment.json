@@ -1,0 +1,9 @@
+{
+  "uuid": "5f0c1e2a-0e11-4c2b-9a51-2f6a7e0a0111",
+  "type": "Homework",
+  "set": "Machine Problem",
+  "number": "1",
+  "title": "Modern Due Soon With Late",
+  "accessControl": [{"dateControl":{"release":{"date":"2026-09-01T00:00:01"},"due":{"date":"2026-10-02T23:59:59"},"lateDeadlines":[{"date":"2026-10-05T23:59:59","credit":50}]}}],
+  "zones": []
+}

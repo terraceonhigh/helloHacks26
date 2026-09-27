@@ -1,0 +1,9 @@
+{
+  "uuid": "5f0c1e2a-0e11-4c2b-9a51-2f6a7e0a0106",
+  "type": "Homework",
+  "set": "Homework",
+  "number": "6",
+  "title": "Not Yet Open Homework",
+  "allowAccess": [{"startDate":"2026-10-15T00:00:01","endDate":"2026-10-22T23:59:59","credit":100}],
+  "zones": []
+}

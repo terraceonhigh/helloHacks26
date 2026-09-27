@@ -1,0 +1,9 @@
+{
+  "uuid": "5f0c1e2a-0e11-4c2b-9a51-2f6a7e0a0101",
+  "type": "Homework",
+  "set": "Homework",
+  "number": "1",
+  "title": "Past Due Homework",
+  "allowAccess": [{"startDate":"2026-09-01T00:00:01","endDate":"2026-09-20T23:59:59","credit":100},{"startDate":"2026-09-01T00:00:01","endDate":"2026-09-24T23:59:59","credit":50}],
+  "zones": []
+}

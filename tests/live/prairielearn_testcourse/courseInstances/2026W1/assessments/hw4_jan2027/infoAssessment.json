@@ -1,0 +1,9 @@
+{
+  "uuid": "5f0c1e2a-0e11-4c2b-9a51-2f6a7e0a0104",
+  "type": "Homework",
+  "set": "Homework",
+  "number": "4",
+  "title": "January 2027 Homework",
+  "allowAccess": [{"startDate":"2026-09-01T00:00:01","endDate":"2027-01-15T23:59:59","credit":100}],
+  "zones": []
+}

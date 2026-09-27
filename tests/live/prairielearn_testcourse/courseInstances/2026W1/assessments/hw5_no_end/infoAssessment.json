@@ -1,0 +1,9 @@
+{
+  "uuid": "5f0c1e2a-0e11-4c2b-9a51-2f6a7e0a0105",
+  "type": "Homework",
+  "set": "Homework",
+  "number": "5",
+  "title": "No End Date Practice",
+  "allowAccess": [{"startDate":"2026-09-01T00:00:01","credit":100}],
+  "zones": []
+}

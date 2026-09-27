@@ -1,0 +1,9 @@
+{
+  "uuid": "5f0c1e2a-0e11-4c2b-9a51-2f6a7e0a0115",
+  "type": "Homework",
+  "set": "Machine Problem",
+  "number": "5",
+  "title": "Modern No Due Date",
+  "accessControl": [{"dateControl":{"release":{"date":"2026-09-01T00:00:01"}}}],
+  "zones": []
+}
