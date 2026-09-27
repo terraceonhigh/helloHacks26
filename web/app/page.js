@@ -44,7 +44,7 @@ import {
   weekDates,
   writePreferredKindsCookie,
 } from "../lib/hub";
-import { parseWorkdaySchedule } from "../lib/workday";
+import { meetingsToIcs, parseReminders, parseWorkdaySchedule } from "../lib/workday";
 
 function Icon({ name, className = "size-5" }) {
   const paths = {
@@ -280,9 +280,10 @@ const SOURCE_LABELS = {
   push: "Push to hosted",
 };
 
-function SettingsPage({ theme, setTheme, customColors, setCustomColors, connections, sampleMode, onSampleModeChange, onConnected, onScheduleImported, allCourses, hiddenCourses, onToggleCourseHidden, feedConnected, feedItemCount, feedError, onConnectFeed, onDisconnectFeed, preferredKinds, onTogglePreferredKind, onConnectHosted, onSynced, hostedConnected, allItems, allCoursesForPush }) {
+function SettingsPage({ theme, setTheme, customColors, setCustomColors, connections, sampleMode, onSampleModeChange, onConnected, onScheduleImported, meetings = [], allCourses, hiddenCourses, onToggleCourseHidden, feedConnected, feedItemCount, feedError, onConnectFeed, onDisconnectFeed, preferredKinds, onTogglePreferredKind, onConnectHosted, onSynced, hostedConnected, allItems, allCoursesForPush }) {
   const [term, setTerm] = useState("2026W1");
   const [workdayStatus, setWorkdayStatus] = useState(null);
+  const [reminderText, setReminderText] = useState("");
   const [customDomain, setCustomDomain] = useState("");
   const [feedUrlInput, setFeedUrlInput] = useState("");
   const [hostedKeyInput, setHostedKeyInput] = useState("");
@@ -329,6 +330,18 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
     if (!reply?.ok) throw new Error(reply?.error || "Extension did not respond.");
     setSyncResults(reply.results);
     if (reply.results.some((result) => result.ok)) await onSynced();
+  }
+
+  // Same output as ubc-workday-ics: every imported class as a weekly
+  // recurring event, built and downloaded in the browser (nothing uploaded).
+  function downloadSchedule() {
+    const ics = meetingsToIcs(meetings, { reminders: parseReminders(reminderText) });
+    const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "lauds-classes.ics";
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   async function handleFile(e) {
@@ -652,6 +665,10 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
                 Import .xlsx
                 <input type="file" accept=".xlsx" onChange={handleFile} className="sr-only" />
               </label>
+              <input type="text" value={reminderText} onChange={(e) => setReminderText(e.target.value)} size={6} placeholder="10,30" aria-label="Reminders, minutes before each class" title="Reminders, minutes before each class" className="rounded-md border border-[var(--line)] bg-[var(--surface-soft)] px-2 py-1 text-xs" />
+              <AppButton disabled={meetings.length === 0} onClick={downloadSchedule} className="toggle-pill" ariaLabel="Download your class schedule as a calendar file">
+                Download .ics
+              </AppButton>
             </div>
           </div>
 
@@ -1099,6 +1116,7 @@ export default function App() {
               onSampleModeChange={setSampleMode}
               onConnected={() => load(false)}
               onScheduleImported={importWorkdaySchedule}
+              meetings={shownMeetings}
               allCourses={allCourses}
               hiddenCourses={hiddenCourses}
               onToggleCourseHidden={toggleCourseHidden}

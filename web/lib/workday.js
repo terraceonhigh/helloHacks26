@@ -199,3 +199,71 @@ export function parseWorkdaySchedule(arrayBuffer, term, source = "workday") {
   }
   return meetings;
 }
+
+// Turn imported class meetings into one .ics the student can add to Apple,
+// Google or Outlook Calendar - the same output as
+// github.com/terraceonhigh/ubc-workday-ics: one weekly recurring event per
+// meeting in America/Vancouver time, optional reminders `reminders` minutes
+// before each class. Pure (no DOM) so it's testable; the page wraps it in a
+// Blob download.
+const VANCOUVER_TZ = [
+  "BEGIN:VTIMEZONE", "TZID:America/Vancouver",
+  "BEGIN:DAYLIGHT", "TZOFFSETFROM:-0800", "TZOFFSETTO:-0700", "TZNAME:PDT", "DTSTART:19700308T020000", "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU", "END:DAYLIGHT",
+  "BEGIN:STANDARD", "TZOFFSETFROM:-0700", "TZOFFSETTO:-0800", "TZNAME:PST", "DTSTART:19701101T020000", "RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU", "END:STANDARD",
+  "END:VTIMEZONE",
+];
+const ICAL_WEEKDAY = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+
+const icsText = (s) => String(s ?? "").replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+const compactDate = (iso) => iso.replaceAll("-", "");
+const compactTime = (hhmm) => `${hhmm.replace(":", "")}00`;
+
+// RFC 5545 caps lines at 75 octets; longer ones continue on a line starting with a space.
+function fold(line) {
+  const out = [];
+  while (line.length > 75) { out.push(line.slice(0, 75)); line = " " + line.slice(75); }
+  out.push(line);
+  return out;
+}
+
+// The first date on/after termStart that falls on one of the meeting's days.
+function firstOccurrence(termStart, days) {
+  const d = new Date(`${termStart}T00:00:00Z`);
+  for (let i = 0; i < 7; i++, d.setUTCDate(d.getUTCDate() + 1)) {
+    if (days.includes(ICAL_WEEKDAY[d.getUTCDay()])) return d.toISOString().slice(0, 10);
+  }
+  return termStart;
+}
+
+export function meetingsToIcs(meetings, { reminders = [], now = new Date() } = {}) {
+  const stamp = now.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Lauds//Class schedule//EN", "CALSCALE:GREGORIAN", "X-WR-CALNAME:Lauds classes", ...VANCOUVER_TZ];
+  for (const m of meetings) {
+    const day = compactDate(firstOccurrence(m.termStart, m.days));
+    // UNTIL must be UTC when DTSTART has a TZID. 07:59:59Z the next day is
+    // 23:59:59 Vancouver time in PST, and 00:59:59 in PDT - no class meets then.
+    const end = new Date(`${m.termEnd}T00:00:00Z`); end.setUTCDate(end.getUTCDate() + 1);
+    const until = `${compactDate(end.toISOString().slice(0, 10))}T075959Z`;
+    const uid = `${[m.course, m.kind, m.days.join(""), m.startTime, m.termStart].join("-").replace(/[^A-Za-z0-9-]/g, "")}@lauds`;
+    lines.push(
+      "BEGIN:VEVENT", `UID:${uid}`, `DTSTAMP:${stamp}`,
+      `DTSTART;TZID=America/Vancouver:${day}T${compactTime(m.startTime)}`,
+      `DTEND;TZID=America/Vancouver:${day}T${compactTime(m.endTime)}`,
+      `RRULE:FREQ=WEEKLY;BYDAY=${m.days.join(",")};UNTIL=${until}`,
+      `SUMMARY:${icsText(`${m.course} ${m.kind}`)}`,
+    );
+    if (m.location) lines.push(`LOCATION:${icsText(m.location)}`);
+    for (const min of reminders) {
+      lines.push("BEGIN:VALARM", "ACTION:DISPLAY", `TRIGGER:-PT${min}M`, `DESCRIPTION:${icsText(`${m.course} in ${min} minutes`)}`, "END:VALARM");
+    }
+    lines.push("END:VEVENT");
+  }
+  lines.push("END:VCALENDAR");
+  return lines.flatMap(fold).join("\r\n") + "\r\n";
+}
+
+// "10, 30" -> [10, 30]; anything that isn't a whole number of minutes up to a
+// week is dropped rather than guessed at.
+export function parseReminders(text) {
+  return [...new Set(String(text ?? "").split(/[,\s]+/).map(Number).filter((n) => Number.isInteger(n) && n > 0 && n <= 10080))];
+}
