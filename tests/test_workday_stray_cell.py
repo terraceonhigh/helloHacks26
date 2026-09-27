@@ -26,6 +26,7 @@ def _fail_on_hang(signum, frame):
     raise TimeoutError("parse_workday_courses hung on a stray far-away cell")
 
 
+@pytest.mark.skipif(not hasattr(signal, "SIGALRM"), reason="SIGALRM is Unix-only")
 def test_stray_cell_at_max_address_parses_quickly(stray_cell_xlsx):
     previous = signal.signal(signal.SIGALRM, _fail_on_hang)
     signal.alarm(20)
