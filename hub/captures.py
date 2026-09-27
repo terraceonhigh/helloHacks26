@@ -11,11 +11,17 @@ from dataclasses import asdict
 
 _SOURCE = re.compile(r"^[a-z][a-z0-9_]{0,39}$")
 
+# Explicit allowlist, not just "matches _SOURCE and has parse_capture" - the
+# regex alone still lets an anonymous POST to the public /api/normalize
+# dynamically import ANY hub.<word> module that happens to exist (PM review
+# on #97/#84). Every module here has a reviewed, tested parse_capture().
+CAPTURE_SOURCES = frozenset({"canvas", "prairielearn", "moodle", "blackboard", "piazza"})
+
 
 def parse(capture):
     """Return a provider adapter's (courses, items) from its browser capture."""
     source = capture.get("source") if isinstance(capture, dict) else None
-    if not isinstance(source, str) or not _SOURCE.fullmatch(source):
+    if not isinstance(source, str) or not _SOURCE.fullmatch(source) or source not in CAPTURE_SOURCES:
         raise ValueError("invalid capture source")
     module_name = f"hub.{source}"
     try:

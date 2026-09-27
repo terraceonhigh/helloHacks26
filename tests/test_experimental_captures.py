@@ -61,3 +61,35 @@ def test_prairielearn_capture_reuses_live_fixture_mapping():
     capture["courses"][0]["assessments"][0]["href"] = "https://evil.example/steal"
     with pytest.raises(ValueError, match="unsafe"):
         prairielearn.parse_capture(capture)
+
+
+def test_prairielearn_capture_accepts_unstarted_assessment_links():
+    from hub import prairielearn
+
+    capture = {"source": "prairielearn", "origin": "https://us.prairielearn.com",
+               "courses": [{"ci_id": "221053", "title": "CPSC 317: Internet Computing, 2026 Winter Term 1",
+                            "assessments": [{
+                                "title": "Not Yet Opened", "group": "Programming Assignments",
+                                "href": "/pl/course_instance/221053/assessment/9001/",
+                                "due_text": "", "score_text": "", "credit_empty": True,
+                            }]}]}
+    _, items = prairielearn.parse_capture(capture)
+    assert items[0].url == "https://us.prairielearn.com/pl/course_instance/221053/assessment/9001/"
+
+
+def test_prairielearn_capture_skips_an_unrecognized_same_course_link_instead_of_failing():
+    from hub import prairielearn
+
+    capture = {"source": "prairielearn", "origin": "https://us.prairielearn.com",
+               "courses": [{"ci_id": "221053", "title": "CPSC 317: Internet Computing, 2026 Winter Term 1",
+                            "assessments": [
+                                {"title": "Odd Row", "group": "Programming Assignments",
+                                 "href": "/pl/course_instance/221053/some_new_type/1/",
+                                 "due_text": "", "score_text": "", "credit_empty": True},
+                                {"title": "A Dictionary Client", "group": "Programming Assignments",
+                                 "href": "/pl/course_instance/221053/assessment_instance/14835025/",
+                                 "due_text": "2026-09-27 23:59:59 (PDT)", "score_text": "100%",
+                                 "credit_empty": False},
+                            ]}]}
+    _, items = prairielearn.parse_capture(capture)
+    assert [i.title for i in items] == ["A Dictionary Client"]

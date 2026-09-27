@@ -20,8 +20,16 @@ function capturePrairieLearnAssessments(root = document, pageUrl = location.href
     const title = cells[1].textContent.trim();
     const link = cells[1].querySelector("a[href]");
     const href = link?.getAttribute("href") || "";
-    if (href && !new RegExp(`^/pl/course_instance/${match[1]}/assessment_instance/\\d+/?$`).test(href)) {
+    // An unstarted assessment usually links to .../assessment/<id>/, not
+    // .../assessment_instance/<id>/ - accept both (PM review on #87/#97).
+    // A link outside this course's own path is a real safety issue and
+    // still rejected; a same-course link whose shape we just don't
+    // recognize is skipped instead of throwing away the whole capture.
+    if (href && !href.startsWith(`/pl/course_instance/${match[1]}/`)) {
       throw new Error("PrairieLearn assessment link left the course");
+    }
+    if (href && !new RegExp(`^/pl/course_instance/${match[1]}/assessment(?:_instance)?/\\d+/?$`).test(href)) {
+      continue;
     }
     const popover = cells[2].querySelector("button[data-bs-content]");
     const popoverHtml = popover?.getAttribute("data-bs-content") || "";

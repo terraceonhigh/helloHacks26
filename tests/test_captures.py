@@ -1,3 +1,6 @@
+import sys
+import types
+
 import pytest
 
 from hub import captures
@@ -38,3 +41,17 @@ def test_normalize_returns_json_safe_identity_deduped_shared_rows():
 def test_capture_dispatch_rejects_unverified_sources(capture):
     with pytest.raises(ValueError):
         captures.parse(capture)
+
+
+def test_capture_dispatch_rejects_a_real_module_not_on_the_allowlist(monkeypatch):
+    """A source that matches _SOURCE, imports cleanly, and even defines
+    parse_capture must still be rejected if it's not in CAPTURE_SOURCES -
+    the allowlist, not duck-typing, is what gates the public /api/normalize
+    (PM review on #97/#84: an anonymous POST could otherwise import any
+    hub.<word> module that happens to look like an adapter)."""
+    fake = types.ModuleType("hub.not_a_real_source")
+    fake.parse_capture = lambda capture: ([], [])
+    monkeypatch.setitem(sys.modules, "hub.not_a_real_source", fake)
+    assert "not_a_real_source" not in captures.CAPTURE_SOURCES
+    with pytest.raises(ValueError):
+        captures.parse({"source": "not_a_real_source"})

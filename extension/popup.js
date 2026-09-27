@@ -2,6 +2,7 @@ const key = document.querySelector("#key");
 const status = document.querySelector("#status");
 const providerSelect = document.querySelector("#provider");
 const originInput = document.querySelector("#origin");
+const navNotice = document.querySelector("#navNotice");
 for (const provider of globalThis.HUB_PROVIDERS) {
   const option = document.createElement("option");
   option.value = provider.id;
@@ -13,7 +14,12 @@ async function refresh() {
   const saved = await chrome.storage.local.get(["syncKey", "syncStatus", "providerOrigins"]);
   key.value = saved.syncKey || "";
   originInput.value = saved.providerOrigins?.[providerSelect.value] || "";
-  originInput.hidden = !globalThis.HUB_PROVIDERS.find(p => p.id === providerSelect.value)?.customOrigin;
+  const provider = globalThis.HUB_PROVIDERS.find(p => p.id === providerSelect.value);
+  originInput.hidden = !provider?.customOrigin;
+  // #87: a navigated provider (indexFile+pageFile) moves this tab through
+  // every course's assessments list page in turn - say so up front rather
+  // than surprising the student mid-sync.
+  navNotice.hidden = !provider?.indexFile;
   status.textContent = saved.syncStatus || "Sign in to the selected provider, then sync.";
 }
 providerSelect.addEventListener("change", refresh);

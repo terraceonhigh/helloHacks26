@@ -322,9 +322,22 @@ def parse_capture(capture):
             if not isinstance(row, dict):
                 raise ValueError("invalid PrairieLearn assessment")
             href = row.get("href", "")
-            if (not isinstance(href, str) or href and not re.fullmatch(
-                    rf"/pl/course_instance/{ci_id}/assessment_instance/\d+/?", href)):
+            if not isinstance(href, str):
                 raise ValueError("unsafe PrairieLearn assessment URL")
+            # An unstarted assessment usually links to .../assessment/<id>/,
+            # not .../assessment_instance/<id>/ (PM review on #87/#97: the
+            # instance-only pattern silently dropped every unstarted
+            # assessment). Anything outside this course's own relative path
+            # is rejected outright (an absolute/foreign href is a real
+            # safety issue - `url = f"{base}{href}"` is a plain string
+            # join, never urljoin); a same-course path we just don't
+            # recognize the shape of is skipped instead of killing the
+            # whole capture over one odd row.
+            if href and not href.startswith(f"/pl/course_instance/{ci_id}/"):
+                raise ValueError("unsafe PrairieLearn assessment URL")
+            if href and not re.fullmatch(
+                    rf"/pl/course_instance/{ci_id}/assessment(?:_instance)?/\d+/?", href):
+                continue
             fields = ("title", "group", "due_text", "score_text")
             if (any(not isinstance(row.get(field, ""), str) for field in fields)
                     or not row.get("title")):
