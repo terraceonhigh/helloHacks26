@@ -107,7 +107,13 @@ def login(base):
 
 
 def _get_json(req, base, path):
-    r = req.get(f"{base}{path}")
+    # `path` is normally a relative path ("/learn/api/public/v1/...") per
+    # Blackboard's documented shape, but next_page() forwards whatever a
+    # tenant's own `paging.nextPage` field contains -- if some tenant version
+    # ever hands back a full absolute URL there instead, don't silently glue
+    # it onto `base` and build a broken, doubled-up URL.
+    url = path if path.startswith(("http://", "https://")) else f"{base}{path}"
+    r = req.get(url)
     if r.status == 401:
         raise site.NotLoggedIn
     if not r.ok:
