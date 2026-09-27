@@ -40,7 +40,6 @@ function Icon({ name, className = "size-5" }) {
     check: <path d="m5 12 4 4L19 6" />,
     arrow: <><path d="M5 12h14M13 6l6 6-6 6" /></>,
     menu: <><path d="M4 7h16M4 12h16M4 17h16" /></>,
-    spark: <><path d="m12 3 1.3 4.2L17 9l-3.7 1.8L12 15l-1.3-4.2L7 9l3.7-1.8L12 3Z" /><path d="m5 14 .7 2.3L8 17l-2.3.7L5 20l-.7-2.3L2 17l2.3-.7L5 14Z" /></>,
     settings: <><path d="M4 6h10M18 6h2M4 18h10M18 18h2M4 12h4M12 12h8" /><circle cx="16" cy="6" r="2" /><circle cx="10" cy="12" r="2" /><circle cx="16" cy="18" r="2" /></>,
     material: <><path d="M7 3h7l4 4v14H7z" /><path d="M14 3v4h4M9 12h6M9 16h6" /></>,
     announcement: <><path d="M9 5 3 9v6h6l6 4V1z" /><path d="M16 8a4.5 4.5 0 0 1 0 8" /></>,
@@ -384,6 +383,7 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
 export default function App() {
   const [activeNav, setActiveNav] = useState("Overview");
   const [activeFilter, setActiveFilter] = useState("All");
+  const [courseMenuOpen, setCourseMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [mobileNav, setMobileNav] = useState(false);
   const [hideOverdue, setHideOverdue] = useState(false);
@@ -655,7 +655,6 @@ export default function App() {
           <section className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
             <div>
               <div className="mb-2 flex items-center gap-2 text-sm font-bold text-[var(--accent)]">
-                <Icon name="spark" className="size-4" />
                 {now.toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" })}
               </div>
               <div className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -746,10 +745,29 @@ export default function App() {
                   </div>
                   <div className="mt-1 text-sm text-[var(--muted)]">Everything due across your connected platforms</div>
                 </div>
-                <div className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-[var(--surface-soft)] p-1">
-                  {[{ id: "All", label: "All courses" }, ...courses.map((c) => ({ id: c.code, label: c.code }))].map((filter) => (
-                    <AppButton key={filter.id} onClick={() => setActiveFilter(filter.id)} className={`filter-button ${activeFilter === filter.id ? "filter-button-active" : ""}`}>{filter.label}</AppButton>
-                  ))}
+                <div className="relative shrink-0">
+                  <AppButton
+                    onClick={() => setCourseMenuOpen((open) => !open)}
+                    ariaLabel="Filter courses"
+                    className="flex items-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-xs font-bold"
+                  >
+                    <span>{activeFilter === "All" ? "All courses" : activeFilter}</span>
+                    <Icon name="arrow" className="size-3 rotate-90" />
+                  </AppButton>
+                  {courseMenuOpen && (
+                    <div className="absolute right-0 top-[calc(100%+8px)] z-10 w-48 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-1.5 shadow-[var(--shadow-card)]">
+                      {[{ id: "All", label: "All courses" }, ...courses.map((c) => ({ id: c.code, label: c.code }))].map((filter) => (
+                        <label key={filter.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-semibold hover:bg-[var(--surface-soft)]">
+                          <input
+                            type="checkbox"
+                            checked={activeFilter === filter.id}
+                            onChange={() => { setActiveFilter(filter.id); setCourseMenuOpen(false); }}
+                          />
+                          <span>{filter.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
