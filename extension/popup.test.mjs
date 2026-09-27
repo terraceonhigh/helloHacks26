@@ -22,7 +22,8 @@ function loadPopup() {
     runtime: {sendMessage: async () => ({ok: true})},
     permissions: {request: async () => true},
   };
-  const context = {document, chrome, HUB_PROVIDERS: [], URL, setTimeout};
+  const crypto = {getRandomValues: (arr) => arr.fill(0)};
+  const context = {document, chrome, crypto, btoa, HUB_PROVIDERS: [], URL, setTimeout};
   context.globalThis = context;
   vm.runInNewContext(fs.readFileSync(new URL("./popup.js", import.meta.url), "utf8"), context);
   return context;
