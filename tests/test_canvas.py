@@ -1,4 +1,4 @@
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 
@@ -130,3 +130,55 @@ def test_oauth_token_cannot_follow_a_foreign_pagination_link():
 
     with pytest.raises(ValueError, match="allowed origin"):
         canvas._BearerRequest(Session()).get("https://attacker.example/api/v1/courses")
+
+
+def test_canvas_oauth_authorization_and_token_grants(monkeypatch):
+    url = canvas.authorization_url("fake-client", "https://hub.example/api/canvas/callback", "fake-state")
+    parsed = urlparse(url)
+    assert parsed.scheme == "https" and parsed.netloc == "canvas.ubc.ca"
+    assert parsed.path == "/login/oauth2/auth"
+    assert parse_qs(parsed.query) == {
+        "client_id": ["fake-client"], "response_type": ["code"],
+        "redirect_uri": ["https://hub.example/api/canvas/callback"],
+        "state": ["fake-state"],
+    }
+    assert "secret" not in url and "token" not in url
+
+    calls = []
+
+    class Response:
+        status_code = 200
+
+        def json(self):
+            return {"access_token": "fake-access", "refresh_token": "fake-refresh"}
+
+    def post(url, *, data, timeout, allow_redirects):
+        calls.append((url, data))
+        assert timeout == 15 and allow_redirects is False
+        return Response()
+
+    monkeypatch.setattr(canvas.requests, "post", post)
+    assert canvas.exchange_code("fake-client", "fake-secret",
+                                "https://hub.example/api/canvas/callback", "fake-code")["access_token"] == "fake-access"
+    assert canvas.refresh_token("fake-client", "fake-secret", "fake-refresh")["access_token"] == "fake-access"
+    assert calls[0][1] == {
+        "grant_type": "authorization_code", "client_id": "fake-client",
+        "client_secret": "fake-secret", "redirect_uri": "https://hub.example/api/canvas/callback",
+        "code": "fake-code",
+    }
+    assert calls[1][1] == {
+        "grant_type": "refresh_token", "client_id": "fake-client",
+        "client_secret": "fake-secret", "refresh_token": "fake-refresh",
+    }
+
+
+def test_canvas_oauth_error_does_not_echo_upstream_secrets(monkeypatch):
+    class Response:
+        status_code = 400
+        text = "fake-secret fake-code"
+
+    monkeypatch.setattr(canvas.requests, "post", lambda *_args, **_kwargs: Response())
+    with pytest.raises(RuntimeError) as error:
+        canvas.exchange_code("fake-client", "fake-secret", "https://hub.example/callback", "fake-code")
+    assert "fake-secret" not in str(error.value)
+    assert "fake-code" not in str(error.value)

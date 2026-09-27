@@ -9,7 +9,7 @@ Try it:  uv run python -m hub.canvas
 """
 import json
 from datetime import date, datetime, timedelta
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urlencode, urljoin, urlparse
 
 import requests
 
@@ -100,6 +100,57 @@ def to_undated_item(a, course_code):
 def login():
     """Open a visible browser; the student signs in; we save the session."""
     site.login(SITE, BASE)
+
+
+def authorization_url(client_id, redirect_uri, state):
+    """URL for Canvas's server-side authorization-code flow.
+
+    The HTTP layer creates and verifies a one-time state value. Never place
+    the client secret, a token, or a student's password in this URL.
+    """
+    if not all((client_id, redirect_uri, state)):
+        raise ValueError("Canvas OAuth configuration or state is missing")
+    return f"{BASE}/login/oauth2/auth?{urlencode({
+        'client_id': client_id,
+        'response_type': 'code',
+        'redirect_uri': redirect_uri,
+        'state': state,
+    })}"
+
+
+def _token_request(client_id, client_secret, grant_type, **fields):
+    if not client_id or not client_secret or not all(fields.values()):
+        raise ValueError("Canvas OAuth credentials or grant value is missing")
+    response = requests.post(
+        f"{BASE}/login/oauth2/token",
+        data={"grant_type": grant_type, "client_id": client_id,
+              "client_secret": client_secret, **fields},
+        timeout=15,
+        allow_redirects=False,
+    )
+    # Never include Canvas's response body here: an upstream error may echo a
+    # code, token, or client secret and end up in public server logs.
+    if not 200 <= response.status_code < 300:
+        raise RuntimeError(f"Canvas OAuth token request failed ({response.status_code})")
+    try:
+        tokens = response.json()
+    except ValueError:
+        raise RuntimeError("Canvas OAuth token response is invalid JSON") from None
+    if not isinstance(tokens, dict) or not tokens.get("access_token"):
+        raise RuntimeError("Canvas OAuth token response is incomplete")
+    return tokens
+
+
+def exchange_code(client_id, client_secret, redirect_uri, code):
+    """Exchange a one-use callback code for Canvas access/refresh tokens."""
+    return _token_request(client_id, client_secret, "authorization_code",
+                          redirect_uri=redirect_uri, code=code)
+
+
+def refresh_token(client_id, client_secret, token):
+    """Refresh access; Canvas keeps the same refresh token across refreshes."""
+    return _token_request(client_id, client_secret, "refresh_token",
+                          refresh_token=token)
 
 
 class _BearerResponse:
