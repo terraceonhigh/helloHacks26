@@ -3,6 +3,7 @@ name = "ubc-hub"
 version = "0.1.0"
 description = "Single pane of glass for UBC: Canvas, Workday, and the UBC Bookstore"
 requires-python = ">=3.12"
+license = "GPL-3.0-or-later"
 dependencies = [
     "streamlit",
     "requests",
