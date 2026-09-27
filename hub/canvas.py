@@ -1,4 +1,4 @@
-"""Canvas adapter without API tokens.
+"""Canvas adapter for local browser sessions or hosted OAuth access tokens.
 
 The student logs in to canvas.ubc.ca themselves (CWL + Duo) in a real browser
 window (hub.site handles that part). We reuse that session to call the same
@@ -9,7 +9,9 @@ Try it:  uv run python -m hub.canvas
 """
 import json
 from datetime import date, datetime, timedelta
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
+
+import requests
 
 from hub import site
 from hub.models import Course, Item, category_for
@@ -100,8 +102,36 @@ def login():
     site.login(SITE, BASE)
 
 
-def fetch(start=None, end=None):
-    """Return (courses, items) for start..end. Logs in if needed.
+class _BearerResponse:
+    """Expose requests' response through the small interface site.get_all uses."""
+
+    def __init__(self, response):
+        self.status = response.status_code
+        self.ok = 200 <= self.status < 300
+        self.headers = response.headers
+        self._response = response
+
+    def text(self):
+        return self._response.text
+
+
+class _BearerRequest:
+    def __init__(self, session):
+        self.session = session
+
+    def get(self, url):
+        parsed = urlparse(url)
+        # Canvas supplies pagination links. Never forward a student's bearer
+        # token to a different origin, even if an upstream Link header says to.
+        if (parsed.scheme != "https" or parsed.hostname != urlparse(BASE).hostname
+                or parsed.port is not None or parsed.username or parsed.password
+                or not parsed.path.startswith("/api/v1/")):
+            raise ValueError("Canvas API pagination left the allowed origin")
+        return _BearerResponse(self.session.get(url, timeout=15, allow_redirects=False))
+
+
+def fetch(start=None, end=None, *, access_token=None):
+    """Return (courses, items) for start..end, using OAuth or local login.
 
     Default is a whole UBC term either side of today (~4 months), not just
     the coming week: planner/items needs *some* range, and Canvas doesn't
@@ -109,7 +139,13 @@ def fetch(start=None, end=None):
     """
     start = start or date.today() - timedelta(days=120)
     end = end or date.today() + timedelta(days=120)
-    return site.fetch_with_session(SITE, BASE, lambda req: _run(req, start, end))
+    if access_token is None:
+        return site.fetch_with_session(SITE, BASE, lambda req: _run(req, start, end))
+    if not access_token:
+        raise ValueError("Canvas access token is empty")
+    with requests.Session() as session:
+        session.headers.update({"Authorization": f"Bearer {access_token}"})
+        return _run(_BearerRequest(session), start, end)
 
 
 def _run(req, start, end):

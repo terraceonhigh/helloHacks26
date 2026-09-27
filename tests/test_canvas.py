@@ -1,3 +1,8 @@
+from urllib.parse import urlparse
+
+import pytest
+
+from hub import canvas
 from hub.canvas import done_from_submissions, to_course, to_item, to_undated_item, unwrap
 
 
@@ -66,3 +71,62 @@ def test_done_from_submissions_also_honors_the_manual_complete_checkbox():
     assert done_from_submissions({"planner_override": {"marked_complete": True}}) is True
     assert done_from_submissions({"submissions": {"submitted": False}, "planner_override": {"marked_complete": False}}) is False
     assert done_from_submissions({"planner_override": None}) is None
+
+
+def test_oauth_fetch_reuses_the_canvas_mapping_without_local_browser(monkeypatch):
+    class Response:
+        status_code = 200
+        headers = {}
+
+        def __init__(self, body):
+            import json
+            self.text = json.dumps(body)
+
+    class Session:
+        def __init__(self):
+            self.headers = {}
+            self.paths = []
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            pass
+
+        def get(self, url, *, timeout, allow_redirects):
+            assert self.headers == {"Authorization": "Bearer fake-access-token"}
+            assert timeout == 15 and allow_redirects is False
+            path = urlparse(url).path
+            self.paths.append(path)
+            if path == "/api/v1/courses":
+                return Response([{"id": 7, "course_code": "CPSC 121", "name": "Models"}])
+            if path == "/api/v1/planner/items":
+                return Response([{"course_id": 7, "plannable_type": "quiz",
+                                  "plannable_date": "2026-09-30T06:59:00Z",
+                                  "plannable": {"title": "Quiz 2"},
+                                  "html_url": "/courses/7/quizzes/3"}])
+            if path == "/api/v1/courses/7/assignments":
+                return Response([{"name": "Reading response", "due_at": None,
+                                  "html_url": "/courses/7/assignments/9"}])
+            raise AssertionError(url)
+
+    session = Session()
+    monkeypatch.setattr(canvas.requests, "Session", lambda: session)
+    monkeypatch.setattr(canvas.site, "fetch_with_session", lambda *_: pytest.fail("local browser used"))
+    courses, items = canvas.fetch(access_token="fake-access-token")
+    assert [c.code for c in courses] == ["CPSC 121"]
+    assert [(i.kind, i.course, i.title) for i in items] == [
+        ("quiz", "CPSC 121", "Quiz 2"),
+        ("assignment", "CPSC 121", "Reading response"),
+    ]
+    assert session.paths == ["/api/v1/courses", "/api/v1/planner/items",
+                             "/api/v1/courses/7/assignments"]
+
+
+def test_oauth_token_cannot_follow_a_foreign_pagination_link():
+    class Session:
+        def get(self, *_args, **_kwargs):
+            pytest.fail("token sent to foreign origin")
+
+    with pytest.raises(ValueError, match="allowed origin"):
+        canvas._BearerRequest(Session()).get("https://attacker.example/api/v1/courses")
