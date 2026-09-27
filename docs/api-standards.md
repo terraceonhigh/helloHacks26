@@ -123,4 +123,45 @@ Researched 2026-09-26. Unmarked claims were checked against the linked source. *
 | Piazza | No official API; unofficial login-based client ([piazza-api](https://github.com/hfaran/piazza-api)) | Fragile |
 | Gradescope / iClicker | LTI only; grades flow into the Canvas gradebook ([iClicker @ UBC](https://lthub.ubc.ca/2023/04/21/improvement-to-how-iclicker-cloud-works-with-canvas/)) | Read them via Canvas |
 | PrairieLearn | No student-facing API. Own CWL-backed login (same flow the browser-login adapters already use for Canvas), then the per-course-instance "assessments" page lists each assessment with a due date. **[page markup unverified — nobody on the team has pulled up a real UBC PrairieLearn course instance to confirm the HTML/route shape yet]** | Via our own browser-session adapter (`hub/site.py`), same pattern as Canvas — once someone verifies the page |
+| Macmillan Achieve | No public API or page-structure docs at all -- closed-source. Reached almost always via LTI launch from the LMS, but also has its own standalone login (`achieve.macmillanlearning.com`) -- see detail below. **[dashboard/assignment-list structure entirely unverified -- nobody on the team has a real Achieve account]** | Login only (`hub/site.py`) -- no items yet, see detail |
 | Kaltura | Kaltura Session from a partner secret or appToken [docs](https://developer.kaltura.com/api-docs/VPaaS-API-Getting-Started/Kaltura_API_Authentication_and_Security.html) | No |
+
+### Macmillan Achieve, detail (issue #24, researched 2026-09-26)
+
+**Confidence here is lower than WeBWorK's (#23) first draft.** WeBWorK is
+open-source with a real, publicly inspectable template to cite against;
+Achieve is a closed-source Macmillan Learning product with no public
+developer documentation of its API or internal page structure at all.
+Nothing below was checked against a real, logged-in Achieve session --
+only public, logged-out help-center pages describing the *access flow*.
+
+- **Cited, real:** Achieve is normally reached by clicking an Achieve-branded
+  link inside the course's LMS (Canvas/Brightspace/etc.), an LTI-launched
+  SSO flow -- "From inside your Canvas course, go to Modules and click on
+  any Macmillan Achieve assignment." -- [UNM, How to Access Macmillan
+  Achieve Assignments](https://canvasinfo.unm.edu/external-apps/students/macmillan-achieve-student/how-to-access-macmillanachieve-assignments.html)
+- **Cited, real:** unlike WeBWorK's UBC deployment (LTI-only, no separate
+  login page found), Achieve also has its own **standalone login** at
+  `achieve.macmillanlearning.com`, independent of any LMS -- a student can
+  sign in with a Macmillan account or join a course via an instructor-given
+  access code from the Achieve sign-in page itself. -- [Macmillan Learning
+  Student Store, SSO-Help](https://store.macmillanlearning.com/us/SSO-Help),
+  [Get Help / FAQs](https://store.macmillanlearning.com/us/content/get-help)
+- **Genuinely unknown:** the dashboard/assignment-list markup or API shape,
+  whether assignments have stable URL-shaped identifiers (needed for
+  `hub.db`'s `UNIQUE(source, url)` items table, the same problem
+  hub/webwork.py hit and fixed), whether due dates or scores appear on any
+  page reachable without extra clicks, and whether an LTI-launched session
+  even persists for a later plain GET the way WeBWorK's did.
+- **Reasoned by analogy, not confirmed:** if Achieve turns out to expose
+  plain JSON behind its dashboard (plausible for a modern SPA, the way
+  hub/brightspace.py found for D2L), that's the right thing to read --
+  AGENTS.md's "behind a login, read JSON, never HTML" rule applies here
+  with *more* force than to WeBWorK/PrairieLearn's legacy server-rendered
+  pages, since there's no real markup on hand to check a guess against.
+- **Result:** `hub/achieve.py` ships `login()` only (reusing `hub.site.login`,
+  unverified against a real Achieve sign-in flow) and a `fetch()` that
+  always returns `([], [])`, documented the same way
+  hub/brightspace.py's "Items: not built here, on purpose" section explains
+  its own gap -- rather than guess at page structure with nothing real to
+  check it against.
