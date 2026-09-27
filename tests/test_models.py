@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from hub.models import Item, status_of
+from hub.models import Item, ItemFile, status_of
 
 NOW = datetime(2026, 9, 30, 12, 0, tzinfo=timezone.utc)
 
@@ -29,3 +29,15 @@ def test_within_48h_is_soon():
 
 def test_beyond_48h_is_upcoming():
     assert status_of(item(due=NOW + timedelta(hours=49)), NOW) == "upcoming"
+
+
+def test_files_defaults_to_empty_not_none():
+    # [] means "not fetched yet", never checked against None elsewhere
+    assert item().files == []
+
+
+def test_files_holds_real_entries_when_an_adapter_sets_them():
+    with_files = Item(course="CPSC 121", category="task", kind="assignment", title="PS3",
+                       due=None, url="https://x", source="canvas",
+                       files=[ItemFile(name="handout.pdf", url="https://x/1")])
+    assert with_files.files[0].kind == "file"  # default kind

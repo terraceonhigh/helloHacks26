@@ -32,7 +32,11 @@ function vanDue(now, dayOffset, hhmm) {
 export function mockItems(now) {
   return [
     { course: "FOO 100", category: "task", kind: "assignment", title: "Problem Set 3",
-      due: vanDue(now, 0, "23:59"), url: "https://canvas.example/courses/100/assignments/3", source: "canvas" },
+      due: vanDue(now, 0, "23:59"), url: "https://canvas.example/courses/100/assignments/3", source: "canvas",
+      files: [ // a real item.files, to demo the non-placeholder path
+        { name: "PS3 handout.pdf", url: "https://canvas.example/files/301", kind: "file" },
+        { name: "Starter code", url: "https://canvas.example/files/302", kind: "folder" },
+      ] },
     { course: "BARR 200", category: "task", kind: "quiz", title: "Lab 4 pre-lab quiz",
       due: vanDue(now, 0, "17:00"), url: "https://prairielearn.example/course_instance/200/assessment/4", source: "prairielearn" },
     { course: "FIZZ 300", category: "task", kind: "assignment", title: "Essay draft",
@@ -42,14 +46,19 @@ export function mockItems(now) {
   ];
 }
 
-// Placeholder "primed files" per task for the Finder pane. Fetching these is
-// an open question on the sketch (LLM agent or heuristic?), so they are static.
-export function mockFiles(item) {
+// hub.models.Item now has a real `files` field (ItemFile: name/url/kind) -
+// see hub/models.py and the Agent board (#15). No adapter fills it in yet
+// (that's the still-open "LLM agent or heuristic" question), so an item
+// with no files falls back to this static placeholder rather than showing
+// an empty pane. Once a real item.files arrives from /api/upcoming, this
+// stops being called for it.
+export function filesFor(item) {
+  if (item.files?.length) return item.files;
   return [
-    { name: "Class Notes", type: "folder" },
-    { name: "Readings", type: "folder" },
-    { name: "template.docx", type: "file" },
-  ].map((f) => ({ ...f, id: `${item.url}#${f.name}` }));
+    { name: "Class Notes", kind: "folder" },
+    { name: "Readings", kind: "folder" },
+    { name: "template.docx", kind: "file" },
+  ].map((f) => ({ ...f, url: `${item.url}#${f.name}` }));
 }
 
 export function isToday(iso, now) {

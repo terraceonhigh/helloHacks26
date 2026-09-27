@@ -22,7 +22,7 @@ import {
   PanelLeft,
   PanelRight,
 } from "lucide-react";
-import { PROVIDERS, TZ, isToday, mockFiles, mockItems, providerName } from "./data";
+import { PROVIDERS, TZ, filesFor, isToday, mockItems, providerName } from "./data";
 import styles from "./mockup.module.css";
 
 const features = tableFeatures({ columnOrderingFeature });
@@ -224,9 +224,9 @@ export default function Mockup() {
         </h2>
         {selected ? (
           <ul className={styles.finder}>
-            {mockFiles(selected).map((f) => (
-              <li key={f.id} className={styles.finderItem}>
-                {f.type === "folder" ? (
+            {filesFor(selected).map((f) => (
+              <li key={f.url} className={styles.finderItem}>
+                {f.kind === "folder" ? (
                   <Folder className={styles.finderIcon} size={48} strokeWidth={1.25} aria-hidden />
                 ) : (
                   <FileText className={styles.finderIcon} size={48} strokeWidth={1.25} aria-hidden />
@@ -238,7 +238,9 @@ export default function Mockup() {
         ) : (
           <p className={styles.hint}>Choose a task&rsquo;s readings link to see its files.</p>
         )}
-        <p className={styles.placeholder}>Placeholder files. Fetching them isn&rsquo;t built yet.</p>
+        {selected && !selected.files?.length && (
+          <p className={styles.placeholder}>Placeholder files. Fetching them isn&rsquo;t built yet.</p>
+        )}
       </aside>
     </div>
   );

@@ -1,5 +1,5 @@
 """Shared model every adapter returns. Keep it tiny (see issue #1)."""
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import Literal
 
@@ -36,6 +36,17 @@ class Course:
 
 
 @dataclass
+class ItemFile:
+    """One thing attached to an Item - a reading, a template, a folder of
+    course notes - for the mockup's Finder-style files pane (#26/#38's
+    dashboard sketch). `kind` picks the icon; `folder` has no direct
+    download, just groups files under it."""
+    name: str
+    url: str
+    kind: Literal["file", "folder", "link"] = "file"
+
+
+@dataclass
 class Item:
     course: str
     category: Category
@@ -45,6 +56,11 @@ class Item:
     url: str
     source: str
     done: bool | None = None  # completed/submitted, if the source can tell us. None = unknown/not applicable
+    # ponytail: no adapter populates this yet - whether it's an LLM agent or
+    # a per-provider heuristic that fills it in is Terrace's open question on
+    # #26/#38, not decided here. This only settles the shape: [] (the
+    # default) means "not fetched", not "genuinely no files".
+    files: list[ItemFile] = field(default_factory=list)
 
 
 Status = Literal["done", "overdue", "soon", "upcoming"]
