@@ -343,11 +343,23 @@ def fetch():
         items = []
         for c in raw_courses:
             course_id = c["id"]
-            work = _get_all(session, f"{API_BASE}/courses/{course_id}/courseWork", {}, "courseWork")
-            subs = _get_all(session, f"{API_BASE}/courses/{course_id}/courseWork/-/studentSubmissions",
-                             {"userId": "me"}, "studentSubmissions")
+            try:
+                work = _get_all(session, f"{API_BASE}/courses/{course_id}/courseWork", {}, "courseWork")
+                subs = _get_all(session, f"{API_BASE}/courses/{course_id}/courseWork/-/studentSubmissions",
+                                 {"userId": "me"}, "studentSubmissions")
+            except Exception:
+                continue  # this course's coursework/submissions call failed; keep the other courses' items
             done_map = done_map_from_submissions(subs)
-            items += [to_item(w, codes.get(course_id, ""), done_map) for w in work]
+            for w in work:
+                try:
+                    items.append(to_item(w, codes.get(course_id, ""), done_map))
+                except Exception:
+                    # One malformed courseWork item (e.g. a dueDate missing a
+                    # field) must not discard every other course's already-
+                    # parsed items along with it - the old list-comprehension
+                    # version let one bad item's exception propagate out of
+                    # this whole function via the outer except below.
+                    continue
         return courses, items
     except Exception:
         # ponytail: one broad catch at the adapter boundary - a dead token,

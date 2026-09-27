@@ -119,3 +119,83 @@ def test_fetch_returns_empty_on_a_broken_token_file(tmp_path, monkeypatch):
     path.write_text("not json")
     monkeypatch.setattr(gc, "token_path", lambda: path)
     assert fetch() == ([], [])
+
+
+class _FakeResponse:
+    def __init__(self, json_body):
+        self._json = json_body
+
+    def raise_for_status(self):
+        pass
+
+    def json(self):
+        return self._json
+
+
+def _valid_token(tmp_path, monkeypatch):
+    import hub.google_classroom as gc
+
+    path = tmp_path / "google_classroom-token.json"
+    path.write_text('{"access_token": "tok", "refresh_token": "r", "client_id": "c", '
+                     '"client_secret": "s", "expires_in": 3600, "obtained_at": 9999999999.0}')
+    monkeypatch.setattr(gc, "token_path", lambda: path)
+    return gc
+
+
+def test_fetch_returns_courses_and_items_end_to_end(tmp_path, monkeypatch):
+    gc = _valid_token(tmp_path, monkeypatch)
+
+    class FakeSession:
+        def __init__(self):
+            self.headers = {}
+
+        def get(self, url, params=None, timeout=None):
+            if url.endswith("/courses"):
+                return _FakeResponse({"courses": [{"id": "c1", "name": "CPSC 121", "section": "101"}]})
+            if url.endswith("/courseWork"):
+                return _FakeResponse({"courseWork": [
+                    {"id": "w1", "title": "PS1", "workType": "ASSIGNMENT",
+                     "alternateLink": "https://classroom.google.com/c/c1/a/w1",
+                     "dueDate": {"year": 2026, "month": 10, "day": 1}, "dueTime": {"hours": 23, "minutes": 59}},
+                ]})
+            if "studentSubmissions" in url:
+                return _FakeResponse({"studentSubmissions": [{"courseWorkId": "w1", "state": "TURNED_IN"}]})
+            raise AssertionError(f"unexpected url: {url}")
+
+    monkeypatch.setattr(gc.requests, "Session", FakeSession)
+    courses, items = gc.fetch()
+    assert [c.code for c in courses] == ["CPSC 121"]
+    assert len(items) == 1
+    assert (items[0].title, items[0].done, items[0].course) == ("PS1", True, "CPSC 121")
+
+
+def test_fetch_skips_one_malformed_item_but_keeps_the_rest(tmp_path, monkeypatch):
+    # The concrete bug fixed on review: to_item() raised for a courseWork
+    # item with a dueDate missing required fields, and that exception
+    # propagated all the way out of fetch()'s outer try/except, discarding
+    # every course and every other item along with it.
+    gc = _valid_token(tmp_path, monkeypatch)
+
+    class FakeSession:
+        def __init__(self):
+            self.headers = {}
+
+        def get(self, url, params=None, timeout=None):
+            if url.endswith("/courses"):
+                return _FakeResponse({"courses": [{"id": "c1", "name": "CPSC 121"}]})
+            if url.endswith("/courseWork"):
+                return _FakeResponse({"courseWork": [
+                    {"id": "good", "title": "Good item", "workType": "ASSIGNMENT",
+                     "alternateLink": "https://classroom.google.com/c/c1/a/good"},
+                    {"id": "bad", "title": "Malformed due date", "workType": "ASSIGNMENT",
+                     "alternateLink": "https://classroom.google.com/c/c1/a/bad",
+                     "dueDate": {"year": 2026}},  # missing month/day -> to_item raises KeyError
+                ]})
+            if "studentSubmissions" in url:
+                return _FakeResponse({"studentSubmissions": []})
+            raise AssertionError(f"unexpected url: {url}")
+
+    monkeypatch.setattr(gc.requests, "Session", FakeSession)
+    courses, items = gc.fetch()
+    assert [c.code for c in courses] == ["CPSC 121"]  # course survives
+    assert [i.title for i in items] == ["Good item"]  # good item survives, bad one skipped
