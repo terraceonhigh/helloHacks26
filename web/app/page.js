@@ -12,6 +12,7 @@ import {
   isOverdue,
   sortItems,
 } from "../lib/hub";
+import { parseWorkdayCourses } from "../lib/workday";
 
 const TABS = [
   { key: "all", label: "All" },
@@ -58,6 +59,49 @@ function ConnectBar({ onConnected }) {
         {busy === "prairielearn" ? "Sign in in the window that opened…" : "Connect PrairieLearn"}
       </button>
       {error && <span className="connect-error">{error}</span>}
+    </div>
+  );
+}
+
+function WorkdayImport({ onImported }) {
+  const [term, setTerm] = useState("2026W1");
+  const [status, setStatus] = useState(null); // {count} | {error}
+
+  async function handleFile(e) {
+    const file = e.target.files[0];
+    e.target.value = ""; // allow re-selecting the same file later
+    if (!file) return;
+    try {
+      const buf = await file.arrayBuffer();
+      const courses = parseWorkdayCourses(buf, term);
+      onImported(courses);
+      setStatus({ count: courses.length });
+    } catch (err) {
+      setStatus({ error: err.message });
+    }
+  }
+
+  return (
+    <div className="workday-import">
+      <label>
+        Term{" "}
+        <input
+          type="text"
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
+          size={8}
+        />
+      </label>{" "}
+      <label className="file-label">
+        Import Workday courses (.xlsx)
+        <input type="file" accept=".xlsx" onChange={handleFile} />
+      </label>
+      {status?.count != null && (
+        <span className="import-status">
+          Imported {status.count} course{status.count === 1 ? "" : "s"}.
+        </span>
+      )}
+      {status?.error && <span className="connect-error">{status.error}</span>}
     </div>
   );
 }
@@ -161,6 +205,21 @@ export default function Page() {
     }
   }
 
+  function importWorkdayCourses(imported) {
+    // Merge by code: a re-import (or a course already present from
+    // Canvas/PrairieLearn/sample data) is updated, not duplicated - but
+    // Workday never carries a grade, so don't let it blank out one we
+    // already knew (e.g. from Canvas).
+    setCourses((prev) => {
+      const byCode = new Map(prev.map((c) => [c.code, c]));
+      for (const c of imported) {
+        const existing = byCode.get(c.code);
+        byCode.set(c.code, existing ? { ...existing, ...c, grade: c.grade ?? existing.grade } : c);
+      }
+      return Array.from(byCode.values());
+    });
+  }
+
   useEffect(() => {
     load(sampleMode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -183,6 +242,8 @@ export default function Page() {
         Gotham for students: every provider, one pane of glass.{" "}
         {sampleMode ? "(Sample data.)" : "(Local mode: real Canvas/PrairieLearn data.)"}
       </p>
+
+      <WorkdayImport onImported={importWorkdayCourses} />
 
       {isLocalMode() && (
         <label className="toggle sample-toggle">

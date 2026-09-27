@@ -239,3 +239,33 @@ tr.overdue td {
   color: #666;
   margin: 0 0 0.75rem;
 }
+
+.workday-import {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+}
+
+.workday-import input[type="text"] {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.15rem 0.4rem;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.file-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.import-status {
+  color: var(--muted);
+}
