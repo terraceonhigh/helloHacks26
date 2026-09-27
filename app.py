@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import streamlit as st
 
-from hub import canvas, db, export_ics, key_dates, prairielearn, workday
+from hub import canvas, db, export_ics, key_dates, piazza, prairielearn, workday
 from hub.logic import sort_items
 from hub.models import Course, Item, category_for, classify_urgency, status_of
 
@@ -32,6 +32,23 @@ def sample_conn():
     return conn
 
 
+def _sample_piazza_posts():
+    """A few made-up posts, so the sidebar's "Recent on Piazza" feed has
+    something to show in Sample data mode without a real Piazza login -
+    same spirit as sample_conn() above."""
+    return [
+        piazza.Post(course="CPSC 121", title="Midterm 1 room assignments",
+                    text="Room bookings are up on the course website - check your own section.",
+                    url="https://piazza.com/class/sample?cid=1", created="2026-09-26T12:00:00Z"),
+        piazza.Post(course="MATH 100", title="Office hours moved this week",
+                    text="Thursday's office hour moves to 2-3pm, same room.",
+                    url="https://piazza.com/class/sample?cid=2", created="2026-09-25T09:00:00Z"),
+        piazza.Post(course="ENGL 110", title="Question about the reading response length",
+                    text="Is the 300-word minimum per chapter or for the whole response?",
+                    url="https://piazza.com/class/sample?cid=3", created="2026-09-24T18:30:00Z"),
+    ]
+
+
 def _row_item(r):
     """A hub.db.upcoming()/undated() row - (code, category, kind, title, due,
     url, done, source) - back as a real Item. One place to do this instead of
@@ -46,15 +63,42 @@ def _row_item(r):
 with st.sidebar:
     demo = st.toggle("Sample data", value=True, help="Off = your own Canvas data from this laptop's hub.db")
     if not demo:
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
         if col1.button("Connect Canvas", help="Opens a browser window: sign in with CWL + Duo yourself"):
             with st.spinner("Waiting for you to sign in to Canvas…"):
                 db.save(db.connect(), *canvas.fetch())
         if col2.button("Connect PrairieLearn", help="Opens a browser window: sign in with CWL + Duo yourself"):
             with st.spinner("Waiting for you to sign in to PrairieLearn…"):
                 db.save(db.connect(), *prairielearn.fetch())
+        if col3.button("Connect Piazza", help="Opens a browser window: sign in with CWL + Duo yourself"):
+            with st.spinner("Waiting for you to sign in to Piazza…"):
+                st.session_state["piazza_posts"] = piazza.recent_posts(limit=8)
     n = st.slider("Show next", 5, 50, 10)
     hide_overdue = st.toggle("Hide overdue", value=False)
+
+    # ---------------------------------------------------------------------
+    # Recent Piazza activity: title, text, and the course it's associated
+    # with (normalised the same way every other source's course code is -
+    # see hub.piazza.Post) - a running feed on the side of the dashboard,
+    # deliberately separate from the ranked task/deadline tables above.
+    # Ordinary class chatter isn't a deadline, and doesn't belong ranked
+    # next to one.
+    # ---------------------------------------------------------------------
+    st.divider()
+    st.caption("Recent on Piazza")
+    piazza_posts = _sample_piazza_posts() if demo else st.session_state.get("piazza_posts")
+    if not piazza_posts:
+        st.caption("Nothing yet." if demo else "Connect Piazza above to see it.")
+    else:
+        for post in piazza_posts[:5]:
+            with st.container(border=True):
+                st.caption(post.course or "Unknown course")
+                st.markdown(f"**[{post.title}]({post.url})**" if post.url else f"**{post.title}**")
+                text = post.text
+                if len(text) > 140:
+                    text = text[:140].rstrip() + "…"
+                if text:
+                    st.caption(text)
 
 conn = sample_conn() if demo else db.connect()
 db.save(conn, *key_dates.fetch("UBCV"))  # public, no login - always shown, sample or real
