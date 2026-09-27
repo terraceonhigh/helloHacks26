@@ -60,7 +60,10 @@ conn = sample_conn() if demo else db.connect()
 db.save(conn, *key_dates.fetch("UBCV"))  # public, no login - always shown, sample or real
 now = datetime.now(timezone.utc)
 
-for tab, category in zip(st.tabs(["All", "Tasks", "Deadlines", "Materials"]), [None, "task", "deadline", "material"]):
+tab_all, tab_tasks, tab_deadlines, tab_materials, tab_courses = \
+    st.tabs(["All", "Tasks", "Deadlines", "Materials", "Courses"])
+
+for tab, category in zip([tab_all, tab_tasks, tab_deadlines, tab_materials], [None, "task", "deadline", "material"]):
     with tab:
         # Completed items never show, regardless of the Hide overdue toggle -
         # nothing left to do about them.
@@ -91,6 +94,27 @@ for tab, category in zip(st.tabs(["All", "Tasks", "Deadlines", "Materials"]), [N
                            "Link": st.column_config.LinkColumn(display_text="open")},
             hide_index=True, use_container_width=True,
         )
+
+# ---------------------------------------------------------------------------
+# Courses (#10): every course we know about, with its current grade (Canvas
+# only) and how many upcoming items it has - the "one card per course"
+# summary the item tables above don't give you.
+# ---------------------------------------------------------------------------
+with tab_courses:
+    courses = db.courses(conn)
+    if not courses:
+        st.info("No courses yet." if demo else "Nothing yet. Connect Canvas in the sidebar.")
+    else:
+        upcoming_counts = {code: len(rows) for code, rows in db.by_course(conn).items()}
+        columns = st.columns(3)
+        for index, (code, term, title, grade) in enumerate(courses):
+            with columns[index % 3], st.container(border=True):
+                st.subheader(code)
+                st.caption(f"{title} · {term}" if term else title)
+                if grade is not None:
+                    st.metric("Grade", f"{grade:.1f}%")
+                count = upcoming_counts.get(code, 0)
+                st.caption(f"{count} upcoming item{'s' if count != 1 else ''}")
 
 
 @st.dialog("Connect Workday")
