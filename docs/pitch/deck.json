@@ -2,10 +2,10 @@
   "v": 4,
   "createdOnFiles": {"v": 1, "at": "2026-09-27T10:00:00Z"},
   "title": "Lauds Pitch Deck",
-  "order": ["cover", "problem", "solution", "tour", "architecture", "breadth", "rigor", "proof", "roadmap", "thanks"],
+  "order": ["cover", "problem", "solution", "gotham", "ooda", "tour", "architecture", "breadth", "rigor", "proof", "roadmap", "thanks"],
   "sections": {
     "intro": {"description": "The problem every UBC student already has", "start": "cover"},
-    "product": {"description": "What we built, and how it works", "start": "solution"},
+    "product": {"description": "What we built, why it works, and how", "start": "solution"},
     "proof": {"description": "Breadth, engineering rigor, and real proof", "start": "breadth"},
     "close": {"description": "Roadmap and the ask", "start": "roadmap"}
   },
