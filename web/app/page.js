@@ -74,7 +74,7 @@ function AppButton({ children, className = "", onClick, ariaLabel, title, disabl
 function ItemLink({ item }) {
   if (!item.url) return null;
   return (
-    <a href={item.url} className="item-link" title={item.url} aria-label={`Open in ${item.source || item.course}: ${item.url}`}>
+    <a href={item.url} className="item-link" aria-label={`Open in ${item.source || item.course}: ${item.url}`}>
       <Icon name="link" className="size-4 shrink-0" />
       <span className="item-link-tip" aria-hidden="true">{item.url}</span>
     </a>
