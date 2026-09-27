@@ -1,0 +1,9 @@
+{
+  "uuid": "5f0c1e2a-0e11-4c2b-9a51-2f6a7e0a0107",
+  "type": "Exam",
+  "set": "Quiz",
+  "number": "1",
+  "title": "Timed Quiz",
+  "allowAccess": [{"startDate":"2026-09-01T00:00:01","endDate":"2026-10-10T18:00:00","credit":100,"timeLimitMin":30}],
+  "zones": []
+}

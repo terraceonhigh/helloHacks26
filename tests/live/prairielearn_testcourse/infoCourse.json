@@ -1,0 +1,8 @@
+{
+  "uuid": "5f0c1e2a-0e11-4c2b-9a51-2f6a7e0a0001",
+  "name": "FAKE 101",
+  "title": "Oracle Test Course",
+  "timezone": "America/Vancouver",
+  "comment": "FAKE course for tests/live/prairielearn_selfhost_oracle.py. No real data.",
+  "topics": [{ "name": "Test", "color": "gray1", "description": "Fake topic." }]
+}
