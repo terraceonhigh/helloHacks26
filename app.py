@@ -3,13 +3,18 @@ from datetime import datetime, timedelta, timezone
 
 import streamlit as st
 
-from hub import canvas, db, export_ics, key_dates, prairielearn
+from hub import canvas, db, export_ics, key_dates, prairielearn, workday
 from hub.logic import sort_items
 from hub.models import Course, Item, category_for, classify_urgency, status_of
 
-st.set_page_config(page_title="UBC Hub")
+st.set_page_config(page_title="UBC Hub", layout="wide")
 st.title("UBC Hub")
 st.caption("Gotham for students: every provider, one pane of glass.")
+
+# One glance at "Urgency" as text still means reading every row - a marker
+# column makes the ranking visible without reading anything (hub.models
+# already defines this exact 5-level scale via classify_urgency/status_of).
+URGENCY_MARKER = {"overdue": "🔴", "critical": "🟠", "high": "🟡", "medium": "🔵", "low": "⚪"}
 
 
 def sample_conn():
@@ -25,6 +30,17 @@ def sample_conn():
     conn = db.connect(":memory:")
     db.save(conn, courses, items)
     return conn
+
+
+def _row_item(r):
+    """A hub.db.upcoming()/undated() row - (code, category, kind, title, due,
+    url, done, source) - back as a real Item. One place to do this instead of
+    repeating datetime.fromisoformat(r[4]) and the same field-by-field
+    unpacking at every call site (status_of, classify_urgency, the calendar
+    export all used to redo it separately)."""
+    return Item(course=r[0], category=r[1], kind=r[2], title=r[3],
+                due=datetime.fromisoformat(r[4]) if r[4] else None, url=r[5],
+                source=r[7], done=bool(r[6]) if r[6] is not None else None)
 
 
 with st.sidebar:
@@ -46,24 +62,32 @@ now = datetime.now(timezone.utc)
 
 for tab, category in zip(st.tabs(["All", "Tasks", "Deadlines", "Materials"]), [None, "task", "deadline", "material"]):
     with tab:
-        def status(r):
-            item = Item(course=r[0], category=r[1], kind=r[2], title=r[3],
-                        due=datetime.fromisoformat(r[4]), url=r[5], source="", done=bool(r[6]) if r[6] is not None else None)
-            return status_of(item, now)
-
         # Completed items never show, regardless of the Hide overdue toggle -
         # nothing left to do about them.
-        rows = [r for r in db.upcoming(conn, category)
-                if status(r) != "done" and (not hide_overdue or status(r) != "overdue")]
+        rows = []
+        for r in db.upcoming(conn, category):
+            state = status_of(_row_item(r), now)
+            if state == "done" or (hide_overdue and state == "overdue"):
+                continue
+            rows.append(r)
         rows = sort_items(rows, now)[:n]
         if not rows:
             st.info("Nothing upcoming." if demo else "Nothing yet. Connect Canvas in the sidebar.")
             continue
+
+        table = []
+        for r in rows:
+            item = _row_item(r)
+            urgency = classify_urgency(item.title, item.due, now)
+            table.append({
+                "": URGENCY_MARKER[urgency], "Urgency": urgency.capitalize(),
+                "Due": item.due.astimezone(), "Course": item.course, "What": item.title,
+                "Kind": item.kind, "Link": item.url,
+            })
         st.dataframe(
-            [{"Urgency": classify_urgency(r[3], datetime.fromisoformat(r[4]), now).capitalize(),
-              "Due": datetime.fromisoformat(r[4]).astimezone(), "Course": r[0], "What": r[3], "Kind": r[2], "Link": r[5]}
-             for r in rows],
-            column_config={"Due": st.column_config.DatetimeColumn(format="ddd MMM D, h:mm a"),
+            table,
+            column_config={"": st.column_config.TextColumn(width="small"),
+                           "Due": st.column_config.DatetimeColumn(format="ddd MMM D, h:mm a"),
                            "Link": st.column_config.LinkColumn(display_text="open")},
             hide_index=True, use_container_width=True,
         )
@@ -71,29 +95,26 @@ for tab, category in zip(st.tabs(["All", "Tasks", "Deadlines", "Materials"]), [N
 
 @st.dialog("Connect Workday")
 def _workday_dialog():
-    # ponytail: stub - hub/workday.py's parse_workday_courses() exists and is
-    # tested, but nothing calls it yet. Wire up a real st.file_uploader() +
-    # term input here (see design.md: student uploads their own "View My
-    # Courses" export, there's no login/API path) when this becomes more
-    # than a placeholder.
-    st.write("Workday import isn't wired up yet.")
-    st.caption("Coming soon: upload your \"View My Courses\" export from Workday to add your class schedule.")
-    st.file_uploader("View My Courses.xlsx", type="xlsx", disabled=True)
+    st.write("Upload your \"View My Courses\" export to add your class schedule.")
+    term = st.text_input("Term", value="2026W1", help="UBC's short term code, e.g. 2026W1")
+    uploaded = st.file_uploader("View My Courses.xlsx", type="xlsx")
+    if uploaded is not None and st.button("Import"):
+        courses = workday.parse_workday_courses(uploaded, term)
+        if not courses:
+            st.warning("No courses found - check it's the \"View My Courses\" export.")
+        else:
+            db.save(db.connect(), courses)
+            st.success(f"Imported {len(courses)} course(s). Turn off \"Sample data\" in the sidebar to see them.")
 
 
 st.divider()
-if st.button("Connect Workday", help="Not implemented yet - opens a placeholder"):
+if st.button("Connect Workday"):
     _workday_dialog()
 
 # #18: one merged .ics feed a student can drop straight into Apple/Google/
 # Outlook Calendar - the cheapest way into a routine they already have.
-_export_items = [
-    Item(course=r[0], category=r[1], kind=r[2], title=r[3],
-         due=datetime.fromisoformat(r[4]), url=r[5], source=r[7])
-    for r in db.upcoming(conn)
-]
 st.download_button(
-    "Add to my calendar", data=export_ics.to_ics(_export_items),
+    "Add to my calendar", data=export_ics.to_ics([_row_item(r) for r in db.upcoming(conn)]),
     file_name="ubc-hub.ics", mime="text/calendar",
     help="One .ics file with every upcoming item - subscribe to it in Apple/Google/Outlook Calendar.",
 )
