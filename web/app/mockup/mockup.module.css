@@ -1,0 +1,241 @@
+/* /mockup: Terrace's paper sketch. Theme tokens only (see globals.css). */
+
+/* globals.css centres <body> at 900px for the main page; the dashboard
+   needs the full window, so the shell covers the viewport instead. */
+.shell {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: var(--left-w) minmax(0, 1fr) var(--right-w);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  --left-w: 220px;
+  --right-w: 320px;
+}
+
+.left { grid-column: 1; }
+.centre { grid-column: 2; }
+.right { grid-column: 3; }
+.shell[data-left="closed"] { --left-w: 0px; }
+.shell[data-right="closed"] { --right-w: 0px; }
+
+.left,
+.right {
+  overflow: hidden auto;
+  background: var(--surface);
+  padding: 1rem;
+  min-width: 0;
+}
+.left { border-right: 1px solid var(--border); }
+.right { border-left: 1px solid var(--border); }
+
+.shell[data-left="closed"] .left,
+.shell[data-right="closed"] .right {
+  display: none;
+}
+
+/* Phone: sidebars start closed and open as drawers over the table. */
+@media (max-width: 899px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .centre { grid-column: 1; }
+  .left,
+  .right {
+    position: absolute;
+    top: 3.5rem;
+    bottom: 0;
+    width: min(85vw, 320px);
+    z-index: 2;
+    box-shadow: 0 0 0 100vmax color-mix(in srgb, var(--text) 12%, transparent);
+  }
+  .left { left: 0; }
+  .right { right: 0; }
+  .shell[data-left="auto"] .left,
+  .shell[data-right="auto"] .right {
+    display: none;
+  }
+}
+
+.paneHeading {
+  font-family: var(--font-brand);
+  font-weight: 400;
+  font-size: 1.25rem;
+  margin: 0 0 1rem;
+}
+
+.providers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.providerCard {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  background: var(--bg);
+}
+
+.centre {
+  overflow: auto;
+  padding: 0 1.25rem 2rem;
+  min-width: 0;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 3.5rem;
+  background: var(--bg);
+}
+
+.headline {
+  margin: 0;
+  font-family: var(--font-brand);
+  font-weight: 400;
+  font-size: 1.75rem;
+  text-align: center;
+  flex: 1;
+}
+
+.iconButton,
+.swapButton,
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.iconButton { padding: 0.35rem; }
+.swapButton,
+.linkButton { padding: 0.35rem 0.7rem; text-align: left; }
+
+.iconButton:hover,
+.swapButton:hover,
+.linkButton:hover { border-color: var(--accent); }
+
+.swapButton[aria-pressed="true"],
+.linkButton[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.iconButton:focus-visible,
+.swapButton:focus-visible,
+.linkButton:focus-visible,
+.submitLink:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+
+.swapRow {
+  margin: 0.5rem 0 0.75rem;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table th,
+.table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.table th {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.9rem;
+}
+
+.selectedRow td {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.courseCell {
+  display: flex;
+  flex-direction: column;
+}
+.courseCode { font-weight: 700; white-space: nowrap; }
+.taskTitle { color: var(--muted); }
+
+.mmdd {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+}
+
+.submitLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--link);
+}
+.submitLink:hover { color: var(--link-h); }
+
+/* Finder-style icon grid */
+.finder {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 1rem 0.5rem;
+}
+.finderItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  text-align: center;
+}
+.finderIcon { color: var(--link); }
+.finderName {
+  font-size: 0.85rem;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.hint { color: var(--muted); }
+.placeholder {
+  margin-top: 1.5rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+/* Phone: stack the table rows so all four cells stay readable. */
+@media (max-width: 599px) {
+  .centre { padding: 0 0.75rem 2rem; }
+  .headline { font-size: 1.4rem; }
+  .table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .table tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.4rem 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .table td { display: block; padding: 0; border: 0; }
+  .table[data-order="date-first"] tr { grid-template-columns: auto 1fr; }
+  .table td:nth-child(n + 3) { grid-column: 1 / -1; }
+}
