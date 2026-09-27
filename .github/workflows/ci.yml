@@ -19,8 +19,23 @@ jobs:
       - name: Run tests
         run: uv run pytest tests/ -v
 
+  js-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies (tests import xlsx)
+        run: npm ci
+        working-directory: web
+      - name: Run JS tests
+        run: node --test 'web/lib/*.test.mjs'   # Node 22 reads a bare dir as a module path; use a glob
+
   deploy:
-    needs: pytest                      # only after tests pass
+    needs: [pytest, js-tests]           # only after both test suites pass
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
