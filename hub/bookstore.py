@@ -156,10 +156,18 @@ def _parse_textbooks(html, course_code):
             continue
 
         title = title_el.get_text(strip=True)
+        # A real, live page (MATH100 section 1B2, found while building this)
+        # renders "the instructor hasn't submitted a booklist yet" as its own
+        # fake course_item - title "No Textbooks Selected", item# "NBR", $0 -
+        # instead of the page-level "No course materials are currently
+        # listed" message this function already checks for above. Same
+        # non-book, just a different shape; skip it the same way.
+        isbn = isbn_el.get_text(strip=True).split(":", 1)[-1].strip() if isbn_el else ""
+        if title.strip().lower() == "no textbooks selected" or isbn == "NBR":
+            continue
         # startswith, not a plain substring check: a status of "Not Required"
         # or "Not currently required" also contains the word "required".
         required = status_el.get_text(strip=True).lower().startswith("required") if status_el else False
-        isbn = isbn_el.get_text(strip=True).split(":", 1)[-1].strip() if isbn_el else ""
 
         price_new = price_used = price_digital = None
         for option_h3 in item.select(".course_item_buy h3"):
@@ -222,7 +230,12 @@ def isbn_to_store_link(isbn):
 
 
 def attach_store_links(textbooks):
-    """Fill in .url for every textbook from one shared catalog scan."""
+    """Fill in .url for every textbook from one shared catalog scan. No
+    textbooks -> no scan: a course with nothing listed, or no matching
+    section at all, shouldn't cost a Shopify catalog request it has no use
+    for (AGENTS.md rule 5)."""
+    if not textbooks:
+        return []
     catalog = _store_catalog()
     return [dataclasses.replace(t, url=catalog.get(t.isbn, t.url)) for t in textbooks]
 
@@ -234,14 +247,28 @@ def attach_store_links(textbooks):
 # ---------------------------------------------------------------------------
 
 
-def fetch(program, term, campus="UBCV"):
-    """Every section in `program` this term, with its textbooks and store
-    links - (courses, textbooks). A course with no textbooks listed still
-    comes back (an empty Bookstore page is a normal state, not a failure);
-    a Bookstore outage just means an empty result, never a crash."""
-    sections = list_sections(program, term, campus)
+def fetch(course_code, term, section=None, campus="UBCV"):
+    """Textbooks for one specific course (e.g. "CPSC 121"), optionally one
+    specific section - never every section in the department.
+
+    A real department can have dozens of sections across dozens of courses;
+    list_sections() itself is one request regardless (the Bookstore returns
+    the whole department's list in one page), but calling fetch_textbooks()
+    per section afterwards is not - looping over all of them would mean
+    dozens of sequential requests for courses the student was never in
+    (AGENTS.md rule 5: "never hammer it in a loop"). This filters down to
+    just the student's own course before that second round of requests.
+
+    Returns ([], []) for a course code that doesn't parse as FACULTY+NUMBER,
+    same as any other failure mode here - never an exception."""
+    faculty, number, _ = normalise_course_code(course_code)
+    if not faculty or not number:
+        return [], []
+    raw_code = f"{faculty}{number}".upper()
+    sections = [s for s in list_sections(faculty, term, campus)
+                if s["code"].upper() == raw_code and (section is None or s["section"] == section)]
     courses = [_course_from_section(s, term) for s in sections]
     textbooks = []
-    for section, course in zip(sections, courses):
-        textbooks.extend(fetch_textbooks(course.code, section["key"]))
+    for s, course in zip(sections, courses):
+        textbooks.extend(fetch_textbooks(course.code, s["key"]))
     return courses, attach_store_links(textbooks)

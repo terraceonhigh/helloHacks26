@@ -158,6 +158,34 @@ def test_pick_price_prefers_new_then_used_then_digital():
     assert bookstore._pick_price(None, None, None) is None
 
 
+# A real, live page (UBCV,2026W1,MATH,MATH100,1B2, found while building this
+# against the real Bookstore) renders "the instructor hasn't submitted a
+# booklist yet" as its own fake course_item - title "No Textbooks Selected",
+# item# "NBR", $0 - rather than the page-level "No course materials are
+# currently listed" message _parse_textbooks already checks for elsewhere.
+_NO_TEXTBOOKS_SELECTED_ITEM = """
+<div class="course_search_body">
+<div class="course_item">
+<div class="course_item_header">
+<div class="course_item_status">Required
+:</div>
+<div class="course_item_title">No Textbooks Selected</div>
+</div>
+<div class="course_item_data">
+<div class="course_item_item"><span>Item#:</span> NBR</div>
+</div>
+<div class="course_item_options"><div class="course_item_buy"><div class="options">
+<h3 class="accordion_h3">Buy New $0.00</h3>
+</div></div></div>
+</div>
+</div>
+"""
+
+
+def test_parse_textbooks_skips_the_bookstores_own_no_textbooks_selected_placeholder():
+    assert bookstore._parse_textbooks(_NO_TEXTBOOKS_SELECTED_ITEM, "MATH 100") == []
+
+
 # ---- #7: ISBN -> store link --------------------------------------------------
 
 
@@ -230,14 +258,57 @@ def test_fetch_returns_courses_and_textbooks_with_links(monkeypatch):
         raise AssertionError(f"unexpected url: {url}")
 
     monkeypatch.setattr(bookstore, "_get", fake_get)
-    courses, textbooks = bookstore.fetch("CPSC", "2026W1")
-    assert len(courses) > 10
-    assert any(c.code == "CPSC 121" for c in courses)
-    cpsc121_books = [t for t in textbooks if t.course == "CPSC 121"]
-    assert len(cpsc121_books) == 1
-    assert cpsc121_books[0].url == "https://bookstore.ubc.ca/products/discrete-mathematics-with-applications-5e"
+    courses, textbooks = bookstore.fetch("CPSC 121", "2026W1")
+    # Only CPSC 121's own section(s), never the rest of the CPSC department -
+    # see fetch()'s docstring (AGENTS.md rule 5).
+    assert courses and all(c.code == "CPSC 121" for c in courses)
+    assert len(textbooks) == 1
+    assert textbooks[0].course == "CPSC 121"
+    assert textbooks[0].url == "https://bookstore.ubc.ca/products/discrete-mathematics-with-applications-5e"
+
+
+def test_fetch_only_touches_the_one_matching_course_not_the_whole_department(monkeypatch):
+    # The real bug this signature exists to prevent: sections_cpsc.html has
+    # more than a dozen CPSC sections in it. fetch("CPSC 121", ...) must only
+    # ever call the textbook endpoint for CPSC 121's own section(s).
+    textbook_calls = []
+
+    def fake_get(url, **params):
+        if url.endswith("/Course/course"):
+            return _html("sections_cpsc.html")
+        if url.endswith("/CourseSearch/"):
+            textbook_calls.append(params["course[]"])
+            return _html("textbooks_none.html")
+        if url.endswith("/products.json"):
+            return json.dumps({"products": []})
+        raise AssertionError(f"unexpected url: {url}")
+
+    monkeypatch.setattr(bookstore, "_get", fake_get)
+    bookstore.fetch("CPSC 121", "2026W1")
+    # CPSC 121 has 2 sections (101, 102) in this fixture; the department as a
+    # whole has 70+ across every CPSC course - only CPSC 121's own may be hit.
+    assert textbook_calls == ["UBCV,2026W1,CPSC,CPSC121,101", "UBCV,2026W1,CPSC,CPSC121,102"]
+
+
+def test_fetch_filters_to_one_section_when_given(monkeypatch):
+    def fake_get(url, **params):
+        if url.endswith("/Course/course"):
+            return _html("sections_cpsc.html")
+        raise AssertionError(f"unexpected url: {url}")
+
+    monkeypatch.setattr(bookstore, "_get", fake_get)
+    # sections_cpsc.html's CPSC 121 only has one real section (101) - ask for
+    # a section that doesn't exist and confirm nothing comes back, rather
+    # than silently falling back to "every section of this course".
+    courses, textbooks = bookstore.fetch("CPSC 121", "2026W1", section="999")
+    assert courses == []
+    assert textbooks == []
+
+
+def test_fetch_returns_empty_for_an_unparseable_course_code():
+    assert bookstore.fetch("not a course code", "2026W1") == ([], [])
 
 
 def test_fetch_degrades_to_empty_on_total_failure(monkeypatch):
     monkeypatch.setattr(bookstore, "_get", lambda *a, **k: (_ for _ in ()).throw(requests.ConnectionError()))
-    assert bookstore.fetch("CPSC", "2026W1") == ([], [])
+    assert bookstore.fetch("CPSC 121", "2026W1") == ([], [])

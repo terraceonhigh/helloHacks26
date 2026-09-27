@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 import streamlit as st
 
-from hub import canvas, db, export_ics, key_dates, prairielearn
+from hub import bookstore, canvas, db, export_ics, key_dates, prairielearn
 from hub.logic import sort_items
 from hub.models import Course, Item, category_for, classify_urgency, status_of
 
@@ -27,6 +27,11 @@ def sample_conn():
     return conn
 
 
+@st.cache_data(ttl=86400)  # design.md: Bookstore data is cached per term - textbook lists barely change
+def _bookstore_lookup(course_code, term):
+    return bookstore.fetch(course_code, term)
+
+
 with st.sidebar:
     demo = st.toggle("Sample data", value=True, help="Off = your own Canvas data from this laptop's hub.db")
     if not demo:
@@ -44,7 +49,10 @@ conn = sample_conn() if demo else db.connect()
 db.save(conn, *key_dates.fetch("UBCV"))  # public, no login - always shown, sample or real
 now = datetime.now(timezone.utc)
 
-for tab, category in zip(st.tabs(["All", "Tasks", "Deadlines", "Materials"]), [None, "task", "deadline", "material"]):
+tab_all, tab_tasks, tab_deadlines, tab_materials, tab_textbooks = \
+    st.tabs(["All", "Tasks", "Deadlines", "Materials", "Textbooks"])
+
+for tab, category in zip([tab_all, tab_tasks, tab_deadlines, tab_materials], [None, "task", "deadline", "material"]):
     with tab:
         def status(r):
             item = Item(course=r[0], category=r[1], kind=r[2], title=r[3],
@@ -65,6 +73,46 @@ for tab, category in zip(st.tabs(["All", "Tasks", "Deadlines", "Materials"]), [N
              for r in rows],
             column_config={"Due": st.column_config.DatetimeColumn(format="ddd MMM D, h:mm a"),
                            "Link": st.column_config.LinkColumn(display_text="open")},
+            hide_index=True, use_container_width=True,
+        )
+
+# ---------------------------------------------------------------------------
+# Textbooks (#5/#6/#7): no setup needed - looked up automatically from each
+# known course's own code + term, the same two things Canvas/Workday already
+# gave us. hub.bookstore.fetch() only ever touches that one course's own
+# section(s), never its whole department (AGENTS.md rule 5: "never hammer it
+# in a loop" - a department can have dozens of sections). Cached 24h per
+# course (design.md: Bookstore data is cached per term).
+# ---------------------------------------------------------------------------
+with tab_textbooks:
+    st.caption("Looked up automatically from each of your courses - nothing to type in.")
+    if st.button("🔍 Look up textbooks"):
+        with st.spinner("Checking the Bookstore…"):
+            for code, term, _title, _grade in db.courses(conn):
+                if not term:
+                    continue
+                matched_course, found = _bookstore_lookup(code, term)
+                # db.save() only matches a textbook to a course_id from the
+                # `courses` list given in this SAME call (hub/db.py's `ids`
+                # dict) - it doesn't look up an already-saved course from an
+                # earlier call. Passing just textbooks= here silently
+                # orphaned every one of them.
+                db.save(conn, courses=matched_course, textbooks=found)
+        # No st.rerun() here: in demo mode `conn` is an in-memory sample_conn()
+        # rebuilt fresh on every rerun (see sample_conn()'s own docstring) - a
+        # rerun would wipe out what was just saved before this same script
+        # pass gets to read it back below. Falling through to db.textbooks()
+        # in this same run already sees it, with no double-render needed.
+
+    books = db.textbooks(conn)
+    if not books:
+        st.info("No textbooks yet - click \"Look up textbooks\" above.")
+    else:
+        st.dataframe(
+            [{"Course": code, "Book": title, "Required": "Yes" if required else "No",
+              "Price": f"${price:.2f}" if price is not None else "?", "Link": url}
+             for code, title, _isbn, required, price, url in books],
+            column_config={"Link": st.column_config.LinkColumn(display_text="open")},
             hide_index=True, use_container_width=True,
         )
 
