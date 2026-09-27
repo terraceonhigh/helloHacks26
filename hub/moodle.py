@@ -224,9 +224,16 @@ def fetch_via_token(base, username, password):
     items) like fetch(), or ([], []) on any failure. The password is used
     once, in memory, to get a token; it is never stored (matches
     hub.site's "never see or store the password" rule, just via a different
-    mechanism since there's no browser session to persist here instead)."""
+    mechanism since there's no browser session to persist here instead).
+
+    docs/api-standards.md documents this as a GET with the password as a
+    query parameter (Moodle's own docs describe it that way too) -- but
+    token.php accepts POST identically, and a URL query string is exactly
+    the kind of place a password shouldn't sit (server access logs, proxy
+    logs, any library's own debug/request logging). POST with a form body
+    avoids that for free, so that's what this sends instead."""
     try:
-        r = requests.get(f"{base}/login/token.php", params={
+        r = requests.post(f"{base}/login/token.php", data={
             "username": username, "password": password, "service": "moodle_mobile_app",
         }, timeout=30)
         r.raise_for_status()
