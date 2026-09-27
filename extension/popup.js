@@ -58,16 +58,31 @@ document.querySelector("#save").addEventListener("click", async () => {
   await chrome.storage.local.set({syncKey: key.value.trim(), hubBase});
   status.textContent = `Saved. Syncing to ${hubBase || DEFAULT_HUB_BASE}.`;
 });
+// Pure so it's unit-testable without a DOM (matches the rest of this repo's
+// "logic gets a test" standard) - given whatever a student typed, returns a
+// real https:// origin or null. A wildcard hostname (e.g. "https://*" or
+// "https://*.ubc.ca") survives the URL parser as origin "https://*" /
+// "https://*.ubc.ca" verbatim - that string would otherwise go straight into
+// chrome.permissions.request as an origin *pattern*, requesting every HTTPS
+// site (or every ubc.ca subdomain) instead of the one site the student
+// actually typed. Require a real dotted hostname, no wildcard, no port.
+function parseCustomOrigin(value) {
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.search || parsed.hash) return null;
+    if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(parsed.hostname) || parsed.port) return null;
+    return parsed.origin;
+  } catch {
+    return null;
+  }
+}
+
 document.querySelector("#sync").addEventListener("click", async () => {
   status.textContent = "Starting sync…";
   const provider = globalThis.HUB_PROVIDERS.find(p => p.id === providerSelect.value);
   if (provider.customOrigin) {
-    let origin;
-    try {
-      const parsed = new URL(originInput.value);
-      if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.search || parsed.hash) throw Error();
-      origin = parsed.origin;
-    } catch {
+    const origin = parseCustomOrigin(originInput.value);
+    if (!origin) {
       status.textContent = "Enter the HTTPS address of your provider site.";
       return;
     }
