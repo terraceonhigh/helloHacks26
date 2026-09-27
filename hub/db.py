@@ -200,6 +200,17 @@ def courses(conn):
     return conn.execute("SELECT code, term, title, grade FROM courses ORDER BY code").fetchall()
 
 
+def textbooks(conn):
+    """Every textbook, joined to its course code. Row shape: (code, title,
+    isbn, required, price, url). LEFT JOIN for the same reason as upcoming():
+    a textbook whose course didn't resolve at save() time shouldn't vanish."""
+    q = ("SELECT COALESCE(courses.code, '(unknown course)'), textbooks.title, textbooks.isbn, "
+         "textbooks.required, textbooks.price, textbooks.url "
+         "FROM textbooks LEFT JOIN courses ON courses.id = textbooks.course_id "
+         "ORDER BY courses.code, textbooks.title")
+    return conn.execute(q).fetchall()
+
+
 def by_course(conn, category=None):
     """upcoming(), grouped under each course code - what a Course card wants:
     "this course's" tasks/deadlines/materials, each list still soonest-first."""

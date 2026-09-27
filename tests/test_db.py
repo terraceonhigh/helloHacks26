@@ -18,6 +18,12 @@ def test_save_and_upcoming():
     assert conn.execute("SELECT isbn FROM textbooks").fetchall() == [("123",)]
 
 
+def test_textbooks_joined_to_course_code():
+    conn = db.connect(":memory:")
+    db.save(conn, [COURSE], [], [BOOK])
+    assert db.textbooks(conn) == [("CPSC 121", "Discrete Math", "123", 1, 80.0, "https://x/b/1")]
+
+
 def test_done_round_trips_through_sqlite():
     conn = db.connect(":memory:")
     done_item = Item(**{**QUIZ.__dict__, "done": True})

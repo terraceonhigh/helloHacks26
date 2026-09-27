@@ -56,6 +56,11 @@ def _upcoming(conn):
     return [_row_to_dict(r, now) for r in rows]
 
 
+def _textbooks(conn):
+    return [{"course": code, "title": title, "isbn": isbn, "required": bool(required), "price": price, "url": url}
+            for code, title, isbn, required, price, url in db.textbooks(conn)]
+
+
 def _announcements(conn):
     """Undated items (announcements, and anything else without a real
     deadline) - already most-recent-first from db.undated(). No urgency
@@ -107,6 +112,8 @@ class Handler(BaseHTTPRequestHandler):
         elif path == "/api/courses":
             conn = db.connect()
             self._json([{"code": c, "term": t, "title": ti, "grade": g} for c, t, ti, g in db.courses(conn)])
+        elif path == "/api/textbooks":
+            self._json(_textbooks(db.connect()))
         elif path in ("/", "/index.html"):
             self._serve_file(UI_DIR / "index.html", "text/html")
         else:
