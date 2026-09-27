@@ -1,0 +1,50 @@
+{
+  "base": "http://canvas.example.invalid",
+  "courses": [
+    {
+      "label": "CPSC_121_101_2026W1",
+      "source": "canvas",
+      "source_id": "4201",
+      "term_hint": "2026 Winter Term 1",
+      "title": "CPSC 121 101 Models of Computation",
+      "url": "http://canvas.example.invalid/courses/4201"
+    }
+  ],
+  "fetched_at": "2026-09-27T12:00:00+00:00",
+  "items": [
+    {
+      "course_source_id": "4201",
+      "done": false,
+      "due": "2026-10-01T19:00:00+00:00",
+      "excerpt": "Complete the Tutorial 2 worksheet (propositional logic) and upload a PDF. See the worksheet .",
+      "kind": "assignment",
+      "links_out": [],
+      "opens": null,
+      "source": "canvas",
+      "source_id": "assignment:51002",
+      "submit_url": null,
+      "title": "Tutorial 2 worksheet",
+      "url": "http://canvas.example.invalid/courses/4201/assignments/51002",
+      "weight": null
+    },
+    {
+      "course_source_id": "4201",
+      "done": false,
+      "due": "2026-10-03T06:59:59+00:00",
+      "excerpt": "Quiz 1 is taken on PrairieLearn. Open it here: Quiz 1 on PrairieLearn . Your score syncs back to Canvas after the 100% credit window closes.",
+      "kind": "assignment",
+      "links_out": [
+        "http://127.0.0.1:3100/pl/course_instance/1/assessment/3/"
+      ],
+      "opens": null,
+      "source": "canvas",
+      "source_id": "assignment:51001",
+      "submit_url": null,
+      "title": "Quiz 1 (PrairieLearn)",
+      "url": "http://canvas.example.invalid/courses/4201/assignments/51001",
+      "weight": null
+    }
+  ],
+  "notes": [],
+  "source": "canvas"
+}

@@ -1,0 +1,17 @@
+{
+  "base": "http://127.0.0.1:3100",
+  "pages": {
+    "/pl": {
+      "file": "pl.html",
+      "status": 200
+    },
+    "/pl/course_instance/1/assessment_instance/1/": {
+      "file": "pl_course_instance_1_assessment_instance_1.html",
+      "status": 200
+    },
+    "/pl/course_instance/1/assessments": {
+      "file": "pl_course_instance_1_assessments.html",
+      "status": 200
+    }
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "AJAX [{\"args\":{\"categoryid\":0,\"courseid\":1,\"day\":1,\"includenavigation\":false,\"mini\":false,\"month\":1,\"year\":2027},\"methodname\":\"core_calendar_get_calendar_monthly_view\"}]": {
+    "content_type": "application/json; charset=utf-8",
+    "file": "00_AJAX_args_categoryid_0_courseid_1_day_1_includenavigation_false_mini_false_month_1_year_2027_methodname_core_calendar_ge.json",
+    "status": 200,
+    "url": "http://localhost:8082/lib/ajax/service.php?sesskey=FXSESSKEY&info=core_calendar_get_calendar_monthly_view"
+  },
+  "AJAX [{\"args\":{\"categoryid\":0,\"courseid\":1,\"day\":1,\"includenavigation\":false,\"mini\":false,\"month\":10,\"year\":2026},\"methodname\":\"core_calendar_get_calendar_monthly_view\"}]": {
+    "content_type": "application/json; charset=utf-8",
+    "file": "01_AJAX_args_categoryid_0_courseid_1_day_1_includenavigation_false_mini_false_month_10_year_2026_methodname_core_calendar_g.json",
+    "status": 200,
+    "url": "http://localhost:8082/lib/ajax/service.php?sesskey=FXSESSKEY&info=core_calendar_get_calendar_monthly_view"
+  },
+  "AJAX [{\"args\":{\"categoryid\":0,\"courseid\":1,\"day\":1,\"includenavigation\":false,\"mini\":false,\"month\":11,\"year\":2026},\"methodname\":\"core_calendar_get_calendar_monthly_view\"}]": {
+    "content_type": "application/json; charset=utf-8",
+    "file": "02_AJAX_args_categoryid_0_courseid_1_day_1_includenavigation_false_mini_false_month_11_year_2026_methodname_core_calendar_g.json",
+    "status": 200,
+    "url": "http://localhost:8082/lib/ajax/service.php?sesskey=FXSESSKEY&info=core_calendar_get_calendar_monthly_view"
+  },
+  "AJAX [{\"args\":{\"categoryid\":0,\"courseid\":1,\"day\":1,\"includenavigation\":false,\"mini\":false,\"month\":12,\"year\":2026},\"methodname\":\"core_calendar_get_calendar_monthly_view\"}]": {
+    "content_type": "application/json; charset=utf-8",
+    "file": "03_AJAX_args_categoryid_0_courseid_1_day_1_includenavigation_false_mini_false_month_12_year_2026_methodname_core_calendar_g.json",
+    "status": 200,
+    "url": "http://localhost:8082/lib/ajax/service.php?sesskey=FXSESSKEY&info=core_calendar_get_calendar_monthly_view"
+  },
+  "AJAX [{\"args\":{\"categoryid\":0,\"courseid\":1,\"day\":1,\"includenavigation\":false,\"mini\":false,\"month\":9,\"year\":2026},\"methodname\":\"core_calendar_get_calendar_monthly_view\"}]": {
+    "content_type": "application/json; charset=utf-8",
+    "file": "04_AJAX_args_categoryid_0_courseid_1_day_1_includenavigation_false_mini_false_month_9_year_2026_methodname_core_calendar_ge.json",
+    "status": 200,
+    "url": "http://localhost:8082/lib/ajax/service.php?sesskey=FXSESSKEY&info=core_calendar_get_calendar_monthly_view"
+  },
+  "AJAX [{\"args\":{\"classification\":\"allincludinghidden\",\"limit\":0,\"offset\":0,\"sort\":\"fullname\"},\"methodname\":\"core_course_get_enrolled_courses_by_timeline_classification\"}]": {
+    "content_type": "application/json; charset=utf-8",
+    "file": "05_AJAX_args_classification_allincludinghidden_limit_0_offset_0_sort_fullname_methodname_core_course_get_enrolled_courses_b.json",
+    "status": 200,
+    "url": "http://localhost:8082/lib/ajax/service.php?sesskey=FXSESSKEY&info=core_course_get_enrolled_courses_by_timeline_classification"
+  },
+  "AJAX [{\"args\":{\"courseid\":2},\"methodname\":\"core_courseformat_get_state\"}]": {
+    "content_type": "application/json; charset=utf-8",
+    "file": "06_AJAX_args_courseid_2_methodname_core_courseformat_get_state.json",
+    "status": 200,
+    "url": "http://localhost:8082/lib/ajax/service.php?sesskey=FXSESSKEY&info=core_courseformat_get_state"
+  },
+  "AJAX [{\"args\":{\"courseid\":3},\"methodname\":\"core_courseformat_get_state\"}]": {
+    "content_type": "application/json; charset=utf-8",
+    "file": "07_AJAX_args_courseid_3_methodname_core_courseformat_get_state.json",
+    "status": 200,
+    "url": "http://localhost:8082/lib/ajax/service.php?sesskey=FXSESSKEY&info=core_courseformat_get_state"
+  },
+  "AJAX [{\"args\":{\"courseid\":4},\"methodname\":\"core_courseformat_get_state\"}]": {
+    "content_type": "application/json; charset=utf-8",
+    "file": "08_AJAX_args_courseid_4_methodname_core_courseformat_get_state.json",
+    "status": 200,
+    "url": "http://localhost:8082/lib/ajax/service.php?sesskey=FXSESSKEY&info=core_courseformat_get_state"
+  },
+  "GET /mod/assign/view.php?id=1": {
+    "content_type": "text/html; charset=utf-8",
+    "file": "09_GET_mod_assign_view_php_id_1.html",
+    "status": 200,
+    "url": "http://localhost:8082/mod/assign/view.php?id=1"
+  },
+  "GET /mod/assign/view.php?id=10": {
+    "content_type": "text/html; charset=utf-8",
+    "file": "10_GET_mod_assign_view_php_id_10.html",
+    "status": 200,
+    "url": "http://localhost:8082/mod/assign/view.php?id=10"
+  },
+  "GET /mod/assign/view.php?id=2": {
+    "content_type": "text/html; charset=utf-8",
+    "file": "11_GET_mod_assign_view_php_id_2.html",
+    "status": 200,
+    "url": "http://localhost:8082/mod/assign/view.php?id=2"
+  },
+  "GET /mod/assign/view.php?id=3": {
+    "content_type": "text/html; charset=utf-8",
+    "file": "12_GET_mod_assign_view_php_id_3.html",
+    "status": 200,
+    "url": "http://localhost:8082/mod/assign/view.php?id=3"
+  },
+  "GET /mod/assign/view.php?id=5": {
+    "content_type": "text/html; charset=utf-8",
+    "file": "13_GET_mod_assign_view_php_id_5.html",
+    "status": 200,
+    "url": "http://localhost:8082/mod/assign/view.php?id=5"
+  },
+  "GET /mod/assign/view.php?id=6": {
+    "content_type": "text/html; charset=utf-8",
+    "file": "14_GET_mod_assign_view_php_id_6.html",
+    "status": 200,
+    "url": "http://localhost:8082/mod/assign/view.php?id=6"
+  },
+  "GET /mod/page/view.php?id=7": {
+    "content_type": "text/html; charset=utf-8",
+    "file": "15_GET_mod_page_view_php_id_7.html",
+    "status": 200,
+    "url": "http://localhost:8082/mod/page/view.php?id=7"
+  },
+  "GET /my/": {
+    "content_type": "text/html; charset=utf-8",
+    "file": "16_GET_my.html",
+    "status": 200,
+    "url": "http://localhost:8082/my/"
+  }
+}

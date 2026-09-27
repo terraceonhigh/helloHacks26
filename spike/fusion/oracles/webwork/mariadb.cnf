@@ -1,0 +1,11 @@
+# From upstream webwork2/docker-config/db/mariadb.cnf
+[client]
+default-character-set = utf8mb4
+[mysql]
+default-character-set = utf8mb4
+[mysqld]
+character-set-server  = utf8mb4
+collation-server      = utf8mb4_general_ci
+max_connections = 500
+wait_timeout = 86400
+skip-name-resolve

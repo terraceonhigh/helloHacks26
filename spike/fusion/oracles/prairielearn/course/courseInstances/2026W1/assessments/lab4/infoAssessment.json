@@ -1,0 +1,31 @@
+{
+  "uuid": "11111111-aaaa-4bbb-8ccc-000000000004",
+  "type": "Homework",
+  "title": "Lab 4",
+  "set": "Lab",
+  "number": "4",
+  "allowAccess": [
+    {
+      "comment": "Listed but not startable before it opens, so students can see it coming.",
+      "credit": 0,
+      "active": false,
+      "startDate": "2026-09-01T00:00:00",
+      "endDate": "2026-10-19T23:59:59"
+    },
+    {
+      "credit": 100,
+      "startDate": "2026-10-20T00:00:00",
+      "endDate": "2026-10-27T23:59:00"
+    }
+  ],
+  "zones": [
+    {
+      "questions": [
+        {
+          "id": "answer42",
+          "autoPoints": 1
+        }
+      ]
+    }
+  ]
+}

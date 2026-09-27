@@ -1,0 +1,35 @@
+{
+  "base": "http://localhost:8081",
+  "responses": {
+    "http://localhost:8081/webwork2/": {
+      "file": "00_webwork2.html",
+      "status": 200,
+      "final_url": "http://localhost:8081/webwork2/"
+    },
+    "http://localhost:8081/webwork2/math100_2026w1/": {
+      "file": "01_webwork2__math100_2026w1.html",
+      "status": 200,
+      "final_url": "http://localhost:8081/webwork2/math100_2026w1/"
+    },
+    "http://localhost:8081/webwork2/math100_2026w1/HW2": {
+      "file": "02_webwork2__math100_2026w1__HW2.html",
+      "status": 200,
+      "final_url": "http://localhost:8081/webwork2/math100_2026w1/HW2"
+    },
+    "http://localhost:8081/webwork2/math100_2026w1/HW3": {
+      "file": "03_webwork2__math100_2026w1__HW3.html",
+      "status": 200,
+      "final_url": "http://localhost:8081/webwork2/math100_2026w1/HW3"
+    },
+    "http://localhost:8081/webwork2/math100_2026w1/HW9": {
+      "file": "04_webwork2__math100_2026w1__HW9.html",
+      "status": 200,
+      "final_url": "http://localhost:8081/webwork2/math100_2026w1/HW9"
+    },
+    "http://localhost:8081/webwork2/math100_2026w1/HW1": {
+      "file": "05_webwork2__math100_2026w1__HW1.html",
+      "status": 200,
+      "final_url": "http://localhost:8081/webwork2/math100_2026w1/HW1"
+    }
+  }
+}

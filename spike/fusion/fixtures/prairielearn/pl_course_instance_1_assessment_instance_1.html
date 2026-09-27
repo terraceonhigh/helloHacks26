@@ -1,0 +1,447 @@
+
+    <!doctype html>
+    <html lang="en">
+      <head>
+        
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <title>[DEV] PS3 — CPSC 121 |  PrairieLearn</title>
+    <link href="/assets/node_modules/f5a36452276fee8a/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link
+      href="/assets/node_modules/a38a1050d45a66fa/bootstrap-icons/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="/assets/public/6c2a4b5ed3ce70bc/stylesheets/colors.css" rel="stylesheet" />
+    <link href="/assets/public/a5a370bb2af3150f/stylesheets/local.css" rel="stylesheet" />
+    <script src="/assets/node_modules/332b5ada10be1415/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/node_modules/f5a36452276fee8a/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <link
+      href="/assets/node_modules/78be53807783b6e1/@fortawesome/fontawesome-free/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/assets/build/stylesheets/prairielearn-ui.css" /> <script src="/assets/build/scripts/application.js"></script>
+    <script src="/assets/build/scripts/navbarClient.js"></script>
+  
+        <link rel="stylesheet" href="/assets/build/stylesheets/pageLayout.css" /> 
+      
+    
+        
+      </head>
+      <body
+        class=""
+        hx-ext=""
+        
+      >
+        <div
+          id="app-container"
+          class="app-container collapsed mobile-collapsed"
+        >
+          <div class="app-top-nav">
+                  
+    
+            <!-- DO NOT RELY ON OR USE THIS CSRF TOKEN FOR ANYTHING OTHER THAN UNIT TESTS! -->
+            <span id="test_csrf_token" hidden>REDACTED</span>
+          
+
+    <nav
+      class="container-fluid bg-primary visually-hidden-focusable"
+      aria-label="Skip link and accessibility guide"
+    >
+      <a href="#content" class="d-inline-flex p-2 m-2 text-white">Skip to main content</a>
+      <a
+        href="https://docs.prairielearn.com/student-guide/accessibility/"
+        class="d-inline-flex p-2 m-2 text-white"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Accessibility guide
+      </a>
+    </nav>
+
+    
+
+    <nav class="navbar navbar-dark bg-dark navbar-expand-md" aria-label="Global navigation">
+      <div class="container-fluid position-relative">
+        
+        <a class="navbar-brand" href="/" aria-label="Homepage">
+          <span class="navbar-brand-label">PrairieLearn</span>
+          <span class="navbar-brand-hover-label">
+            Go home <i class="fa fa-angle-right" aria-hidden="true"></i>
+          </span>
+        </a>
+        <button
+          id="course-nav-toggler"
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#course-nav"
+          data-bs-animation="false"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="course-nav" class="collapse navbar-collapse mobile-collapsed">
+          <ul class="nav navbar-nav me-auto" id="main-nav">
+            
+    <li class="nav-item navbar-text me-4">
+      CPSC 121, 2026W1
+    </li>
+
+    <li class="nav-item ">
+      <a class="nav-link" href="/pl/course_instance/1/assessments">Assessments</a>
+    </li>
+    <li class="nav-item ">
+      <a class="nav-link" href="/pl/course_instance/1/gradebook">Gradebook</a>
+    </li>
+
+    
+            <li class="nav-item active">
+              <a class="nav-link" href="/pl/course_instance/1/assessment_instance/1">
+                PS3
+              </a>
+            </li>
+          
+  
+          </ul>
+
+          
+                  <a
+                    id="navbar-load-from-disk"
+                    class="btn btn-success btn-sm"
+                    href="/pl/loadFromDisk"
+                  >
+                    Load from disk
+                  </a>
+                
+          
+          
+          
+    <ul
+      class="nav navbar-nav"
+      id="username-nav"
+      data-access-as-administrator="true"
+      data-view-type="student"
+      data-authn-course-role="None"
+      data-authn-course-instance-role="None"
+      data-has-instructor-access=""
+    >
+      <li class="nav-item dropdown mb-2 mb-md-0 ">
+        <a
+          class="nav-link dropdown-toggle"
+          id="navbarDropdown"
+          href="#"
+          role="button"
+          data-bs-auto-close="outside"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          Fake Student
+        </a>
+        <div class="dropdown-menu dropdown-menu-end">
+          
+           
+          
+          <a class="dropdown-item" href="/pl/request_course">Course Requests</a>
+          <a class="dropdown-item" href="/pl/settings">Settings</a>
+          <a class="dropdown-item" href="/pl/logout">Log out</a>
+        </div>
+      </li>
+    </ul>
+  
+        </div>
+      </div>
+    </nav>
+
+    
+    
+  
+                </div>
+          
+          <div class="">
+            <div
+              class="d-flex flex-column"
+              data-split-pane-scroll-parent
+            >
+              
+              
+              
+              
+      
+      
+      
+      
+    
+              <main
+                id="content"
+                class="container pt-3 pb-3"
+              >
+                
+                
+      
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white d-flex align-items-center">
+          <h1>
+            PS3:
+            Problem Set 3
+          </h1>
+          
+        </div>
+
+        <div class="card-body">
+          
+          <div class="row align-items-center">
+            
+                    <div class="col-md-3 col-sm-6">
+                      Total points:
+                      0/1
+                      
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                      <div class="progress border border-success" style="min-width:5em;max-width:20em" data-testid="scorebar"><div class="progress-bar bg-success" style="width:0%"></div><div class="d-flex flex-column justify-content-center text-center" style="width:100%">0%</div></div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                      
+      Assessment is <strong>open</strong> and you can answer questions.
+      <br />
+      Available credit: 100% until 17:00, Mon, Oct 5
+      
+    <button
+      type="button"
+      class="btn btn-xs btn-ghost"
+      data-bs-toggle="popover"
+      data-bs-container="body"
+      data-bs-html="true"
+      data-bs-title="Access details"
+      data-bs-content="
+    &lt;table class=&#34;table&#34; aria-label=&#34;Access details&#34;&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Credit&lt;/th&gt;
+        &lt;th&gt;Start&lt;/th&gt;
+        &lt;th&gt;End&lt;/th&gt;
+      &lt;/tr&gt;
+      
+          &lt;tr&gt;
+            &lt;td&gt;100%&lt;/td&gt;
+            &lt;td&gt;2026-09-01 00:00:00 (PDT)&lt;/td&gt;
+            &lt;td&gt;2026-10-05 17:00:00 (PDT)&lt;/td&gt;
+          &lt;/tr&gt;
+        
+    &lt;/table&gt;
+  "
+    >
+      <i class="fa fa-question-circle"></i>
+    </button>
+  
+    
+                    </div>
+                  
+            
+          </div>
+
+          
+          
+        </div>
+
+        <div class="table-responsive">
+          <table
+            class="table table-sm table-hover"
+            aria-label="Questions"
+            data-testid="assessment-questions"
+          >
+            <thead>
+              
+    
+            
+                    <tr>
+                      <th>Question</th>
+                      
+          
+                  <th class="text-center">Value</th>
+                  <th class="text-center">Variant history</th>
+                
+          <th class="text-center">Awarded points</th>
+        
+                    </tr>
+                  
+          
+  
+            </thead>
+            
+      <tbody>
+        
+        
+        
+            <tr
+              class=""
+            >
+              <td>
+                <div class="d-flex align-items-center">
+                  
+    
+            <a
+              href="/pl/course_instance/1/instance_question/1/"
+              >PS3.1. Fake question: type 42</a
+            >
+          
+    
+    
+  
+                </div>
+              </td>
+              
+    
+            <td class="text-center">
+              1
+            </td>
+            <td class="text-center">
+              
+    
+    
+  
+            </td>
+          
+    
+    <td class="text-center">
+      
+    <span class="text-nowrap ">
+      &mdash;
+      <small>/<span class="text-muted">1</span></small>
+      
+    </span>
+  
+    </td>
+  
+            </tr>
+          
+      </tbody>
+    
+          </table>
+        </div>
+
+        
+      </div>
+
+      
+    <div class="card mb-4" id="attach-file-panel">
+      <div class="card-header bg-secondary text-white d-flex align-items-center">
+        <i class="fas fa-paperclip"></i>
+        <h2>&nbsp;Personal Notes</h2>
+      </div>
+      <div class="card-body"><i>No attached notes</i></div>
+      
+              <div class="card-footer">
+                
+                          
+    <div>
+      <button
+        class="btn btn-xs btn-secondary"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#attachFileCollapse"
+        aria-expanded="false"
+        aria-controls="attachFileCollapse"
+      >
+        Attach a file <i class="far fa-caret-square-down"></i>
+      </button>
+      <div class="collapse" id="attachFileCollapse">
+        <form
+          class="attach-file-form mb-3"
+          name="attach-file-form"
+          method="POST"
+          enctype="multipart/form-data"
+        >
+          <p class="small mt-3">
+            Attached files will be saved here for your reference. These files act as personal notes
+            and can be used for your own review purposes. They are not used for grading.
+          </p>
+          <div class="mb-3">
+            <label class="form-label" for="attachFileInput">Choose file</label>
+            <input type="file" name="file" class="form-control" id="attachFileInput" />
+            <small class="form-text text-muted">
+              Max file size: 10 MB
+            </small>
+          </div>
+          <div class="mb-3">
+            <input type="hidden" name="__action" value="attach_file" />
+            
+            <input type="hidden" name="__csrf_token" value="REDACTED" />
+            <button type="submit" class="btn btn-primary" disabled>Attach file</button>
+          </div>
+        </form>
+
+        <script type="module">
+          // This script is type="module" so that it is deferred and runs after the DOM is ready.
+          const form = document.querySelector('form.attach-file-form');
+          const fileInput = form.querySelector('#attachFileInput');
+          const submitButton = form.querySelector('button[type="submit"]');
+          fileInput.addEventListener('change', (e) => {
+            // Only enable the "submit" button if a file is selected.
+            submitButton.disabled = fileInput.files.length === 0;
+          });
+        </script>
+      </div>
+    </div>
+  
+                          
+    <div>
+      <button
+        class="btn btn-xs btn-secondary"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#attachTextCollapse"
+        aria-expanded="false"
+        aria-controls="attachTextCollapse"
+      >
+        Add text note <i class="far fa-caret-square-down"></i>
+      </button>
+      <div class="collapse" id="attachTextCollapse">
+        <form method="POST" class="attach-text-form">
+          <p class="small mt-3">
+            Attached personal notes will be saved here for your reference. These notes can be used
+            for your own review purposes. They are not used for grading.
+          </p>
+          <input
+            type="text"
+            class="form-control"
+            aria-label="Text filename"
+            name="filename"
+            value="notes.txt"
+          />
+          <div class="mt-1 mb-3">
+            <textarea
+              class="form-control"
+              rows="5"
+              aria-label="Text contents"
+              name="contents"
+              placeholder="Type or paste text here"
+            ></textarea>
+          </div>
+          
+          <input type="hidden" name="__csrf_token" value="REDACTED" />
+          <button type="submit" class="btn btn-sm btn-primary" name="__action" value="attach_text">
+            Add note
+          </button>
+        </form>
+      </div>
+    </div>
+  
+                        
+              </div>
+            
+    </div>
+  
+      
+    
+              </main>
+              
+            </div>
+          </div>
+        </div>
+        
+      </body>
+    </html>
+  

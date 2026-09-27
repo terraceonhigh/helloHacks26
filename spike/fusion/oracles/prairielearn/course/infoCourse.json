@@ -1,0 +1,12 @@
+{
+  "uuid": "7b0f3a52-2f6c-4e0e-9a8d-1f5c2b6a9c01",
+  "name": "CPSC 121",
+  "title": "Models of Computation",
+  "timezone": "America/Vancouver",
+  "assessmentSets": [
+    { "abbreviation": "Q", "name": "Quiz", "heading": "Quizzes", "color": "red1" },
+    { "abbreviation": "PS", "name": "Homework", "heading": "Homework", "color": "green1" },
+    { "abbreviation": "L", "name": "Lab", "heading": "Labs", "color": "blue1" }
+  ],
+  "topics": [ { "name": "Logic", "color": "gray1", "description": "Fake topic." } ]
+}

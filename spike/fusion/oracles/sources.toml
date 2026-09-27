@@ -1,0 +1,29 @@
+# Live sources for `python -m fusion.serve --live oracles/sources.toml`.
+# Paths are relative to the project root. Secrets files are gitignored.
+# Canvas has no live server in this spike: it is replayed from its snapshot below.
+
+[[source]]
+name = "moodle"
+base = "http://localhost:8082"
+adapter = "fusion.adapters.moodle"
+login = "oracles.moodle.login"
+secrets = "oracles/moodle/secrets.env"
+
+[[source]]
+name = "webwork"
+base = "http://localhost:8081"
+adapter = "fusion.adapters.webwork"
+login = "oracles.webwork.login"
+secrets = "oracles/webwork/secrets.env"
+
+[[source]]
+name = "prairielearn"
+base = "http://127.0.0.1:3100"
+adapter = "fusion.adapters.prairielearn"
+login = "oracles.prairielearn.login"
+secrets = "oracles/prairielearn/secrets.env"
+
+# Replayed snapshots mixed in with the live sources. Canvas has no live server in
+# this spike, so its SYNTHETIC fixture snapshot stands in (fixtures/canvas/README.md).
+[[snapshot]]
+path = "fixtures/snapshots/canvas.json"

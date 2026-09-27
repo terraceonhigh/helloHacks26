@@ -1,0 +1,11 @@
+{
+  "uuid": "11111111-aaaa-4bbb-8ccc-000000000002",
+  "type": "Homework",
+  "title": "Problem Set 3",
+  "set": "Homework",
+  "number": "3",
+  "allowAccess": [
+    { "credit": 100, "startDate": "2026-09-01T00:00:00", "endDate": "2026-10-05T17:00:00" }
+  ],
+  "zones": [ { "questions": [ { "id": "answer42", "autoPoints": 1 } ] } ]
+}

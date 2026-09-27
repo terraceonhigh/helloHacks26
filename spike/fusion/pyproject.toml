@@ -1,0 +1,20 @@
+[project]
+name = "fusion-spike"
+version = "0.0.1"
+description = "Headless multi-provider edtech fusion: observations in, fused tracks out over HTTP"
+requires-python = ">=3.12"
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "icalendar",
+]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

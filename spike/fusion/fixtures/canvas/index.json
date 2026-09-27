@@ -1,0 +1,49 @@
+{
+  "_SYNTHETIC": "Authored from Canvas's public REST API docs (canvas.instructure.com/doc/api, 2026-09-27). NEVER verified against a live Canvas. Bodies carry the while(1); prefix Canvas adds to cookie-session JSON.",
+  "base": "http://canvas.example.invalid",
+  "responses": [
+    {
+      "path": "/api/v1/courses",
+      "page": null,
+      "file": "courses.txt",
+      "headers": {
+        "Content-Type": "application/json; charset=utf-8",
+        "Link": "<http://canvas.example.invalid/api/v1/courses?include%5B%5D=term&per_page=100&page=1>; rel=\"current\", <http://canvas.example.invalid/api/v1/courses?include%5B%5D=term&per_page=100&page=1>; rel=\"first\", <http://canvas.example.invalid/api/v1/courses?include%5B%5D=term&per_page=100&page=1>; rel=\"last\""
+      }
+    },
+    {
+      "path": "/api/v1/planner/items",
+      "page": null,
+      "file": "planner_items_p1.txt",
+      "headers": {
+        "Content-Type": "application/json; charset=utf-8",
+        "link": "<http://canvas.example.invalid/api/v1/planner/items?start_date=2026-09-01T07%3A00%3A00Z&end_date=2026-12-31T08%3A00%3A00Z&per_page=50&page=first>; rel=\"current\", <http://canvas.example.invalid/api/v1/planner/items?start_date=2026-09-01T07%3A00%3A00Z&end_date=2026-12-31T08%3A00%3A00Z&per_page=50&page=bookmark:WyIyMDI2LTEwLTAzVDA2OjU5OjU5WiIsNTEwMDFd>; rel=\"next\", <http://canvas.example.invalid/api/v1/planner/items?start_date=2026-09-01T07%3A00%3A00Z&end_date=2026-12-31T08%3A00%3A00Z&per_page=50&page=first>; rel=\"first\""
+      }
+    },
+    {
+      "path": "/api/v1/planner/items",
+      "page": "bookmark:WyIyMDI2LTEwLTAzVDA2OjU5OjU5WiIsNTEwMDFd",
+      "file": "planner_items_p2.txt",
+      "headers": {
+        "Content-Type": "application/json; charset=utf-8",
+        "link": "<http://canvas.example.invalid/api/v1/planner/items?start_date=2026-09-01T07%3A00%3A00Z&end_date=2026-12-31T08%3A00%3A00Z&per_page=50&page=first>; rel=\"current\", <http://canvas.example.invalid/api/v1/planner/items?start_date=2026-09-01T07%3A00%3A00Z&end_date=2026-12-31T08%3A00%3A00Z&per_page=50&page=first>; rel=\"first\""
+      }
+    },
+    {
+      "path": "/api/v1/courses/4201/assignments/51001",
+      "page": null,
+      "file": "assignment_51001.txt",
+      "headers": {
+        "Content-Type": "application/json; charset=utf-8"
+      }
+    },
+    {
+      "path": "/api/v1/courses/4201/assignments/51002",
+      "page": null,
+      "file": "assignment_51002.txt",
+      "headers": {
+        "Content-Type": "application/json; charset=utf-8"
+      }
+    }
+  ]
+}

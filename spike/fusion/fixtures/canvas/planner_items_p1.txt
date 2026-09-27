@@ -1,0 +1,35 @@
+while(1);[
+  {
+    "_SYNTHETIC": "SYNTHETIC: authored from Canvas public REST API docs, never verified against a live Canvas. Key not sent by Canvas.",
+    "context_type": "Course",
+    "course_id": 4201,
+    "plannable_id": 51002,
+    "planner_override": null,
+    "plannable_type": "assignment",
+    "new_activity": false,
+    "submissions": {
+      "submitted": false,
+      "excused": false,
+      "graded": false,
+      "posted_at": null,
+      "late": false,
+      "missing": false,
+      "needs_grading": false,
+      "has_feedback": false,
+      "redo_request": false
+    },
+    "plannable_date": "2026-10-01T19:00:00Z",
+    "plannable": {
+      "id": 51002,
+      "title": "Tutorial 2 worksheet",
+      "created_at": "2026-09-10T20:14:03Z",
+      "updated_at": "2026-09-18T22:40:51Z",
+      "points_possible": 2.0,
+      "due_at": "2026-10-01T19:00:00Z",
+      "restrict_quantitative_data": false
+    },
+    "html_url": "/courses/4201/assignments/51002",
+    "context_name": "CPSC 121 101 Models of Computation",
+    "context_image": null
+  }
+]

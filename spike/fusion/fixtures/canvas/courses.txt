@@ -1,0 +1,56 @@
+while(1);[
+  {
+    "_SYNTHETIC": "SYNTHETIC: authored from Canvas public REST API docs, never verified against a live Canvas. Key not sent by Canvas.",
+    "id": 4201,
+    "name": "CPSC 121 101 Models of Computation",
+    "course_code": "CPSC_121_101_2026W1",
+    "original_name": null,
+    "workflow_state": "available",
+    "account_id": 7,
+    "root_account_id": 1,
+    "uuid": "fAkE0000000000000000000000000000000CPSC",
+    "start_at": null,
+    "end_at": null,
+    "grading_standard_id": null,
+    "is_public": false,
+    "created_at": "2026-07-15T17:02:11Z",
+    "enrollment_term_id": 126,
+    "license": "private",
+    "grade_passback_setting": null,
+    "public_syllabus": false,
+    "public_syllabus_to_auth": false,
+    "storage_quota_mb": 5000,
+    "is_public_to_auth_users": false,
+    "homeroom_course": false,
+    "course_color": null,
+    "friendly_name": null,
+    "apply_assignment_group_weights": true,
+    "calendar": {
+      "ics": "http://canvas.example.invalid/feeds/calendars/course_fAkE.ics"
+    },
+    "time_zone": "America/Vancouver",
+    "blueprint": false,
+    "template": false,
+    "enrollments": [
+      {
+        "type": "student",
+        "role": "StudentEnrollment",
+        "role_id": 3,
+        "user_id": 90001,
+        "enrollment_state": "active",
+        "limit_privileges_to_course_section": false
+      }
+    ],
+    "hide_final_grades": false,
+    "restrict_enrollments_to_course_dates": false,
+    "term": {
+      "id": 126,
+      "name": "2026 Winter Term 1",
+      "start_at": "2026-09-01T07:00:00Z",
+      "end_at": "2026-12-31T08:00:00Z",
+      "created_at": "2026-03-01T18:00:00Z",
+      "workflow_state": "active",
+      "grading_period_group_id": null
+    }
+  }
+]

@@ -1,0 +1,175 @@
+{
+  "base": "http://localhost:8082",
+  "courses": [
+    {
+      "label": "MATH100-2026W1",
+      "source": "moodle",
+      "source_id": "2",
+      "term_hint": null,
+      "title": "MATH 100 Differential Calculus",
+      "url": "http://localhost:8082/course/view.php?id=2"
+    },
+    {
+      "label": "CPSC121-101-2026W1",
+      "source": "moodle",
+      "source_id": "3",
+      "term_hint": null,
+      "title": "CPSC 121 101 Models of Computation",
+      "url": "http://localhost:8082/course/view.php?id=3"
+    },
+    {
+      "label": "ENGL110-001-2026W1",
+      "source": "moodle",
+      "source_id": "4",
+      "term_hint": null,
+      "title": "ENGL 110 Approaches to Literature",
+      "url": "http://localhost:8082/course/view.php?id=4"
+    }
+  ],
+  "fetched_at": "2026-09-27T06:40:19.633745+00:00",
+  "items": [
+    {
+      "course_source_id": "2",
+      "done": null,
+      "due": "2026-09-20T23:59:00-07:00",
+      "excerpt": "Do this set on WeBWorK: http://localhost:8081/webwork2/math100_2026w1/HW1/",
+      "kind": "assignment",
+      "links_out": [
+        "http://localhost:8081/webwork2/math100_2026w1/HW1/"
+      ],
+      "opens": null,
+      "source": "moodle",
+      "source_id": "cm:1",
+      "submit_url": null,
+      "title": "WeBWorK HW1",
+      "url": "http://localhost:8082/mod/assign/view.php?id=1",
+      "weight": null
+    },
+    {
+      "course_source_id": "2",
+      "done": null,
+      "due": "2026-09-29T23:00:00-07:00",
+      "excerpt": "Homework 2 lives on WeBWorK: http://localhost:8081/webwork2/math100_2026w1/HW2/",
+      "kind": "assignment",
+      "links_out": [
+        "http://localhost:8081/webwork2/math100_2026w1/HW2/"
+      ],
+      "opens": null,
+      "source": "moodle",
+      "source_id": "cm:2",
+      "submit_url": null,
+      "title": "Homework 2 (WeBWorK)",
+      "url": "http://localhost:8082/mod/assign/view.php?id=2",
+      "weight": null
+    },
+    {
+      "course_source_id": "2",
+      "done": false,
+      "due": "2026-10-09T23:59:00-07:00",
+      "excerpt": "Written assignment 1. Submit your work here as online text.",
+      "kind": "assignment",
+      "links_out": [],
+      "opens": null,
+      "source": "moodle",
+      "source_id": "cm:3",
+      "submit_url": "http://localhost:8082/mod/assign/view.php?id=3&action=editsubmission",
+      "title": "Assignment 1",
+      "url": "http://localhost:8082/mod/assign/view.php?id=3",
+      "weight": null
+    },
+    {
+      "course_source_id": "2",
+      "done": null,
+      "due": "2026-10-15T18:00:00-07:00",
+      "excerpt": "In-class midterm, room TBA.",
+      "kind": "exam",
+      "links_out": [],
+      "opens": null,
+      "source": "moodle",
+      "source_id": "event:6",
+      "submit_url": null,
+      "title": "Midterm 1",
+      "url": "http://localhost:8082/calendar/view.php?view=day&course=2&time=1792112400#event_6",
+      "weight": null
+    },
+    {
+      "course_source_id": "3",
+      "done": null,
+      "due": null,
+      "excerpt": "Take Quiz 1 on PrairieLearn: http://127.0.0.1:3100/pl/course_instance/1/assessment/3/",
+      "kind": "assignment",
+      "links_out": [
+        "http://127.0.0.1:3100/pl/course_instance/1/assessment/3/"
+      ],
+      "opens": null,
+      "source": "moodle",
+      "source_id": "cm:10",
+      "submit_url": null,
+      "title": "PrairieLearn Quiz 1",
+      "url": "http://localhost:8082/mod/assign/view.php?id=10",
+      "weight": null
+    },
+    {
+      "course_source_id": "3",
+      "done": false,
+      "due": "2026-10-16T23:59:00-07:00",
+      "excerpt": "Quiz 3 is a written quiz submitted on Moodle.",
+      "kind": "assignment",
+      "links_out": [],
+      "opens": null,
+      "source": "moodle",
+      "source_id": "cm:6",
+      "submit_url": "http://localhost:8082/mod/assign/view.php?id=6&action=editsubmission",
+      "title": "Quiz 3",
+      "url": "http://localhost:8082/mod/assign/view.php?id=6",
+      "weight": null
+    },
+    {
+      "course_source_id": "3",
+      "done": null,
+      "due": "2026-10-05T17:00:00-07:00",
+      "excerpt": "Reminder: Problem Set 3 is due.",
+      "kind": "event",
+      "links_out": [],
+      "opens": null,
+      "source": "moodle",
+      "source_id": "event:7",
+      "submit_url": null,
+      "title": "Problem Set 3 due",
+      "url": "http://localhost:8082/calendar/view.php?view=day&course=3&time=1791244800#event_7",
+      "weight": null
+    },
+    {
+      "course_source_id": "4",
+      "done": false,
+      "due": "2026-10-09T23:59:00-07:00",
+      "excerpt": "Close reading response. Submit as online text.",
+      "kind": "assignment",
+      "links_out": [],
+      "opens": null,
+      "source": "moodle",
+      "source_id": "cm:5",
+      "submit_url": "http://localhost:8082/mod/assign/view.php?id=5&action=editsubmission",
+      "title": "Assignment 1",
+      "url": "http://localhost:8082/mod/assign/view.php?id=5",
+      "weight": null
+    },
+    {
+      "course_source_id": "4",
+      "done": null,
+      "due": null,
+      "excerpt": "Read chapter 4 of the course reader before next week.",
+      "kind": "reading",
+      "links_out": [],
+      "opens": null,
+      "source": "moodle",
+      "source_id": "cm:7",
+      "submit_url": null,
+      "title": "Reading: Chapter 4",
+      "url": "http://localhost:8082/mod/page/view.php?id=7",
+      "weight": null
+    }
+  ],
+  "notes": [],
+  "source": "moodle"
+}

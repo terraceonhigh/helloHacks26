@@ -1,0 +1,80 @@
+{
+  "base": "http://127.0.0.1:3100",
+  "courses": [
+    {
+      "label": "CPSC 121, 2026W1",
+      "source": "prairielearn",
+      "source_id": "1",
+      "term_hint": "2026 Winter Term 1",
+      "title": "CPSC 121: Models of Computation, 2026 Winter Term 1",
+      "url": "http://127.0.0.1:3100/pl/course_instance/1"
+    }
+  ],
+  "fetched_at": "2026-09-27T06:40:24.616955+00:00",
+  "items": [
+    {
+      "course_source_id": "1",
+      "done": null,
+      "due": "2026-10-02T23:59:00-07:00",
+      "excerpt": "[Quizzes] Q1: 100% until 23:59, Fri, Oct 2 | Not started",
+      "kind": "quiz",
+      "links_out": [],
+      "opens": "2026-09-01T00:00:00-07:00",
+      "source": "prairielearn",
+      "source_id": "1:Q1",
+      "submit_url": null,
+      "title": "Quiz 1",
+      "url": "http://127.0.0.1:3100/pl/course_instance/1/assessment/3/",
+      "weight": null
+    },
+    {
+      "course_source_id": "1",
+      "done": null,
+      "due": "2026-10-16T23:59:00-07:00",
+      "excerpt": "[Quizzes] Q2: 100% until 23:59, Fri, Oct 16 | Not started",
+      "kind": "quiz",
+      "links_out": [],
+      "opens": "2026-09-01T00:00:00-07:00",
+      "source": "prairielearn",
+      "source_id": "1:Q2",
+      "submit_url": null,
+      "title": "Quiz 2",
+      "url": "http://127.0.0.1:3100/pl/course_instance/1/assessment/4/",
+      "weight": null
+    },
+    {
+      "course_source_id": "1",
+      "done": null,
+      "due": "2026-10-05T17:00:00-07:00",
+      "excerpt": "[Homework] PS3: 100% until 17:00, Mon, Oct 5 | 0%",
+      "kind": "homework",
+      "links_out": [],
+      "opens": "2026-09-01T00:00:00-07:00",
+      "source": "prairielearn",
+      "source_id": "1:PS3",
+      "submit_url": null,
+      "title": "Problem Set 3",
+      "url": "http://127.0.0.1:3100/pl/course_instance/1/assessment_instance/1/",
+      "weight": null
+    },
+    {
+      "course_source_id": "1",
+      "done": null,
+      "due": "2026-10-27T23:59:00-07:00",
+      "excerpt": "[Labs] L4: 100% starting from 00:00, Tue, Oct 20 | Not started",
+      "kind": "lab",
+      "links_out": [],
+      "opens": "2026-10-20T00:00:00-07:00",
+      "source": "prairielearn",
+      "source_id": "1:L4",
+      "submit_url": null,
+      "title": "Lab 4",
+      "url": "http://127.0.0.1:3100/pl/course_instance/1/assessments#L4",
+      "weight": null
+    }
+  ],
+  "notes": [
+    "L4 'Lab 4': no link for the student yet ('100% starting from 00:00, Tue, Oct 20'); url is the assessments page"
+  ],
+  "source": "prairielearn"
+}

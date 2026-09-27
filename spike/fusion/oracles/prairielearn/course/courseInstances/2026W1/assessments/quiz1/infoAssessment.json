@@ -1,0 +1,12 @@
+{
+  "uuid": "11111111-aaaa-4bbb-8ccc-000000000001",
+  "type": "Exam",
+  "title": "Quiz 1",
+  "set": "Quiz",
+  "number": "1",
+  "allowAccess": [
+    { "credit": 100, "startDate": "2026-09-01T00:00:00", "endDate": "2026-10-02T23:59:00" },
+    { "credit": 50, "startDate": "2026-09-01T00:00:00", "endDate": "2026-10-09T23:59:00" }
+  ],
+  "zones": [ { "questions": [ { "id": "answer42", "autoPoints": 1 } ] } ]
+}

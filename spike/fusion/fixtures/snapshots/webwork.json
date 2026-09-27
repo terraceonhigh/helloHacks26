@@ -1,0 +1,78 @@
+{
+  "base": "http://localhost:8081",
+  "courses": [
+    {
+      "label": "math100_2026w1",
+      "source": "webwork",
+      "source_id": "math100_2026w1",
+      "term_hint": null,
+      "title": "math100 2026w1",
+      "url": "http://localhost:8081/webwork2/math100_2026w1"
+    }
+  ],
+  "fetched_at": "2026-09-27T06:40:22.118063+00:00",
+  "items": [
+    {
+      "course_source_id": "math100_2026w1",
+      "done": false,
+      "due": "2026-09-29T23:59:00-07:00",
+      "excerpt": "[due from set page status] Open. Due September 29, 2026, 11:59:00 PM PDT. | Set closes on September 29, 2026, 11:59:00 PM PDT. | Set Info This assignment will close on September 29, 2026, 11:59:00 PM PDT .",
+      "kind": "homework",
+      "links_out": [],
+      "opens": null,
+      "source": "webwork",
+      "source_id": "math100_2026w1/HW2",
+      "submit_url": null,
+      "title": "HW2",
+      "url": "http://localhost:8081/webwork2/math100_2026w1/HW2",
+      "weight": null
+    },
+    {
+      "course_source_id": "math100_2026w1",
+      "done": null,
+      "due": "2026-10-17T23:59:00-07:00",
+      "excerpt": "[due from set header] Will open on October 10, 2026, 12:00:00 AM PDT. | Set opens on October 10, 2026, 12:00:00 AM PDT. | Set Info This assignment will close on October 17, 2026, 11:59:00 PM PDT .",
+      "kind": "homework",
+      "links_out": [],
+      "opens": "2026-10-10T00:00:00-07:00",
+      "source": "webwork",
+      "source_id": "math100_2026w1/HW3",
+      "submit_url": null,
+      "title": "HW3",
+      "url": "http://localhost:8081/webwork2/math100_2026w1/HW3",
+      "weight": null
+    },
+    {
+      "course_source_id": "math100_2026w1",
+      "done": null,
+      "due": "2027-01-15T23:59:00-08:00",
+      "excerpt": "[due from set header] Will open on December 1, 2026, 12:00:00 AM PST. | Set opens on December 1, 2026, 12:00:00 AM PST. | Set Info This assignment will close on January 15, 2027, 11:59:00 PM PST .",
+      "kind": "homework",
+      "links_out": [],
+      "opens": "2026-12-01T00:00:00-08:00",
+      "source": "webwork",
+      "source_id": "math100_2026w1/HW9",
+      "submit_url": null,
+      "title": "HW9",
+      "url": "http://localhost:8081/webwork2/math100_2026w1/HW9",
+      "weight": null
+    },
+    {
+      "course_source_id": "math100_2026w1",
+      "done": false,
+      "due": "2026-09-20T23:59:00-07:00",
+      "excerpt": "[due from set header] Answers available for review. | Set is closed. | Set Info This assignment will close on September 20, 2026, 11:59:00 PM PDT .",
+      "kind": "homework",
+      "links_out": [],
+      "opens": null,
+      "source": "webwork",
+      "source_id": "math100_2026w1/HW1",
+      "submit_url": null,
+      "title": "HW1",
+      "url": "http://localhost:8081/webwork2/math100_2026w1/HW1",
+      "weight": null
+    }
+  ],
+  "notes": [],
+  "source": "webwork"
+}

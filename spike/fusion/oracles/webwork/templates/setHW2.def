@@ -1,0 +1,24 @@
+assignmentType          = default
+openDate                = 09/15/2026 at 12:00am
+reducedScoringDate      = 09/29/2026 at 11:59pm
+dueDate                 = 09/29/2026 at 11:59pm
+answerDate              = 09/29/2026 at 11:59pm
+enableReducedScoring    = N
+paperHeaderFile         = defaultHeader
+screenHeaderFile        = defaultHeader
+description             = MATH 100 HW2 (fake fusion-spike data)
+restrictProbProgression = 0
+emailInstructor         = 0
+
+problemListV2
+problem_start
+problem_id           = 1
+source_file          = fx_trivial.pg
+value                = 1
+max_attempts         = -1
+showMeAnother        = -1
+showHintsAfter       = -2
+prPeriod             = -1
+counts_parent_grade  = 0
+att_to_open_children = 0
+problem_end

@@ -1,0 +1,52 @@
+# WeBWorK 2 (openwebwork/webwork2 main, slim build: see Dockerfile) + MariaDB.
+# Brought up by up.sh, which exports the passwords from secrets.env.
+name: fx-webwork
+services:
+  db:
+    image: mirror.gcr.io/library/mariadb:11.8
+    container_name: fx-webwork-db
+    restart: unless-stopped
+    volumes:
+      - fx-webwork-mysql:/var/lib/mysql
+      - ./mariadb.cnf:/etc/mysql/conf.d/fx-webwork.cnf:ro
+    environment:
+      MYSQL_ROOT_PASSWORD: ${WW_DB_ROOT_PASSWORD:?run up.sh}
+      MYSQL_DATABASE: webwork
+      MYSQL_USER: webworkWrite
+      MYSQL_PASSWORD: ${WW_DB_PASSWORD:?run up.sh}
+      TZ: America/Vancouver
+    networks: [fx-webwork-net]
+  app:
+    image: fx-webwork-app:local
+    container_name: fx-webwork-app
+    restart: unless-stopped
+    depends_on: [db]
+    hostname: fx-webwork
+    volumes:
+      - fx-webwork-courses:/opt/webwork/courses
+    ports:
+      - '127.0.0.1:8081:8080'
+    stop_signal: SIGWINCH
+    stop_grace_period: 30s
+    environment:
+      WEBWORK_DB_DRIVER: MariaDB
+      WEBWORK_DB_HOST: db
+      WEBWORK_DB_PORT: 3306
+      WEBWORK_DB_NAME: webwork
+      WEBWORK_DB_USER: webworkWrite
+      WEBWORK_DB_PASSWORD: ${WW_DB_PASSWORD:?run up.sh}
+      WEBWORK_ROOT_URL: http://localhost:8081
+      WEBWORK_TIMEZONE: America/Vancouver
+      SYSTEM_TIMEZONE: America/Vancouver
+      TZ: America/Vancouver
+      MIN_HTML_ERRORS: 0
+      JSON_ERROR_LOG: 0
+    networks: [fx-webwork-net]
+volumes:
+  fx-webwork-mysql:
+    name: fx-webwork-mysql
+  fx-webwork-courses:
+    name: fx-webwork-courses
+networks:
+  fx-webwork-net:
+    name: fx-webwork-net

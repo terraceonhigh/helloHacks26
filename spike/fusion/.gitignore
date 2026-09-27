@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+oracles/.env
+oracles/**/secrets*
+*.pyc
+.pytest_cache/

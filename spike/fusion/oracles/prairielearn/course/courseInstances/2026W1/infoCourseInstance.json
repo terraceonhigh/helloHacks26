@@ -1,0 +1,7 @@
+{
+  "uuid": "3c1e6d0a-8b7f-4f2a-a0c9-5d2e4b7f6a02",
+  "longName": "2026 Winter Term 1",
+  "timezone": "America/Vancouver",
+  "publishing": { "startDate": "2026-09-01T00:00:00", "endDate": "2026-12-31T23:59:59" },
+  "selfEnrollment": { "enabled": false }
+}
