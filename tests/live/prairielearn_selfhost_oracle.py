@@ -6,16 +6,18 @@ against what that course configures.
 Opt-in and networked: NOT a pytest test (the filename doesn't match test_*.py).
 See tests/live/README.md for starting the container.
 
-    uv run python tests/live/prairielearn_selfhost_oracle.py [BASE_URL] [--conformance]
+    uv run python tests/live/prairielearn_selfhost_oracle.py [BASE_URL] [--conformance] [--source KEY]
 
 --conformance also runs tests/live/adapter_conformance.check on the adapter
 output (ground truth for undated: listed assessments configured with no end).
+--source is the expected Item.source (default prairielearn).
 
 BASE_URL defaults to $PL_SELFHOST_URL, then http://100.124.35.27:3002.
 Exit status is non-zero if any check FAILs. INFO lines are findings about
 real PrairieLearn behaviour.
 
-No product code is changed: hub.prairielearn.BASE is monkeypatched here, and
+No product code is changed: _run() is called as _run(req, "prairielearn", BASE)
+if it takes a base, else hub.prairielearn.BASE is monkeypatched; and
 requests.Session is wrapped in a tiny shim with the Playwright
 APIRequestContext surface _run() uses (req.get(url) -> .status, .ok,
 .text(), .headers).
@@ -25,6 +27,7 @@ With no cookie you're the dev admin ("Dev User"); the cookie
 `pl_test_user=test_student` makes you the built-in test student
 (student@example.com). No real accounts or passwords are involved.
 """
+import inspect
 import os
 import re
 import sys
@@ -42,7 +45,13 @@ from hub.models import category_for  # noqa: E402
 from tests.live import adapter_conformance  # noqa: E402
 
 CONFORMANCE = "--conformance" in sys.argv[1:]
-ARGS = [a for a in sys.argv[1:] if a != "--conformance"]
+ARGV = sys.argv[1:]
+SOURCE = "prairielearn"
+if "--source" in ARGV:
+    i = ARGV.index("--source")
+    SOURCE = ARGV[i + 1]
+    del ARGV[i:i + 2]
+ARGS = [a for a in ARGV if a != "--conformance"]
 BASE = (ARGS[0] if ARGS else os.environ.get("PL_SELFHOST_URL", "http://100.124.35.27:3002")).rstrip("/")
 VAN = ZoneInfo("America/Vancouver")  # the course instance's configured timezone, real tzdata
 
@@ -146,10 +155,13 @@ def main():
     if ci is None:
         return 1
 
-    pl.BASE = BASE  # monkeypatch: the adapter builds every URL from this
     req = Req()
     try:
-        courses, items = pl._run(req)
+        if len(inspect.signature(pl._run).parameters) >= 3:
+            courses, items = pl._run(req, "prairielearn", BASE)  # multi-campus: _run(req, campus_key, base)
+        else:
+            pl.BASE = BASE  # monkeypatch: the adapter builds every URL from this
+            courses, items = pl._run(req)
     except Exception as e:  # noqa: BLE001
         check("hub.prairielearn._run(req) runs", False, repr(e))
         return 1
@@ -194,7 +206,7 @@ def main():
         check(f"[{title}] appears", it is not None)
         if it is None:
             continue
-        check(f"[{title}] source", it.source == "prairielearn", it.source)
+        check(f"[{title}] source", it.source == SOURCE, it.source)
         check(f"[{title}] kind/category from group '{group}'", (it.kind, it.category) == (kind, category_for(kind)),
               f"got {it.kind}/{it.category}, want {kind}/{category_for(kind)}")
 
@@ -233,7 +245,7 @@ def main():
     if CONFORMANCE:
         print("\n--- adapter conformance")
         undated = sum(1 for t, _, _, end in EXPECTED if end is None and t in raw_titles)
-        findings = adapter_conformance.check(courses, items, base=BASE, source="prairielearn", report_undated=undated)
+        findings = adapter_conformance.check(courses, items, base=BASE, source=SOURCE, report_undated=undated)
         results.extend([False] * adapter_conformance.report(findings))
 
     fails = results.count(False)
