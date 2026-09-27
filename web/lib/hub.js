@@ -238,6 +238,36 @@ function sameDay(a, b) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
 
+// The calendar grid for the month containing `monthDate`: 6 weeks of 7 dates
+// (Mon-Sun), padded with the trailing days of the previous/next month so
+// every row is full - what a month view needs to render a rectangular grid.
+// Fixed at 6 weeks (42 cells) rather than 4-6 depending on the month, so the
+// grid never resizes as the student pages between months.
+// ponytail: plain Date math instead of a date library - this repo has none,
+// and a month grid is just "first day's weekday offset, then walk forward".
+export function monthGrid(monthDate) {
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
+  const firstOfMonth = new Date(year, month, 1);
+  const startOffset = (firstOfMonth.getDay() + 6) % 7; // Mon=0..Sun=6
+  const gridStart = new Date(year, month, 1 - startOffset);
+  const cells = Array.from({ length: 42 }, (_, i) => {
+    const d = new Date(gridStart);
+    d.setDate(gridStart.getDate() + i);
+    return { date: d, inMonth: d.getMonth() === month };
+  });
+  const weeks = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+  return weeks;
+}
+
+// Active items due on one calendar date (local time) - the Calendar page's
+// per-day list once a cell is clicked. Expects already-active (non-done)
+// items - see selectActiveItems.
+export function selectItemsDueOn(items, date) {
+  return sortItems(items.filter((item) => item.due && sameDay(new Date(item.due), date)));
+}
+
 // What Settings' Connections list needs: one row per known provider, derived
 // from the data actually on hand rather than a separately-tracked "connected"
 // flag (sample data never sets item.source, so it correctly shows as
