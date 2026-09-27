@@ -57,15 +57,28 @@ function Icon({ name, className = "size-5" }) {
     check: <path d="m5 12 4 4L19 6" />,
     arrow: <><path d="M5 12h14M13 6l6 6-6 6" /></>,
     menu: <><path d="M4 7h16M4 12h16M4 17h16" /></>,
-    settings: <><path d="M4 6h10M18 6h2M4 18h10M18 18h2M4 12h4M12 12h8" /><circle cx="16" cy="6" r="2" /><circle cx="10" cy="12" r="2" /><circle cx="16" cy="18" r="2" /></>,
+    settings: <><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></>,
+    link: <><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></>,
     material: <><path d="M7 3h7l4 4v14H7z" /><path d="M14 3v4h4M9 12h6M9 16h6" /></>,
     announcement: <><path d="M9 5 3 9v6h6l6 4V1z" /><path d="M16 8a4.5 4.5 0 0 1 0 8" /></>,
   };
   return <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
 }
 
-function AppButton({ children, className = "", onClick, ariaLabel, disabled }) {
-  return <button aria-label={ariaLabel} disabled={disabled} className={`app-button ${className}`} onClick={onClick}>{children}</button>;
+function AppButton({ children, className = "", onClick, ariaLabel, title, disabled }) {
+  return <button aria-label={ariaLabel} title={title} disabled={disabled} className={`app-button ${className}`} onClick={onClick}>{children}</button>;
+}
+
+// The item row's deep link: a chain-link icon whose hover/focus tooltip
+// shows the URL it opens. No URL, no icon.
+function ItemLink({ item }) {
+  if (!item.url) return null;
+  return (
+    <a href={item.url} className="item-link" title={item.url} aria-label={`Open in ${item.source || item.course}: ${item.url}`}>
+      <Icon name="link" className="size-4 shrink-0" />
+      <span className="item-link-tip" aria-hidden="true">{item.url}</span>
+    </a>
+  );
 }
 
 const NAV_ITEMS = [
@@ -1066,11 +1079,11 @@ export default function App() {
             </div>
             <AppButton
               ariaLabel="Settings"
+              title="Settings"
               onClick={() => { setActiveNav("Settings"); setMobileNav(false); }}
-              className={`icon-button gap-1.5 px-2 ${activeNav === "Settings" ? "nav-item-active" : ""}`}
+              className={`icon-button settings-button ${activeNav === "Settings" ? "nav-item-active" : ""}`}
             >
-              <Icon name="settings" className="size-4" />
-              <span className="text-xs font-bold">Settings</span>
+              <Icon name="settings" />
             </AppButton>
           </div>
         </div>
@@ -1210,7 +1223,7 @@ export default function App() {
                           <div className="text-xs font-bold">{formatDue(item.due)}</div>
                           <div className="mt-0.5 text-[0.7rem] text-[var(--muted)]">{displayLabel(item.urgency)}</div>
                         </div>
-                        <a href={item.url} aria-label="Open"><Icon name="arrow" className="size-4 shrink-0 text-[var(--muted-light)]" /></a>
+                        <ItemLink item={item} />
                       </div>
                     ))}
                     {topAssignments.length === 0 && (
@@ -1285,7 +1298,7 @@ export default function App() {
                           <div className="truncate font-bold">{item.title}</div>
                           <div className="mt-1 text-xs font-medium text-[var(--muted)]">{item.course}</div>
                         </div>
-                        <a href={item.url} aria-label="Open"><Icon name="arrow" className="size-4 shrink-0 text-[var(--muted-light)]" /></a>
+                        <ItemLink item={item} />
                       </div>
                     ))
                   )
@@ -1352,7 +1365,7 @@ export default function App() {
                           <div className="text-xs font-bold">{formatDue(item.due)}</div>
                           <div className="mt-0.5 text-[0.7rem] text-[var(--muted)]">{displayLabel(item.urgency)}</div>
                         </div>
-                        <a href={item.url} aria-label="Open"><Icon name="arrow" className="size-4 shrink-0 text-[var(--muted-light)]" /></a>
+                        <ItemLink item={item} />
                       </div>
                     ))}
                     {visible.length === 0 && (
