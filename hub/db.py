@@ -207,3 +207,13 @@ def by_course(conn, category=None):
     for row in upcoming(conn, category):
         grouped.setdefault(row[0], []).append(row)
     return grouped
+
+
+def textbooks(conn, code=None):
+    """Every textbook, joined to its course code - optionally for just one
+    course. Row shape: (course_code, title, isbn, required, price, url).
+    Required books first, since that's what a student actually needs to buy."""
+    q = ("SELECT courses.code, textbooks.title, textbooks.isbn, textbooks.required, "
+         "textbooks.price, textbooks.url FROM textbooks JOIN courses ON courses.id = textbooks.course_id"
+         + (" WHERE courses.code = ?" if code else "") + " ORDER BY textbooks.required DESC, textbooks.title")
+    return conn.execute(q, (code,) if code else ()).fetchall()
