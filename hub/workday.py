@@ -31,7 +31,11 @@ def _course_from_listing(listing, term):
 
 
 def parse_workday_courses(path, term):
-    workbook = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    # read_only=True trusts the sheet's declared dimension, which real
+    # Workday exports understate (confirmed against a real export) - it
+    # silently truncates to almost nothing. Non-read-only parses actual
+    # cells instead.
+    workbook = openpyxl.load_workbook(path, read_only=False, data_only=True)
     sheet = workbook[_SHEET_NAME] if _SHEET_NAME in workbook.sheetnames else workbook.active
     rows = list(sheet.iter_rows(values_only=True))
 
@@ -39,11 +43,16 @@ def parse_workday_courses(path, term):
     if header_row_index is None:
         return []
 
+    # Real exports have one row per meeting component (Lecture, Lab,
+    # Discussion...), each repeating the same course listing text - dedupe
+    # by code, keeping the first occurrence.
     courses = []
+    seen_codes = set()
     for row in rows[header_row_index + 1:]:
         if course_col >= len(row) or not row[course_col]:
             continue
         course = _course_from_listing(str(row[course_col]).strip(), term)
-        if course is not None:
+        if course is not None and course.code not in seen_codes:
+            seen_codes.add(course.code)
             courses.append(course)
     return courses

@@ -18,19 +18,27 @@ test("parses all course rows", () => {
   const courses = load();
   assert.deepEqual(
     courses.map((c) => c.code),
-    ["CPSC 121", "MATH 200", "CPSC 210"]
+    ["FAKE 100", "FAKE 200", "FAKE 300"]
   );
 });
 
 test("fields from first row", () => {
-  const [cpsc121] = load();
-  assert.equal(cpsc121.section, "001");
-  assert.equal(cpsc121.term, "2026W1");
-  assert.equal(cpsc121.title, "Models of Computation");
+  const [fake100] = load();
+  assert.equal(fake100.term, "2026W1");
+  assert.equal(fake100.title, "Introduction to Fake Studies");
+  // Real Workday "Course Listing" text never embeds a section number (it
+  // lives in a separate column this parser doesn't read) - always null.
+  assert.equal(fake100.section, null);
 });
 
-test("missing section still parses", () => {
-  const cpsc210 = load()[2];
-  assert.equal(cpsc210.section, null);
-  assert.equal(cpsc210.title, "Software Construction");
+test("duplicate component rows dedupe to one course", () => {
+  // Real exports have one row per meeting component (Lecture, Lab,
+  // Discussion...), each repeating the same Course Listing text.
+  const codes = load().map((c) => c.code);
+  assert.equal(codes.filter((c) => c === "FAKE 100").length, 1);
+});
+
+test("no separator falls back to raw listing as title", () => {
+  const fake300 = load()[2];
+  assert.equal(fake300.title, "fake300");
 });

@@ -44,21 +44,48 @@ function courseFromListing(listing, term) {
 
 // arrayBuffer: from File.arrayBuffer() (a file the user picked, read
 // entirely client-side - never uploaded anywhere).
+// Some real Workday exports ship a !ref range that undercounts the actual
+// populated cells, so sheet_to_json silently truncates almost everything
+// (confirmed against a real export, not just a theoretical worry - matches
+// the same fix ubc-workday2cal's prior art needed). Recompute !ref from the
+// real cell addresses before reading rows.
+function fixTruncatedRange(sheet) {
+  const addresses = Object.keys(sheet).filter((k) => !k.startsWith("!"));
+  if (addresses.length === 0) return;
+  let maxRow = 0;
+  let maxCol = 0;
+  for (const addr of addresses) {
+    const { r, c } = XLSX.utils.decode_cell(addr);
+    if (r > maxRow) maxRow = r;
+    if (c > maxCol) maxCol = c;
+  }
+  sheet["!ref"] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: maxRow, c: maxCol } });
+}
+
 export function parseWorkdayCourses(arrayBuffer, term) {
   const workbook = XLSX.read(arrayBuffer, { type: "array" });
   const sheetName = workbook.SheetNames.includes(SHEET_NAME) ? SHEET_NAME : workbook.SheetNames[0];
   const sheet = workbook.Sheets[sheetName];
+  fixTruncatedRange(sheet);
   const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
 
   const [headerRowIndex, courseCol] = findHeaderRow(rows);
   if (headerRowIndex == null) return [];
 
+  // Real exports have one row per meeting component (Lecture, Lab,
+  // Tutorial...), each repeating the same course listing text - confirmed
+  // against a real export, not a theoretical worry. Dedupe by code, keeping
+  // the first occurrence.
   const courses = [];
+  const seenCodes = new Set();
   for (let i = headerRowIndex + 1; i < rows.length; i++) {
     const row = rows[i] || [];
     if (courseCol >= row.length || !row[courseCol]) continue;
     const course = courseFromListing(String(row[courseCol]).trim(), term);
-    if (course) courses.push(course);
+    if (course && !seenCodes.has(course.code)) {
+      seenCodes.add(course.code);
+      courses.push(course);
+    }
   }
   return courses;
 }
