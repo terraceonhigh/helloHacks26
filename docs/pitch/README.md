@@ -15,3 +15,4 @@ whoever has it for the live link rather than editing these files directly.
 
 - **5-minute order and timed script:** `SPEAKER-NOTES.md` (slide ids match `deck.json`).
 - **PowerPoint export with speaker notes:** `keynote/`. The source here is canonical; regenerate the export after edits.
+- **Judge Q&A cheat sheet (study this):** `JUDGE-CHEATSHEET.md`.
