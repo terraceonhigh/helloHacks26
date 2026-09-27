@@ -6,6 +6,50 @@
 
 const URGENCY_ORDER = ["overdue", "critical", "high", "medium", "low"];
 
+// Kinds a student can flag as "always show me these first" in Settings -
+// mirrors the vocabulary hub/models.py's _WEIGHT_KEYWORDS treats as
+// high-stakes (final/midterm/exam, project/essay/paper, assignment/homework,
+// quiz, reading), collapsed to the `kind` values items actually carry
+// (see hub/canvas.py's KINDS map and hub.js's own CATEGORY_FOR below).
+export const PREFERRED_KIND_OPTIONS = [
+  { id: "exam", label: "Exams" },
+  { id: "quiz", label: "Quizzes" },
+  { id: "assignment", label: "Assignments" },
+  { id: "reading", label: "Readings" },
+  { id: "project", label: "Projects / essays" },
+];
+
+const PREFERRED_KINDS_COOKIE = "hub-preferred-kinds";
+
+// Pure: turn the cookie's raw comma-separated value into a Set, dropping
+// anything that isn't a known kind id so a stale or hand-edited cookie can't
+// smuggle in junk. Kept separate from the document.cookie read/write below so
+// the actual parsing logic is unit-testable without a DOM.
+export function parsePreferredKinds(raw) {
+  if (!raw) return new Set();
+  const valid = new Set(PREFERRED_KIND_OPTIONS.map((o) => o.id));
+  return new Set(
+    raw.split(",").map((s) => s.trim()).filter((s) => valid.has(s)),
+  );
+}
+
+// Not pure (touches document.cookie) - no test for these two, per the
+// pattern in hub.test.mjs; parsePreferredKinds carries the logic that can be
+// tested.
+export function readPreferredKindsCookie() {
+  if (typeof document === "undefined") return new Set();
+  const match = document.cookie.match(/(?:^|; )hub-preferred-kinds=([^;]*)/);
+  return parsePreferredKinds(match ? decodeURIComponent(match[1]) : "");
+}
+
+export function writePreferredKindsCookie(kinds) {
+  if (typeof document === "undefined") return;
+  const value = encodeURIComponent(Array.from(kinds).join(","));
+  // 1 year, path=/ so it's readable app-wide; samesite=lax is plenty for a
+  // same-site preference with no cross-site use.
+  document.cookie = `${PREFERRED_KINDS_COOKIE}=${value}; path=/; max-age=31536000; samesite=lax`;
+}
+
 export function apiBase() {
   return process.env.NEXT_PUBLIC_HUB_API || null;
 }
@@ -120,11 +164,23 @@ export async function connectPrairieLearn() {
 // Sort by urgency (matches hub.logic.sort_items's order) when the backend
 // (or sample data) provides it; items without it yet (API not upgraded)
 // fall back to due-date order rather than a guessed urgency.
-export function sortItems(items) {
+//
+// preferredKinds (a Set of `kind` ids, from Settings' "what's urgent to you"
+// preference) only breaks ties *within* an urgency band - a stable secondary
+// key, applied before falling back to due date. It never moves an item
+// across bands or touches the urgency label itself: that math is
+// hub/models.py's classify_urgency() and stays backend-only, per the note
+// above SAMPLE_ROWS. ponytail: a real "boost" would re-run the weight/hours
+// formula with a per-student multiplier server-side; this client-only nudge
+// is the cheap version for a preference toggle, not a ranking rewrite.
+export function sortItems(items, preferredKinds = new Set()) {
   return [...items].sort((a, b) => {
     const aRank = a.urgency ? URGENCY_ORDER.indexOf(a.urgency) : URGENCY_ORDER.length;
     const bRank = b.urgency ? URGENCY_ORDER.indexOf(b.urgency) : URGENCY_ORDER.length;
     if (aRank !== bRank) return aRank - bRank;
+    const aPreferred = preferredKinds.has(a.kind) ? 0 : 1;
+    const bPreferred = preferredKinds.has(b.kind) ? 0 : 1;
+    if (aPreferred !== bPreferred) return aPreferred - bPreferred;
     return new Date(a.due) - new Date(b.due);
   });
 }
@@ -196,8 +252,8 @@ export function selectActiveItems(items) {
 
 // The flat item list for a given tab/toggle/limit combination. Expects
 // already-active (non-done) items - see selectActiveItems.
-export function selectVisibleItems(items, { tab, hideOverdue, showN, now }) {
-  return sortItems(items)
+export function selectVisibleItems(items, { tab, hideOverdue, showN, now, preferredKinds }) {
+  return sortItems(items, preferredKinds)
     .filter((item) => tab === "all" || tab === "courses" || item.category === tab)
     .filter((item) => !hideOverdue || !isOverdue(item, now))
     .slice(0, showN);
@@ -205,14 +261,14 @@ export function selectVisibleItems(items, { tab, hideOverdue, showN, now }) {
 
 // One course's own items, ranked - what the Courses tab's per-course table
 // needs. Expects already-active (non-done) items - see selectActiveItems.
-export function selectCourseItems(items, courseCode) {
-  return sortItems(items.filter((item) => item.course === courseCode));
+export function selectCourseItems(items, courseCode, preferredKinds) {
+  return sortItems(items.filter((item) => item.course === courseCode), preferredKinds);
 }
 
 // The single most urgent active item, or null. Expects already-active
 // (non-done) items - see selectActiveItems.
-export function selectNextUp(items) {
-  return sortItems(items)[0] ?? null;
+export function selectNextUp(items, preferredKinds) {
+  return sortItems(items, preferredKinds)[0] ?? null;
 }
 
 // The 7 dates (Mon-Sun) of the week containing `now` - what a calendar-week

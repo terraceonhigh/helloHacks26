@@ -13,12 +13,15 @@ import {
   isLocalMode,
   isOverdue,
   mergeCourses,
+  PREFERRED_KIND_OPTIONS,
+  readPreferredKindsCookie,
   selectActiveItems,
   selectConnections,
   selectCourseItems,
   selectNextUp,
   selectVisibleItems,
   weekDates,
+  writePreferredKindsCookie,
 } from "../lib/hub";
 import { parseWorkdayCourses } from "../lib/workday";
 
@@ -135,9 +138,28 @@ function QuickActions({ sampleMode, onSampleModeChange, onConnected, onWorkdayIm
   );
 }
 
-function SettingsPage({ theme, setTheme, customColors, setCustomColors, connections }) {
+function SettingsPage({ theme, setTheme, customColors, setCustomColors, connections, preferredKinds, onTogglePreferredKind }) {
   return (
     <div className="max-w-2xl space-y-6">
+      <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-card)]">
+        <div className="mb-1 text-xl font-bold tracking-tight">What matters to you</div>
+        <div className="mb-5 text-sm text-[var(--muted)]">
+          Pick the kinds of work you personally treat as most urgent. Matching items get a Priority badge and move to the front of their urgency group - it doesn&apos;t change the urgency itself.
+        </div>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {PREFERRED_KIND_OPTIONS.map((option) => (
+            <label key={option.id} className="toggle-pill">
+              <input
+                type="checkbox"
+                checked={preferredKinds.has(option.id)}
+                onChange={() => onTogglePreferredKind(option.id)}
+              />
+              {option.label}
+            </label>
+          ))}
+        </div>
+      </section>
+
       <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-card)]">
         <div className="mb-1 text-xl font-bold tracking-tight">Appearance</div>
         <div className="mb-5 text-sm text-[var(--muted)]">Pick a color scheme, or build your own.</div>
@@ -212,6 +234,7 @@ export default function App() {
   const [showN, setShowN] = useState(10);
   const [theme, setTheme] = useState("everforest");
   const [customColors, setCustomColors] = useState(DEFAULT_CUSTOM_COLORS);
+  const [preferredKinds, setPreferredKinds] = useState(new Set());
 
   const [sampleMode, setSampleMode] = useState(true);
   const [items, setItems] = useState([]);
@@ -227,7 +250,18 @@ export default function App() {
     } catch {
       // ignore malformed/missing storage - keep the default
     }
+    setPreferredKinds(readPreferredKindsCookie());
   }, []);
+
+  function togglePreferredKind(kindId) {
+    setPreferredKinds((prev) => {
+      const next = new Set(prev);
+      if (next.has(kindId)) next.delete(kindId);
+      else next.add(kindId);
+      writePreferredKindsCookie(next);
+      return next;
+    });
+  }
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem("gather-theme", theme);
@@ -278,9 +312,9 @@ export default function App() {
   }, [activeItems, search]);
 
   const filteredByCourse = activeFilter === "All" ? searched : searched.filter((item) => item.course === activeFilter);
-  const visible = selectVisibleItems(filteredByCourse, { tab: activeNavTab, hideOverdue, showN, now });
-  const topAssignments = selectVisibleItems(activeItems, { tab: "all", hideOverdue: false, showN: 5, now });
-  const nextUp = selectNextUp(activeItems);
+  const visible = selectVisibleItems(filteredByCourse, { tab: activeNavTab, hideOverdue, showN, now, preferredKinds });
+  const topAssignments = selectVisibleItems(activeItems, { tab: "all", hideOverdue: false, showN: 5, now, preferredKinds });
+  const nextUp = selectNextUp(activeItems, preferredKinds);
   const days = weekDates(now);
   const connections = selectConnections(items, importedCourses);
 
@@ -333,7 +367,15 @@ export default function App() {
 
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
           {activeNav === "Settings" ? (
-            <SettingsPage theme={theme} setTheme={setTheme} customColors={customColors} setCustomColors={setCustomColors} connections={connections} />
+            <SettingsPage
+              theme={theme}
+              setTheme={setTheme}
+              customColors={customColors}
+              setCustomColors={setCustomColors}
+              connections={connections}
+              preferredKinds={preferredKinds}
+              onTogglePreferredKind={togglePreferredKind}
+            />
           ) : (
           <>
           <section className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
@@ -399,7 +441,10 @@ export default function App() {
                       <div key={item.id} className="assignment-row">
                         <span className="course-mark">{item.course.slice(0, 2)}</span>
                         <div className="min-w-0 flex-1">
-                          <div className="truncate font-bold">{item.title}</div>
+                          <div className="truncate font-bold">
+                            {item.title}
+                            {preferredKinds.has(item.kind) && <span className="due-soon ml-2 rounded-md px-1.5 py-0.5 text-[0.65rem] font-bold align-middle">Priority</span>}
+                          </div>
                           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-[var(--muted)]">
                             <span>{item.course}</span><span>·</span><span>{item.kind}</span>
                           </div>
@@ -459,11 +504,14 @@ export default function App() {
                         <div className="mb-3 text-xs text-[var(--muted)]">
                           {course.term} &middot; Grade: {course.grade == null ? "—" : `${course.grade}%`}
                         </div>
-                        {selectCourseItems(activeItems, course.code).map((item) => (
+                        {selectCourseItems(activeItems, course.code, preferredKinds).map((item) => (
                           <div key={item.id} className={`assignment-row ${isOverdue(item, now) ? "due-now" : ""}`}>
                             <span className="course-mark">{item.course.slice(0, 2)}</span>
                             <div className="min-w-0 flex-1">
-                              <div className="truncate font-bold">{item.title}</div>
+                              <div className="truncate font-bold">
+                                {item.title}
+                                {preferredKinds.has(item.kind) && <span className="due-soon ml-2 rounded-md px-1.5 py-0.5 text-[0.65rem] font-bold align-middle">Priority</span>}
+                              </div>
                               <div className="text-xs text-[var(--muted)]">{displayLabel(item.urgency)} &middot; {formatDue(item.due)}</div>
                             </div>
                             <a href={item.url} className="text-xs font-bold text-[var(--accent)]">open</a>
@@ -478,7 +526,10 @@ export default function App() {
                       <div key={item.id} className="assignment-row">
                         <span className="course-mark">{item.course.slice(0, 2)}</span>
                         <div className="min-w-0 flex-1">
-                          <div className="truncate font-bold">{item.title}</div>
+                          <div className="truncate font-bold">
+                            {item.title}
+                            {preferredKinds.has(item.kind) && <span className="due-soon ml-2 rounded-md px-1.5 py-0.5 text-[0.65rem] font-bold align-middle">Priority</span>}
+                          </div>
                           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-[var(--muted)]">
                             <span>{item.course}</span><span>·</span><span>{item.kind}</span>
                           </div>
