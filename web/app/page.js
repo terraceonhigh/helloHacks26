@@ -19,6 +19,8 @@ import {
   isOverdue,
   mergeCourses,
   mergeItems,
+  PREFERRED_KIND_OPTIONS,
+  readPreferredKindsCookie,
   selectActiveItems,
   selectConnections,
   selectCourseItems,
@@ -26,6 +28,7 @@ import {
   selectVisibleCourses,
   selectVisibleItems,
   weekDates,
+  writePreferredKindsCookie,
 } from "../lib/hub";
 import { parseWorkdayCourses } from "../lib/workday";
 
@@ -82,7 +85,7 @@ const CUSTOM_COLOR_FIELDS = [
 const WEEKDAY_LETTERS = ["M", "T", "W", "T", "F", "S", "S"];
 const MAX_WORKDAY_FILE_BYTES = 5_000_000;
 
-function SettingsPage({ theme, setTheme, customColors, setCustomColors, connections, sampleMode, onSampleModeChange, onConnected, onWorkdayImported, allCourses, hiddenCourses, onToggleCourseHidden, canvasFeedUrl, feedItemCount, feedError, onConnectFeed, onDisconnectFeed }) {
+function SettingsPage({ theme, setTheme, customColors, setCustomColors, connections, sampleMode, onSampleModeChange, onConnected, onWorkdayImported, allCourses, hiddenCourses, onToggleCourseHidden, canvasFeedUrl, feedItemCount, feedError, onConnectFeed, onDisconnectFeed, preferredKinds, onTogglePreferredKind }) {
   const [term, setTerm] = useState("2026W1");
   const [workdayStatus, setWorkdayStatus] = useState(null);
   const [customDomain, setCustomDomain] = useState("");
@@ -132,6 +135,25 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
 
   return (
     <div className="max-w-2xl space-y-6">
+      <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-card)]">
+        <div className="mb-1 text-xl font-bold tracking-tight">What matters to you</div>
+        <div className="mb-5 text-sm text-[var(--muted)]">
+          Pick the kinds of work you personally treat as most urgent. Matching items get a Priority badge and move to the front of their urgency group - it doesn&apos;t change the urgency itself.
+        </div>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {PREFERRED_KIND_OPTIONS.map((option) => (
+            <label key={option.id} className="toggle-pill">
+              <input
+                type="checkbox"
+                checked={preferredKinds.has(option.id)}
+                onChange={() => onTogglePreferredKind(option.id)}
+              />
+              {option.label}
+            </label>
+          ))}
+        </div>
+      </section>
+
       <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-card)]">
         <div className="mb-1 text-xl font-bold tracking-tight">Appearance</div>
         <div className="mb-5 text-sm text-[var(--muted)]">Pick a color scheme, or build your own.</div>
@@ -390,6 +412,7 @@ export default function App() {
   const [showN, setShowN] = useState(10);
   const [theme, setTheme] = useState("everforest");
   const [customColors, setCustomColors] = useState(DEFAULT_CUSTOM_COLORS);
+  const [preferredKinds, setPreferredKinds] = useState(new Set());
 
   // First-time default: off in local mode (a local run means someone's about
   // to connect a real account, so show that path immediately rather than
@@ -429,6 +452,7 @@ export default function App() {
     } catch {
       // ignore malformed/missing storage - keep the default (nothing hidden)
     }
+    setPreferredKinds(readPreferredKindsCookie());
     // The feed URL is a secret (works like a password) - localStorage only,
     // never sent anywhere but /api/feed. Re-fetches automatically on every
     // load so a saved connection keeps working without re-pasting the link.
@@ -448,6 +472,17 @@ export default function App() {
         });
     }
   }, []);
+
+  function togglePreferredKind(kindId) {
+    setPreferredKinds((prev) => {
+      const next = new Set(prev);
+      if (next.has(kindId)) next.delete(kindId);
+      else next.add(kindId);
+      writePreferredKindsCookie(next);
+      return next;
+    });
+  }
+
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem("gather-theme", theme);
@@ -550,7 +585,7 @@ export default function App() {
   }, [activeItems, search]);
 
   const filteredByCourse = activeFilter === "All" ? searched : searched.filter((item) => item.course === activeFilter);
-  const visible = selectVisibleItems(filteredByCourse, { tab: activeNavTab, hideOverdue, showN, now });
+  const visible = selectVisibleItems(filteredByCourse, { tab: activeNavTab, hideOverdue, showN, now, preferredKinds });
 
   const searchedAnnouncements = useMemo(() => {
     const visibleAnnouncementsBase = hideCourseItems(announcements, hiddenCourses);
@@ -560,8 +595,8 @@ export default function App() {
   }, [announcements, hiddenCourses, search]);
   const visibleAnnouncements = (activeFilter === "All" ? searchedAnnouncements : searchedAnnouncements.filter((item) => item.course === activeFilter)).slice(0, showN);
 
-  const topAssignments = selectVisibleItems(activeItems, { tab: "all", hideOverdue: false, showN: 5, now });
-  const nextUp = selectNextUp(activeItems);
+  const topAssignments = selectVisibleItems(activeItems, { tab: "all", hideOverdue: false, showN: 5, now, preferredKinds });
+  const nextUp = selectNextUp(activeItems, preferredKinds);
   const days = weekDates(now);
   const connections = selectConnections(allItems, importedCourses);
 
@@ -649,6 +684,8 @@ export default function App() {
               feedError={feedError}
               onConnectFeed={connectCanvasFeed}
               onDisconnectFeed={disconnectCanvasFeed}
+              preferredKinds={preferredKinds}
+              onTogglePreferredKind={togglePreferredKind}
             />
           ) : (
           <>
@@ -715,7 +752,10 @@ export default function App() {
                       <div key={item.id} className="assignment-row">
                         <span className="course-mark">{item.course.slice(0, 2)}</span>
                         <div className="min-w-0 flex-1">
-                          <div className="truncate font-bold">{item.title}</div>
+                          <div className="truncate font-bold">
+                            {item.title}
+                            {preferredKinds.has(item.kind) && <span className="due-soon ml-2 rounded-md px-1.5 py-0.5 text-[0.65rem] font-bold align-middle">Priority</span>}
+                          </div>
                           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-[var(--muted)]">
                             <span>{item.course}</span><span>·</span><span>{item.kind}</span>
                             {/* The boxed due-date badge below is sm:+ only - repeat it as
@@ -799,11 +839,14 @@ export default function App() {
                         <div className="mb-3 text-xs text-[var(--muted)]">
                           {course.term} &middot; Grade: {course.grade == null ? "—" : `${course.grade}%`}
                         </div>
-                        {selectCourseItems(activeItems, course.code).map((item) => (
+                        {selectCourseItems(activeItems, course.code, preferredKinds).map((item) => (
                           <div key={item.id} className={`assignment-row ${isOverdue(item, now) ? "due-now" : ""}`}>
                             <span className="course-mark">{item.course.slice(0, 2)}</span>
                             <div className="min-w-0 flex-1">
-                              <div className="truncate font-bold">{item.title}</div>
+                              <div className="truncate font-bold">
+                                {item.title}
+                                {preferredKinds.has(item.kind) && <span className="due-soon ml-2 rounded-md px-1.5 py-0.5 text-[0.65rem] font-bold align-middle">Priority</span>}
+                              </div>
                               <div className="text-xs text-[var(--muted)]">{item.kind} &middot; {displayLabel(item.urgency)} &middot; {formatDue(item.due)}</div>
                             </div>
                             <a href={item.url} className="text-xs font-bold text-[var(--accent)]">open</a>
@@ -818,7 +861,10 @@ export default function App() {
                       <div key={item.id} className="assignment-row">
                         <span className="course-mark">{item.course.slice(0, 2)}</span>
                         <div className="min-w-0 flex-1">
-                          <div className="truncate font-bold">{item.title}</div>
+                          <div className="truncate font-bold">
+                            {item.title}
+                            {preferredKinds.has(item.kind) && <span className="due-soon ml-2 rounded-md px-1.5 py-0.5 text-[0.65rem] font-bold align-middle">Priority</span>}
+                          </div>
                           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-[var(--muted)]">
                             <span>{item.course}</span><span>·</span><span>{item.kind}</span>
                             {/* The boxed due-date badge below is sm:+ only - repeat it as
