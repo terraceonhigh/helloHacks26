@@ -1,19 +1,52 @@
+<div align="center">
+
 # Lauds
 
-**The first thing you check in the morning.**
+### The first thing you check in the morning.
 
-**▶ Try it live: [hello-hacks26-terraceonhigh.vercel.app](https://hello-hacks26-terraceonhigh.vercel.app/)**. No install, no login. It opens on a made-up demo student.
+**Nine systems a student already uses, fused into one ranked answer to "what do I do today?"**
 
-Lauds is a read-only student dashboard that answers "what do I need to do this week?" Every platform a student already uses (Canvas, PrairieLearn, WeBWorK, Workday, the UBC Bookstore and others) is a sensor. Each platform gets one adapter that turns its data into a small shared model: `Course`, `Item`, `Textbook` and `Meeting` in [`hub/models.py`](hub/models.py). Fusion then runs on that shared model, never on raw provider data: course codes are matched across sources (`CPSC_V 110-101` and `CPSC 110` become one course), exact duplicates merge, and everything is ranked by urgency. Adding a platform needs no change to the core model or logic.
+[![Try the live demo](https://img.shields.io/badge/%E2%96%B6%20try%20the%20live%20demo-no%20login%20needed-b84028?style=for-the-badge)](https://hello-hacks26-terraceonhigh.vercel.app/)
+[![CI](https://github.com/terraceonhigh/helloHacks26/actions/workflows/ci.yml/badge.svg)](https://github.com/terraceonhigh/helloHacks26/actions/workflows/ci.yml)
+![Built at UBC BizTech HelloHacks 2026](https://img.shields.io/badge/built%20at-HelloHacks%202026-17211b)
 
-## Why
+<a href="https://hello-hacks26-terraceonhigh.vercel.app/"><img src="docs/pitch/images/readme-overview.png" alt="The Lauds dashboard: 25 items due this week, 5 overdue, the five most urgent across every course, each linking back to its own platform" width="860"></a>
 
-- Students lose real time to admin overhead: five or more systems, each with its own login, calendar and idea of "due".
-- Canvas only sees Canvas. WeBWorK, PrairieLearn, Workday and the Bookstore never reach its To-Do list.
-- Lauds puts them in one view and links each item back to where it lives. Lauds is read-only: it opens the item in its own platform and never writes back.
+</div>
+
+## The 30-second version
+
+- **The problem.** A UBC student's week lives in Canvas, PrairieLearn, WeBWorK, Piazza, Workday, the Bookstore and more. None of them talk to each other, and Canvas only sees Canvas.
+- **The idea.** Treat every platform as a *sensor*. One small adapter per platform translates it into one shared model (`Course`, `Item`, `Textbook`, `Meeting`). Fusion runs on that model: courses matched across systems, duplicates merged, everything ranked by urgency.
+- **The proof.** The live demo runs a whole fake semester through the **real** adapter code: 195 raw records from 9 sources become 76 items across 6 courses, with the class timetable alongside. No login needed.
+
+## By the numbers
+
+| 9 | 195 &rarr; 76 | 14 | 325 | 0 |
+| :---: | :---: | :---: | :---: | :---: |
+| sensors feeding the demo | raw records fused into items | platforms in the pipeline (6 merged) | automated backend tests | passwords Lauds ever sees |
+
+Built in one weekend by four students, two of them in their first year.
+
+## Try these three things (60 seconds, live site)
+
+1. **Open [the demo](https://hello-hacks26-terraceonhigh.vercel.app/).** Due this week, overdue, and the five most urgent items across every course. Hover a row's link icon to see where the item really lives.
+2. **Assignments tab: find "Quiz 3".** It was posted on both Canvas and PrairieLearn, and it shows up **once**. That's the fusion layer. (Today that merge is an exact match on course, title and due time.)
+3. **Calendar, then Schedule.** Deadlines from every platform on one month grid, and the weekly timetable straight from Workday. Import your own Workday `.xlsx` in Settings and hit **Download .ics** to put your classes in any calendar app.
+
+<img src="docs/pitch/images/readme-calendar.png" alt="Lauds calendar view: deadlines from every course on one month grid" width="860">
+
+## Why it matters
+
+- **Canvas only sees Canvas.** WeBWorK, PrairieLearn, Workday and the Bookstore never reach its To-Do list. The cross-platform join is the gap Lauds fills.
+- **Nothing to replace.** Lauds is read-only. It reads the platforms students already use and links every item back to where it lives.
+- **Built to grow.** A new platform or a new school means one new adapter, with no change to the core model, fusion or screens. Moodle, Brightspace and Blackboard adapters are already started.
+- **Honest by design.** Students log in themselves in their own browser, and Lauds never sees a password. When a source breaks, it says "unavailable" instead of pretending the list is complete. See [Known limitations](#known-limitations) for exactly what's live today.
 
 ## Contents
 
+- [The 30-second version](#the-30-second-version)
+- [Try these three things](#try-these-three-things-60-seconds-live-site)
 - [How it works](#how-it-works)
 - [Where your data lives](#where-your-data-lives)
 - [Features](#features)
