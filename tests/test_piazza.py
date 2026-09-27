@@ -11,7 +11,10 @@ only check that this adapter's parsing does what it claims with *this*
 shaped input, not that Piazza actually sends input shaped exactly like
 this.
 """
-from hub.piazza import _history_subject, _int2base, _is_pinned_or_instructor, _nonce, to_course, to_item
+import json
+
+from hub import piazza, site
+from hub.piazza import _history_subject, _int2base, _is_pinned_or_instructor, _nonce, fetch, to_course, to_item
 
 # Real field names per Piazza.get_user_classes (piazza_api/piazza.py:66-89):
 # name, term, course_number, id, prof_hash.
@@ -142,3 +145,119 @@ def test_int2base_matches_known_values():
     assert _int2base(0, 36) == "0"
     assert _int2base(35, 36) == "z"
     assert _int2base(36, 36) == "10"
+
+
+# ---------------------------------------------------------------------------
+# Orchestration (_call, _run, fetch): the pure-parsing tests above had zero
+# coverage of the actual request/response glue -- exactly where a real bug
+# was found on review: one network's feed/post call failing (a malformed
+# response, a transient error) propagated out of _run() and wiped out every
+# other network's already-parsed courses and items too, the same class of
+# bug fixed in hub/google_classroom.py and hub/ed_discussion.py during this
+# same review pass.
+# ---------------------------------------------------------------------------
+
+
+class _FakeResponse:
+    def __init__(self, body, ok=True):
+        self._body = body
+        self.ok = ok
+
+    def json(self):
+        return self._body
+
+
+def _rpc_result(result):
+    return _FakeResponse({"result": result})
+
+
+def test_fetch_returns_courses_and_items_end_to_end(monkeypatch):
+    calls = []
+
+    class FakeReq:
+        def post(self, url, data, headers):
+            body = json.loads(data)
+            method = body["method"]
+            calls.append(method)
+            if method == "user.status":
+                return _rpc_result({"networks": [NETWORK_WITH_COURSE_NUMBER]})
+            if method == "network.get_my_feed":
+                return _rpc_result({"feed": [{"id": "kz1abc234d"}]})
+            if method == "content.get":
+                return _rpc_result(PINNED_POST)
+            raise AssertionError(f"unexpected method: {method}")
+
+    def fake_fetch_with_session(site_name, base, run):
+        assert site_name == "piazza"
+        return run(FakeReq())
+
+    monkeypatch.setattr(piazza.site, "fetch_with_session", fake_fetch_with_session)
+
+    courses, items = fetch(limit=5)
+    assert [c.code for c in courses] == ["CPSC 121"]
+    assert len(items) == 1
+    assert items[0].title == "Midterm 1 room assignments"
+    assert "user.status" in calls and "network.get_my_feed" in calls and "content.get" in calls
+
+
+def test_fetch_skips_one_broken_network_but_keeps_the_rest(monkeypatch):
+    # The concrete bug fixed on review.
+    good_network = NETWORK_WITH_COURSE_NUMBER
+    broken_network = NETWORK_NO_COURSE_NUMBER  # its feed call will raise
+
+    class FakeReq:
+        def post(self, url, data, headers):
+            body = json.loads(data)
+            method, params = body["method"], body["params"]
+            if method == "user.status":
+                return _rpc_result({"networks": [good_network, broken_network]})
+            if method == "network.get_my_feed" and params.get("nid") == broken_network["id"]:
+                raise RuntimeError("simulated malformed response for this one network")
+            if method == "network.get_my_feed":
+                return _rpc_result({"feed": [{"id": "kz1abc234d"}]})
+            if method == "content.get":
+                return _rpc_result(PINNED_POST)
+            raise AssertionError(f"unexpected call: {method} {params}")
+
+    def fake_fetch_with_session(site_name, base, run):
+        return run(FakeReq())
+
+    monkeypatch.setattr(piazza.site, "fetch_with_session", fake_fetch_with_session)
+
+    courses, items = fetch(limit=5)
+    # Both courses still come back (courses are built from user.status alone,
+    # before any per-network feed call) -- only the broken network's items
+    # are missing, not everything.
+    assert {c.code for c in courses} == {"CPSC 121", "MATH 200 Discussion"}
+    assert [i.title for i in items] == ["Midterm 1 room assignments"]
+
+
+def test_fetch_lets_not_logged_in_propagate_for_fetch_with_sessions_own_retry(monkeypatch):
+    # NotLoggedIn is the one exception _run() must NOT swallow per-network -
+    # hub.site.fetch_with_session catches it at the top level to retry the
+    # whole call once after a fresh login (same as every other adapter).
+    class FakeReq:
+        def post(self, url, data, headers):
+            return _FakeResponse({"error": "session expired"})
+
+    seen = []
+
+    def fake_fetch_with_session(site_name, base, run):
+        seen.append(1)
+        try:
+            run(FakeReq())
+        except site.NotLoggedIn:
+            seen.append("caught")
+        return [], []
+
+    monkeypatch.setattr(piazza.site, "fetch_with_session", fake_fetch_with_session)
+    fetch()
+    assert seen == [1, "caught"]
+
+
+def test_fetch_returns_empty_on_total_failure(monkeypatch):
+    def fake_fetch_with_session(site_name, base, run):
+        raise RuntimeError("simulated failure")
+
+    monkeypatch.setattr(piazza.site, "fetch_with_session", fake_fetch_with_session)
+    assert fetch() == ([], [])

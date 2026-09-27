@@ -360,8 +360,19 @@ def _run(req, limit):
     for n in networks:
         code = to_course(n).code
         nid = n.get("id")
-        if nid:
+        if not nid:
+            continue
+        try:
             items += _posts_for_network(req, nid, code, limit)
+        except site.NotLoggedIn:
+            raise  # a genuine session expiry: let fetch_with_session retry the whole run
+        except Exception:
+            # One network's feed/post call failing (a malformed response, a
+            # transient error) must not drop every other network's courses
+            # and items along with it - the same "one bad entity nukes
+            # everything" bug just found and fixed in this same review pass
+            # for hub/google_classroom.py and hub/ed_discussion.py.
+            continue
     return courses, items
 
 
