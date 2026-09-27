@@ -81,6 +81,11 @@ def due_from_popover(popover_html):
     if not rows:
         return None
     end = rows[0].select("td")[2].get_text(strip=True)  # "2026-09-27 23:59:59 (PDT)" or "—"
+    return due_from_end_text(end)
+
+
+def due_from_end_text(end):
+    """Parse the first 100%-credit end text from either adapter input path."""
     m = re.match(r"(.+) \(([A-Z]+)\)$", end)
     if not m:
         return None
@@ -104,7 +109,11 @@ def done_from_score(cells):
     other case, a closed assessment whose score never reached 100%)."""
     if len(cells) < 4:
         return None
-    m = _SCORE_RE.search(cells[3].get_text(strip=True))
+    return done_from_score_text(cells[3].get_text(strip=True))
+
+
+def done_from_score_text(score_text):
+    m = _SCORE_RE.search(score_text)
     return m is not None and float(m.group(1)) >= 100
 
 
@@ -128,34 +137,101 @@ def done_from_credit(cells):
     if len(cells) < 4:
         return False
     credit_cell = cells[2]
-    if credit_cell.find("button") is not None or credit_cell.get_text(strip=True) != "":
+    return done_from_credit_fields(
+        credit_cell.find("button") is None and credit_cell.get_text(strip=True) == "",
+        cells[3].get_text(strip=True),
+    )
+
+
+def done_from_credit_fields(credit_empty, score_text):
+    if not credit_empty:
         return False
-    m = _SCORE_RE.search(cells[3].get_text(strip=True))
+    m = _SCORE_RE.search(score_text)
     return m is not None and float(m.group(1)) > 0
+
+
+def _item_from_fields(*, title, group, ci_id, course_code, href, due_text, score_text,
+                      credit_empty):
+    kind = KIND_FOR_GROUP.get(group.strip().lower(), "assignment")
+    url = f"{BASE}{href}" if href else f"{BASE}/pl/course_instance/{ci_id}/assessments#{quote(title)}"
+    return Item(
+        course=course_code,
+        category=category_for(kind),
+        kind=kind,
+        title=title,
+        due=due_from_end_text(due_text) if due_text else None,
+        url=url,
+        source=SITE,
+        done=bool(done_from_score_text(score_text)) or done_from_credit_fields(credit_empty, score_text),
+    )
 
 
 def to_item(row, course_code, group, ci_id):
     cells = row.select("td")
     link = cells[1].find("a")
     popover = cells[2].find("button")
-    kind = KIND_FOR_GROUP.get(group.strip().lower(), "assignment")
     title = cells[1].get_text(strip=True)
     # An assessment PrairieLearn hasn't opened yet has no link (module
     # docstring), so url="" used to be its identity - every unreleased
     # assessment in every course collapsed onto one hub.db row (#15). Fall
     # back to the assessments page plus the title, unique enough within a
     # course and stable across re-fetches until the assessment actually opens.
-    url = f"{BASE}{link['href']}" if link else f"{BASE}/pl/course_instance/{ci_id}/assessments#{quote(title)}"
-    return Item(
-        course=course_code,
-        category=category_for(kind),
-        kind=kind,
-        title=title,
-        due=due_from_popover(popover["data-bs-content"]) if popover else None,
-        url=url,
-        source="prairielearn",
-        done=bool(done_from_score(cells)) or done_from_credit(cells),
+    due_text = ""
+    if popover:
+        rows = BeautifulSoup(popover["data-bs-content"], "html.parser").select("tr")[1:]
+        if rows:
+            due_text = rows[0].select("td")[2].get_text(strip=True)
+    return _item_from_fields(
+        title=title, group=group, ci_id=ci_id, course_code=course_code,
+        href=link["href"] if link else "", due_text=due_text,
+        score_text=cells[3].get_text(strip=True) if len(cells) > 3 else "",
+        credit_empty=(cells[2].find("button") is None and cells[2].get_text(strip=True) == ""),
     )
+
+
+def parse_capture(capture):
+    """Map selected assessment fields through the existing PrairieLearn rules."""
+    # ponytail: PrairieLearn-only rule-6 DOM exception; use a student JSON API
+    # if PrairieLearn offers one. This function never parses uploaded HTML.
+    if not isinstance(capture, dict) or capture.get("source") != SITE:
+        raise ValueError("expected PrairieLearn capture")
+    if capture.get("origin") != BASE:
+        raise ValueError("invalid PrairieLearn origin")
+    raw_courses = capture.get("courses")
+    if (not isinstance(raw_courses, list) or len(raw_courses) > 100
+            or any(not isinstance(course, dict) for course in raw_courses)):
+        raise ValueError("invalid PrairieLearn courses")
+    courses, items = [], []
+    for raw in raw_courses:
+        ci_id, title, assessments = raw.get("ci_id"), raw.get("title"), raw.get("assessments")
+        if (not isinstance(ci_id, str) or not ci_id.isdecimal()
+                or not isinstance(title, str) or not title
+                or not isinstance(assessments, list) or len(assessments) > 300):
+            raise ValueError("invalid PrairieLearn course")
+        if not COURSE_TITLE.match(title):
+            continue  # Same example-course filter as _run().
+        course = to_course(ci_id, title)
+        courses.append(course)
+        for row in assessments:
+            if not isinstance(row, dict):
+                raise ValueError("invalid PrairieLearn assessment")
+            href = row.get("href", "")
+            if (not isinstance(href, str) or href and not re.fullmatch(
+                    rf"/pl/course_instance/{ci_id}/assessment_instance/\d+/?", href)):
+                raise ValueError("unsafe PrairieLearn assessment URL")
+            fields = ("title", "group", "due_text", "score_text")
+            if (any(not isinstance(row.get(field, ""), str) for field in fields)
+                    or not row.get("title")):
+                raise ValueError("invalid PrairieLearn assessment fields")
+            if not isinstance(row.get("credit_empty", False), bool):
+                raise ValueError("invalid PrairieLearn credit status")
+            items.append(_item_from_fields(
+                title=row.get("title", ""), group=row.get("group", ""),
+                ci_id=ci_id, course_code=course.code, href=href,
+                due_text=row.get("due_text", ""), score_text=row.get("score_text", ""),
+                credit_empty=row.get("credit_empty", False),
+            ))
+    return courses, items
 
 
 _CI_LINK = re.compile(r"^/pl/course_instance/(\d+)(?:/instructor)?/?$")

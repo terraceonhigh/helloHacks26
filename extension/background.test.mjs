@@ -102,3 +102,82 @@ test("the transport runs another registered provider without provider-specific c
   assert.equal(injections[0].target.tabId, 9);
   assert.equal(injections[0].files[0], "providers/moodle.js");
 });
+
+test("a configured school origin controls custom-provider injection and sender validation", async () => {
+  const handlers = {};
+  const injections = [];
+  const stored = {providerOrigins: {blackboard: "https://bb.example.edu"}};
+  const chrome = {
+    storage: {local: {setAccessLevel: async () => {}, get: async () => stored,
+                      set: async value => Object.assign(stored, value)}},
+    runtime: {onInstalled: {addListener: () => {}},
+              onMessage: {addListener: fn => { handlers.message = fn; }}},
+    alarms: {create: () => {}, onAlarm: {addListener: () => {}}},
+    tabs: {query: async query => {
+      assert.equal(query.url, "https://bb.example.edu/*");
+      return [{id: 4, status: "complete"}];
+    }, create: async () => {}},
+    scripting: {executeScript: async args => injections.push(args)}
+  };
+  const context = {chrome, URL, fetch: async () => { throw Error("unexpected upload"); },
+    HUB_PROVIDERS: [{id: "blackboard", label: "Blackboard", customOrigin: true,
+      captureFile: "providers/blackboard.js"}], importScripts: () => {}};
+  vm.runInNewContext(fs.readFileSync(new URL("./background.js", import.meta.url), "utf8"), context);
+  const result = await new Promise(resolve =>
+    handlers.message({type: "SYNC_NOW", provider: "blackboard"}, {}, resolve));
+  assert.equal(result.ok, true);
+  assert.equal(injections[0].files[0], "providers/blackboard.js");
+  handlers.message({type: "CAPTURE_FAILED", source: "blackboard", error: "fake"},
+    {tab: {url: "https://other.example/"}}, () => {});
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.notEqual(stored.syncStatus, "fake");
+});
+
+test("navigated provider opens every course page and captures all rows", async () => {
+  const handlers = {};
+  const stored = {};
+  const visited = [];
+  let onUpdated;
+  const origin = "https://us.prairielearn.com";
+  const chrome = {
+    storage: {local: {setAccessLevel: async () => {}, get: async () => stored,
+                      set: async value => Object.assign(stored, value)}},
+    runtime: {onInstalled: {addListener: () => {}},
+              onMessage: {addListener: fn => { handlers.message = fn; }}},
+    alarms: {create: () => {}, onAlarm: {addListener: fn => { handlers.alarm = fn; }}},
+    tabs: {query: async () => [{id: 7, status: "complete"}], create: async () => {},
+      onUpdated: {addListener: fn => { onUpdated = fn; }, removeListener: () => {}},
+      update: async (id, {url}) => {
+        visited.push(url);
+        setTimeout(() => onUpdated(id, {status: "complete"}, {id, url}), 0);
+      }},
+    scripting: {executeScript: async ({files}) => [{result:
+      files[0].endsWith("index.js") ? [
+        {ci_id: "1", title: "CPSC 101: Intro, 2026 Winter Term 1"},
+        {ci_id: "2", title: "CPSC 102: Intro, 2026 Winter Term 1"}
+      ] : {ci_id: visited.at(-1).match(/\/(\d+)\/assessments$/)[1], assessments: [
+        {title: "Quiz", group: "Quizzes", href: "", due_text: "", score_text: "",
+         credit_empty: false}
+      ]}
+    }]}
+  };
+  const context = {chrome, URL, Date, JSON, setTimeout, clearTimeout,
+    fetch: async () => ({ok: true, json: async () =>
+      ({source: "prairielearn", stored: false, courses: [], items: []})}),
+    HUB_PROVIDERS: [{id: "prairielearn", label: "PrairieLearn", origin,
+      indexFile: "providers/prairielearn-index.js", pageFile: "providers/prairielearn-assessments.js",
+      courseIdField: "ci_id", courseIdPattern: /^\d+$/,
+      pagePathTemplate: "/pl/course_instance/{id}/assessments", rowsKey: "assessments"}],
+    importScripts: () => {}};
+  vm.runInNewContext(fs.readFileSync(new URL("./background.js", import.meta.url), "utf8"), context);
+  handlers.alarm({name: "provider-sync"});
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.deepEqual(visited, []);
+  const result = await new Promise(resolve =>
+    handlers.message({type: "SYNC_NOW", provider: "prairielearn"}, {}, resolve));
+  assert.equal(result.ok, true);
+  assert.deepEqual(visited, [origin + "/", origin + "/pl/course_instance/1/assessments",
+    origin + "/pl/course_instance/2/assessments"]);
+  assert.equal(stored.latestCaptures.prairielearn.courses.length, 2);
+  assert.equal(stored.latestCaptures.prairielearn.courses[1].assessments.length, 1);
+});

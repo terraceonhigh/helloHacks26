@@ -35,8 +35,13 @@ trusted extension contexts. They are removed when the extension is removed.
 | Provider | Extension capture | Reason |
 | --- | --- | --- |
 | Canvas | Implemented, fixture-tested; live account verification pending | JSON endpoints and shared-model mapper are already in `hub/canvas.py` |
-| Moodle, Blackboard, Google Classroom, Ed, Piazza | Pending | Their repo adapters are unmerged or unverified; each needs a checked browser capture path |
-| PrairieLearn | Pending policy decision | Existing adapter reads logged-in HTML; AGENTS.md permits only JSON behind CWL |
+| Moodle | Experimental on `jacky-extension-providers-exp`; synthetic tests only | Uses page JS session key with same-origin AJAX JSON, then existing adapter mapping. The proposed AJAX methods are not confirmed on a real school site |
+| Blackboard | Experimental on `jacky-extension-providers-exp`; courses only | Its draft REST path and session-cookie access are unverified; no task endpoint identified |
+| Piazza | Experimental on `jacky-extension-providers-exp`; pinned/staff posts only | JSON RPC shape is based on its draft adapter, without a live account check or due dates |
+| Google Classroom, Ed | Pending | Google Classroom's draft uses OAuth; Ed's draft uses a personal API token. The current browser-session capture does not implement either flow |
+| PrairieLearn | Experimental on `jacky-extension-providers-exp`; browser navigation and parser tests only | Opens the signed-in home page, visits each course assessments page, selects row fields in the tab, then reuses `hub/prairielearn.py` mapping. PM approved only a narrower current-page DOM read; automated navigation needs Terrace's further review |
+| Brightspace | Pending | No existing adapter in this checkout; official OAuth app registration needs an institution-side decision |
+| WeBWorK | Usually via Canvas | Issue #23 tracks verifying Canvas External Tool assignments; direct set-date correction has no permitted JSON capture yet |
 | Workday | Separate hosted import | The existing site imports the student's Excel export in the browser |
 | Bookstore, key dates | No extension needed | Public/static sources can be fetched without a student login |
 
@@ -46,6 +51,23 @@ host permission, and implementing `parse_capture()` inside the provider's
 existing `hub/<provider>.py` adapter. `hub.captures.parse()` dispatches to that
 adapter; the extension transport does not branch on the provider name. A
 registry entry without a working capture and parser is not considered support.
+
+The experimental branch uses `optional_host_permissions` for Moodle and
+Blackboard. The student supplies the HTTPS site origin and grants access for
+that origin in Chrome. This is intended for a manual test; no unverified
+provider is enabled in the stable PR #84.
+
+PrairieLearn runs only when the student presses Sync: the extension opens its
+home page in an existing signed-in tab and navigates that tab through each
+course's assessments page. A scheduled sync never moves the tab. Only course
+titles, assessment titles, group labels, first full-credit end text, score
+text, status, and safe same-origin links leave the tab. The browser never
+sends raw page HTML or the full popover HTML. The implementation is held in
+the experimental PR until Terrace reviews the broader navigation flow. The
+PM agent approved a PrairieLearn-only exception for reading a single page the
+student is already viewing, but explicitly excluded crawling. This branch
+implements Jacky's later request to navigate across course assessment lists;
+it never opens an individual assessment or quiz link.
 
 ## Hosted upload contract
 
