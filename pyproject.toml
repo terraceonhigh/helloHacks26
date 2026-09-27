@@ -10,6 +10,7 @@ dependencies = [
     "openpyxl",
     "icalendar",
     "playwright>=1.63.0",
+    "anthropic>=1.8.0",
 ]
 
 [dependency-groups]
