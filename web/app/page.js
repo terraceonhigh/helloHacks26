@@ -35,6 +35,7 @@ function Icon({ name, className = "size-5" }) {
     menu: <><path d="M4 7h16M4 12h16M4 17h16" /></>,
     spark: <><path d="m12 3 1.3 4.2L17 9l-3.7 1.8L12 15l-1.3-4.2L7 9l3.7-1.8L12 3Z" /><path d="m5 14 .7 2.3L8 17l-2.3.7L5 20l-.7-2.3L2 17l2.3-.7L5 14Z" /></>,
     settings: <><path d="M4 6h10M18 6h2M4 18h10M18 18h2M4 12h4M12 12h8" /><circle cx="16" cy="6" r="2" /><circle cx="10" cy="12" r="2" /><circle cx="16" cy="18" r="2" /></>,
+    materials: <><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" /></>,
   };
   return <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
 }
@@ -47,6 +48,7 @@ const NAV_ITEMS = [
   { label: "Overview", icon: "home", tab: "all" },
   { label: "Assignments", icon: "tasks", tab: "task" },
   { label: "Calendar", icon: "calendar", tab: "deadline" },
+  { label: "Materials", icon: "materials", tab: "material" },
   { label: "Courses", icon: "courses", tab: "courses" },
   { label: "Settings", icon: "settings", tab: "settings" },
 ];
@@ -206,6 +208,7 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
 export default function App() {
   const [activeNav, setActiveNav] = useState("Overview");
   const [activeFilter, setActiveFilter] = useState("All");
+  const [courseMenuOpen, setCourseMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [mobileNav, setMobileNav] = useState(false);
   const [hideOverdue, setHideOverdue] = useState(false);
@@ -339,7 +342,6 @@ export default function App() {
           <section className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
             <div>
               <div className="mb-2 flex items-center gap-2 text-sm font-bold text-[var(--accent)]">
-                <Icon name="spark" className="size-4" />
                 {now.toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" })}
               </div>
               <div className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -422,13 +424,34 @@ export default function App() {
               <>
               <div className="flex flex-col gap-4 border-b border-[var(--line)] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
                 <div>
-                  <div className="text-xl font-bold tracking-tight">{activeNavTab === "courses" ? "Courses" : "Upcoming assignments"}</div>
-                  <div className="mt-1 text-sm text-[var(--muted)]">Everything due across your connected platforms</div>
+                  <div className="text-xl font-bold tracking-tight">{activeNav === "Courses" ? "Courses" : activeNav === "Materials" ? "Materials" : activeNav === "Calendar" ? "Calendar" : "Upcoming assignments"}</div>
+                  <div className="mt-1 text-sm text-[var(--muted)]">
+                    {activeNav === "Materials" ? "Readings, textbooks and other materials across your connected platforms" : "Everything due across your connected platforms"}
+                  </div>
                 </div>
-                <div className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-[var(--surface-soft)] p-1">
-                  {[{ id: "All", label: "All courses" }, ...courses.map((c) => ({ id: c.code, label: c.code }))].map((filter) => (
-                    <AppButton key={filter.id} onClick={() => setActiveFilter(filter.id)} className={`filter-button ${activeFilter === filter.id ? "filter-button-active" : ""}`}>{filter.label}</AppButton>
-                  ))}
+                <div className="relative shrink-0">
+                  <AppButton
+                    onClick={() => setCourseMenuOpen((open) => !open)}
+                    ariaLabel="Filter courses"
+                    className="flex items-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-xs font-bold"
+                  >
+                    <span>{activeFilter === "All" ? "All courses" : activeFilter}</span>
+                    <Icon name="arrow" className="size-3 rotate-90" />
+                  </AppButton>
+                  {courseMenuOpen && (
+                    <div className="absolute right-0 top-[calc(100%+8px)] z-10 w-48 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-1.5 shadow-[var(--shadow-card)]">
+                      {[{ id: "All", label: "All courses" }, ...courses.map((c) => ({ id: c.code, label: c.code }))].map((filter) => (
+                        <label key={filter.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-semibold hover:bg-[var(--surface-soft)]">
+                          <input
+                            type="checkbox"
+                            checked={activeFilter === filter.id}
+                            onChange={() => { setActiveFilter(filter.id); setCourseMenuOpen(false); }}
+                          />
+                          <span>{filter.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
