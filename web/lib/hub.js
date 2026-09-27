@@ -153,6 +153,19 @@ export function displayLabel(value) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+// Display only - same category as displayLabel: formats a raw value (an
+// ISO due date) for a person to read, decides nothing.
+export function formatDue(iso) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 // --- Processing layer -------------------------------------------------
 // Everything below is pure: given state, compute what to render. page.js
 // owns *when* state changes (fetch, toggle, import); this owns *what the
@@ -187,4 +200,10 @@ export function selectVisibleItems(items, { tab, hideOverdue, showN, now }) {
     .filter((item) => tab === "all" || tab === "courses" || item.category === tab)
     .filter((item) => !hideOverdue || !isOverdue(item, now))
     .slice(0, showN);
+}
+
+// One course's own items, ranked - what the Courses tab's per-course table
+// needs. Expects already-active (non-done) items - see selectActiveItems.
+export function selectCourseItems(items, courseCode) {
+  return sortItems(items.filter((item) => item.course === courseCode));
 }

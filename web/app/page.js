@@ -7,12 +7,13 @@ import {
   displayLabel,
   fetchCourses,
   fetchUpcoming,
+  formatDue,
   isLocalMode,
   isOverdue,
   mergeCourses,
   selectActiveItems,
+  selectCourseItems,
   selectVisibleItems,
-  sortItems,
 } from "../lib/hub";
 import { parseWorkdayCourses } from "../lib/workday";
 
@@ -23,17 +24,6 @@ const TABS = [
   { key: "material", label: "Materials" },
   { key: "courses", label: "Courses" },
 ];
-
-function formatDue(iso) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
 
 function ConnectBar({ onConnected }) {
   const [busy, setBusy] = useState(null); // "canvas" | "prairielearn" | null
@@ -166,7 +156,7 @@ function CoursesTab({ courses, items, sampleMode }) {
             {course.term} &middot; Grade: {course.grade == null ? "—" : `${course.grade}%`}
           </p>
           <ItemsTable
-            items={sortItems(items.filter((i) => i.course === course.code))}
+            items={selectCourseItems(items, course.code)}
             sampleMode={sampleMode}
           />
         </section>
