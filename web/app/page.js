@@ -288,7 +288,7 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
   const [hostedKeyInput, setHostedKeyInput] = useState("");
   const [extensionId, setExtensionId] = useState("");
   const [syncResults, setSyncResults] = useState(null);
-  const [pushBase, setPushBase] = useState("https://hello-hacks26-one.vercel.app");
+  const [pushBase, setPushBase] = useState("https://hello-hacks26.vercel.app");
   const [pushKeyInput, setPushKeyInput] = useState("");
   const [pushStatus, setPushStatus] = useState(null);
   const [busy, setBusy] = useState(null);
