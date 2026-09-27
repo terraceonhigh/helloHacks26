@@ -120,7 +120,71 @@ Researched 2026-09-26. **This is a research snapshot, not how we build.** The te
 | Google Classroom | OAuth2 with `classroom.courses.readonly` and `classroom.coursework.me.readonly` [docs](https://developers.google.com/workspace/classroom/guides/auth) | Yes |
 | MS Graph Education | Delegated `EduAssignments.ReadBasic` | Likely needs admin consent **[unverified]** |
 | Ed Discussion | Personal API token; undocumented API ([edapi](https://pypi.org/project/edapi/)) | Yes |
-| Piazza | No official API; unofficial login-based client ([piazza-api](https://github.com/hfaran/piazza-api)) | Fragile |
+| Piazza | No official API. Real login/endpoint shapes confirmed by reading the unofficial client's own source ([piazza-api](https://github.com/hfaran/piazza-api)) — see detail below. No real due-date field exists anywhere in it; a pinned/instructor post is the closest analog, surfaced without a fabricated date. | Yes, via `hub/site.py`'s browser-session pattern — see detail |
 | Gradescope / iClicker | LTI only; grades flow into the Canvas gradebook ([iClicker @ UBC](https://lthub.ubc.ca/2023/04/21/improvement-to-how-iclicker-cloud-works-with-canvas/)) | Read them via Canvas |
 | PrairieLearn | No student-facing API. Own CWL-backed login (same flow the browser-login adapters already use for Canvas), then the per-course-instance "assessments" page lists each assessment with a due date. **[page markup unverified — nobody on the team has pulled up a real UBC PrairieLearn course instance to confirm the HTML/route shape yet]** | Via our own browser-session adapter (`hub/site.py`), same pattern as Canvas — once someone verifies the page |
 | Kaltura | Kaltura Session from a partner secret or appToken [docs](https://developer.kaltura.com/api-docs/VPaaS-API-Getting-Started/Kaltura_API_Authentication_and_Security.html) | No |
+
+### Piazza, detail (research task, 2026-09-26)
+
+**No live UBC Piazza network exists to verify against** — same
+`[UNVERIFIED END-TO-END]` position `hub/moodle.py` is in. What's below is
+real, though, in a different sense: it was checked by cloning and reading
+the actual unofficial client this row already pointed at
+([hfaran/piazza-api](https://github.com/hfaran/piazza-api), commit
+`39681fe`, "Release 0.16.0"), not paraphrased from memory.
+
+- **Login is a direct POST of email+password to Piazza's own login
+  endpoint**, confirmed in `piazza_api/rpc.py`'s `PiazzaRPC.user_login`:
+  `GET /main/csrf_token` for a CSRF token (scraped out of the raw response
+  text, not a documented JSON field), then `POST /class` with
+  `email`/`password`/`csrf_token` form data. Failure is detected by
+  grepping the HTML response for the literal string `VAR ERROR_MSG` — not
+  a structured error response.
+- **Every other call goes through one generic RPC method**: `POST
+  https://piazza.com/logic/api?method=<name>&aid=<nonce>` (or `/main/api`
+  for a couple of calls) with a JSON `{"method", "params"}` body. The
+  `nonce` is a small, real, cited algorithm in `piazza_api/nonce.py`
+  (base-36 time + random tail). A call's own failure shows up as an
+  `{"error": ...}` field in an HTTP-200 JSON body, not via HTTP status.
+- **Courses ("networks")**: one `user.status` call (`Piazza.get_user_classes`,
+  `piazza_api/piazza.py`) returns every class the student is in, each with
+  real fields `name`, `term`, `course_number` (sometimes absent), `id`
+  (the network id).
+- **Posts have no bulk detail endpoint.** The feed call
+  (`network.get_my_feed`) returns only enough to list posts by id — the
+  client's own `iter_all_posts` docstring says outright *"this method does
+  not go against a bulk endpoint; it retrieves each post individually"* —
+  so reading anything beyond a post's id means one `content.get` call per
+  post.
+- **Full post field names** come from the piazza-api repo's own
+  `data_descriptions/Piazza_API_Post_Data_Dictionary.md`, not from the
+  client code itself: real fields include `id`, `folders`, `created`,
+  `type`, `bucket_name` (e.g. `"Pinned"`), `tags` (contains `"pin"` /
+  `"instructor-note"`), and `history` (each entry carrying its own
+  `subject`/`created` — a post's original subject/content live in
+  `history[0]`, not at the top level at all).
+- **No due-date field exists anywhere in any of the above.** `created` and
+  `history[].created` are posting timestamps, not deadlines. The closest
+  real analog to a graded date — a pinned or instructor-authored post,
+  where instructors sometimes write real exam/deadline info as prose (the
+  same free-text-carries-real-dates pattern this session's `hub/syllabus.py`
+  found for Canvas announcements) — is surfaced by `hub/piazza.py` as an
+  `Item` with `due=None`, never a fabricated date. Extracting an actual
+  date out of that prose would need free-text extraction like
+  `hub/syllabus.py`'s LLM pass, not attempted here (new dependency, out of
+  scope for this task).
+- **Browser-session vs. direct POST — browser-session chosen as the
+  primary path**, matching `hub/moodle.py`'s reasoning for the same fork:
+  Piazza's own login is not behind UBC CWL by default (unlike a
+  self-hosted, potentially-SSO-fronted Moodle), but *some* institutional
+  networks do enable SAML/SSO for Piazza and there's no way to tell which
+  ones from the outside. Reusing piazza-api's exact direct-POST mechanism
+  as the primary path would mean this project's own code receives a raw
+  password in-process on every fetch (never persisted, but a strictly
+  weaker guarantee than every other adapter here gives) and would silently
+  break for any SSO-enabled network. `hub/site.py`'s browser-session reuse
+  costs nothing extra and works either way, so it's the primary path;
+  piazza-api's real direct-POST flow is kept as a documented,
+  clearly-secondary fallback (`hub/piazza.py`'s `login_with_credentials`)
+  for a network confirmed to have no SSO in front of it.
