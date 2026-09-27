@@ -1,6 +1,6 @@
 # Lauds: 5-minute keynote script
 
-Target 5:00 (plus or minus 30s). The script is 545 spoken words: 3.6 to 4.2 minutes of speech, plus about 45s of demo clicks and slide changes.
+Target 5:00 (plus or minus 30s). The script is 542 spoken words: 3.6 to 4.2 minutes of speech, plus about 45s of demo clicks and slide changes.
 Slide ids match `deck.json`. Words in [brackets] are actions, not lines.
 
 | # | Slide (id) | Starts | Length | Note |
@@ -8,8 +8,8 @@ Slide ids match `deck.json`. Words in [brackets] are actions, not lines.
 | 1 | Lauds (`cover`) | 0:00 | 15s |  |
 | 2 | Meet Stu. (`problem`) | 0:15 | 35s |  |
 | 3 | Every platform is a sensor (`solution`) | 0:50 | 30s |  |
-| 4 | Gotham for students (`gotham`) | 1:20 | 35s |  |
-| 5 | An OODA loop (`ooda`) | 1:55 | 35s |  |
+| 4 | How the sensors come together (`gotham`) | 1:20 | 35s |  |
+| 5 | A tight loop (`ooda`) | 1:55 | 35s |  |
 | 6 | Product demo (switch to the live site) (`tour`) | 2:30 | 75s |  |
 | 7 | How it works (`architecture`) | 3:45 | 15s |  |
 | 8 | 14 platforms (`breadth`) | 4:00 | 15s |  |
@@ -30,13 +30,13 @@ Meet Stu. Stu has Canvas, Piazza, WeBWorK, and a couple of PrairieLearns on diff
 
 Here's our idea. Every one of those platforms is a sensor. Each one sees its own slice of Stu's week, and nothing more. Lauds doesn't replace any of them. It reads them all, translates them into one shared model, and fuses them: duplicates merged, courses matched, everything ranked by what needs attention today.
 
-## 4. Gotham for students (1:20, about 35s)
+## 4. How the sensors come together (1:20, about 35s)
 
-If that sounds familiar, it's the idea behind Palantir Gotham, which fuses many narrow intelligence feeds into one operating picture. We built Gotham for students. The sensors are across the top. Each one gets a small adapter that translates it into one shared model: courses, items and textbooks. Fusion only happens on that model. That's how CPSC underscore V 110 in Canvas and CPSC 110 in Piazza become one course. That's the product: the join, not any single connector.
+Here's how the sensors come together. Across the top are the systems Stu already uses: nine systems, nine logins, nine separate habits. Each one gets a small adapter that translates it into one shared model: courses, items and textbooks. Fusion only happens on that model. That's how CPSC underscore V 110 in Canvas and CPSC 110 in Piazza become one course. We fuse them into one morning check. The fusion layer is the product, not any single connector.
 
-## 5. An OODA loop (1:55, about 35s)
+## 5. A tight loop (1:55, about 35s)
 
-Gotham's users think in OODA loops: observe, orient, decide, act. Lauds runs that loop every morning. Observe: read every sensor. Orient: fuse it into one model, so one quiz on two platforms is one item. Decide: rank by urgency, weighted by what matters to you. Act: one click opens it where it lives, or checks it off. Most student tools stop at observe. Lauds closes the loop.
+And it runs as a tight loop, every morning. See it: read every sensor. Fuse it: one model, so one quiz on two platforms is one item. Decide: rank by urgency, weighted by what matters to you. Act: one click opens it where it lives, or checks it off. Most student tools stop at reading. Lauds closes the loop, before you open any other tab.
 
 ## 6. Product demo (switch to the live site) (2:30, about 75s)
 

@@ -60,8 +60,7 @@ s = slide(ACC)
 text(s, 0.8, 1.55, 11.7, 0.4, [("UBC BIZTECH HELLOHACKS 2026", 16, PINK, {"bold": True, "spc": 400})])
 text(s, 0.8, 2.0, 11.7, 1.9, [("Lauds", 120, CREAM, {"bold": True})])
 text(s, 0.8, 4.15, 11.7, 0.6, [("The first thing you check in the morning.", 28, SOFT, {})])
-text(s, 0.8, 6.55, 11.7, 0.4, [("Palantir Gotham for students", 16, "F4C3B3", {"bold": True})])
-notes(s, "Open with: \"Lauds: sensor fusion for student life. The first thing you check in the morning.\"\n\nSay the name slowly: L-A-U-D-S. Lauds is the old name for the morning prayer, the first thing you do each day.\n\nThe one-breath version, if asked what it is: A UBC student's week is spread across nine systems that never talk to each other. Lauds treats each one as a sensor, fuses them into one shared model, and shows one ranked picture of what's due, where to be and what's at risk. It's Palantir Gotham for student life.")
+notes(s, "Open with: \"Lauds: sensor fusion for student life. The first thing you check in the morning.\"\n\nSay the name slowly: L-A-U-D-S. Lauds is the old name for the morning prayer, the first thing you do each day.\n\nThe one-breath version, if asked what it is: A UBC student's week is spread across nine systems that never talk to each other. Lauds treats each one as a sensor, fuses them into one shared model, and shows one ranked picture of what's due, where to be and what's at risk.")
 
 # 2 Meet Stu
 s = slide()
@@ -77,7 +76,7 @@ notes(s, "Stu is the demo student you'll see on the live site. In one term Stu h
 
 # 3 Solution
 s = slide()
-eyebrow(s, "Sensor fusion")
+eyebrow(s, "Why?")
 title(s, "Every platform is a sensor. Lauds fuses them.", size=40)
 text(s, 0.8, 2.65, 11.0, 1.4, [("Lauds reads each system a student already uses, translates it into one shared model, and fuses it: duplicates merged, courses matched, everything ranked by what needs attention today, with a link back to where it lives.", 20, BODY, {})])
 cols = [("SENSORS", "Canvas, Workday, Bookstore, Piazza...", CARD, MUTED, INK, LINE),
@@ -89,9 +88,10 @@ for i, (lab, body, fill, lc, bc, ln) in enumerate(cols):
 for x in (4.4, 8.5): arrow(s, x, 5.3, 0.5, 0.4)
 notes(s, "This is the value proposition. Pause here.\n\nSay: \"We don't replace any of these systems. We read them all, translate them into one shared model, and fuse them.\"\n\nThe three boxes, left to right: the sensors are the systems students already use; fusion happens on one shared model (courses, tasks, announcements, materials); what comes out is one picture, the dashboard.\n\nThe proof you'll show in the demo: the same quiz posted on Canvas and PrairieLearn shows up once, not twice.")
 
-# 4 NEW Gotham diagram
+# 4 How the sensors come together
 s = slide()
-title(s, "Gotham for students: many narrow sensors, one picture", y=0.45, size=28, h=0.7)
+eyebrow(s, "How the sensors come together", y=0.35)
+title(s, "Many narrow sensors, one fused picture.", y=0.65, size=28, h=0.6)
 sensors = ["Canvas", "PrairieLearn", "WeBWorK", "Piazza", "Workday", "Bookstore"]
 text(s, 0.8, 1.3, 7.4, 0.3, [("SENSORS: THE SYSTEMS A STUDENT ALREADY USES", 11, MUTED, {"bold": True, "spc": 150})])
 for i, n in enumerate(sensors):
@@ -106,10 +106,10 @@ for (y, h, n, l, fill, nc, lc, ln), top in zip(layers, ys):
     box(s, 0.8, y, 7.4, h, fill=fill, line=ln, anchor=MSO_ANCHOR.MIDDLE, pad=0.15,
         lines=[(n, 15, nc, {"bold": True, "align": C, "after": 2}), (l, 12, lc, {"align": C})])
 box(s, 8.75, 1.65, 3.8, 4.9, fill=TINT, line=None, pad=0.35, anchor=MSO_ANCHOR.MIDDLE,
-    lines=[("THE GOTHAM LINE", 12, ACC, {"bold": True, "spc": 200, "after": 14}),
-           ("\"Gotham fuses intelligence feeds into one operating picture. We fuse a student's nine systems into one morning check.\"", 20, INK, {"italic": True, "after": 14}),
+    lines=[("THE IDEA", 12, ACC, {"bold": True, "spc": 200, "after": 14}),
+           ("\"Nine systems, nine logins, nine separate habits. We fuse them into one morning check.\"", 20, INK, {"italic": True, "after": 14}),
            ("The fusion layer is the product, not any single connector.", 14, BODY, {})])
-notes(s, "NEW SLIDE (not in the web deck). Use it to land the Gotham analogy.\n\nPalantir Gotham is software intelligence analysts use to fuse many sources into one picture of a situation. No single source is enough; the value is in the join. Lauds applies that to one student's life.\n\nRead it top to bottom:\n- Sensors: the systems the student already uses. Lauds reads them, it doesn't replace them.\n- Adapters: one small plug-in file per system. A new platform, or a whole other school, is one adapter.\n- Shared model: the ontology, Gotham's word for the one vocabulary every source is translated into. Here that's a Course, an Item (anything due or announced) and a Textbook.\n- Fusion: happens only on the shared model. That's why the same quiz on Canvas and PrairieLearn shows once, and why 'CPSC_V 110-101 2026W1' in Canvas and 'CPSC 110' in Piazza become one course.\n- One picture: the dashboard.\n\nThen read the quote on the right.")
+notes(s, "Replaced by the timed script below.")
 
 # 5 Product demo
 s = slide()
@@ -261,7 +261,7 @@ qa = [("Is this real data?", "The demo student is fake, built in each platform's
       ("How does it scale to other schools?", "A new platform or school is one adapter file. Fusion, ranking and screens don't change."),
       ("Do you scrape?", "Each platform's own data feed where one exists; otherwise one narrow page the student is already signed into."),
       ("What about passwords?", "We never see them. You log in yourself, and the session stays on your laptop."),
-      ("Why 'Gotham for students'?", "Gotham fuses narrow intelligence feeds into one operating picture. Each student system is a narrow feed."),
+      ("Why fusion, not another dashboard?", "Other dashboards show one platform. Lauds joins nine, so duplicates merge and one ranked list covers everything."),
       ("What's next?", "Sync across devices, capture from tabs you already have open, deadlines read from syllabus PDFs.")]
 for col in range(2):
     tb = text(s, 0.8 + col * 6.05, 1.7, 5.65, 5.4, [])
@@ -281,7 +281,8 @@ cl = [("Don't say", "Say instead"),
       ("\"We support 14 platforms.\"", "\"14 in the pipeline: 6 merged, 8 in review.\""),
       ("\"Click to buy your textbooks.\"", "\"It shows your required textbooks.\""),
       ("\"We only ever read JSON.\"", "\"Structured data first, a narrow page read where there's no feed.\""),
-      ("\"It's a Canvas tool.\"", "\"Canvas is the first sensor, not the product.\"")]
+      ("\"It's a Canvas tool.\"", "\"Canvas is the first sensor, not the product.\""),
+      ("Comparisons to Palantir or military language", "\"Many narrow sensors, one fused picture.\"")]
 tbl = s.shapes.add_table(len(cl), 2, Inches(0.8), Inches(1.7), Inches(11.7), Inches(4.6)).table
 for c in range(2): tbl.columns[c].width = Inches(5.85)
 for r, row in enumerate(cl):
@@ -293,16 +294,16 @@ for r, row in enumerate(cl):
 notes(s, "APPENDIX, for you, not the audience. Also: record the demo video in Sample mode. Real data would show your actual courses and grades.")
 
 
-# ---- 5-minute cut: OODA slide, timed script in notes, backup slides to the appendix ----
+# ---- 5-minute cut: loop slide, timed script in notes, backup slides to the appendix ----
 s = slide()
 eyebrow(s, "Why it works", y=0.5)
-title(s, "An OODA loop for every student's morning", y=0.85, size=32, h=0.7)
-text(s, 0.8, 1.55, 11.7, 0.4, [("Observe, orient, decide, act: the decision loop from military strategy, run on a student's week.", 15, BODY, {})])
-ooda = [(0.8, 2.25, "OBSERVE", "Read every sensor", "Canvas, PrairieLearn, WeBWorK, Piazza, Workday, the Bookstore", False),
-        (5.0, 2.25, "ORIENT", "Fuse into one model", "Match courses, merge duplicates: one quiz on two platforms is one item", True),
+title(s, "A tight loop for every student's morning", y=0.85, size=32, h=0.7)
+text(s, 0.8, 1.55, 11.7, 0.4, [("See it, fuse it, rank it, act on it: a tight four-step loop, run on a student's week.", 15, BODY, {})])
+loop = [(0.8, 2.25, "SEE", "Read every sensor", "Canvas, PrairieLearn, WeBWorK, Piazza, Workday, the Bookstore", False),
+        (5.0, 2.25, "FUSE", "Fuse into one model", "Match courses, merge duplicates: one quiz on two platforms is one item", True),
         (5.0, 4.85, "DECIDE", "Rank what matters", "Urgency from due date and kind, weighted by what matters to you", False),
         (0.8, 4.85, "ACT", "One click to do it", "Open it where it lives, check it off, or send it to your calendar", False)]
-for x, y, lab, h, b, hot in ooda:
+for x, y, lab, h, b, hot in loop:
     box(s, x, y, 3.4, 2.05, fill=ACC if hot else CARD, line=None if hot else LINE, pad=0.25,
         lines=[(lab, 12, PINK if hot else ACC, {"bold": True, "spc": 250, "after": 6}), (h, 18, CREAM if hot else INK, {"bold": True, "after": 6}), (b, 13, SOFT if hot else BODY, {})])
 for shp, x, y, w, h in [(MSO_SHAPE.RIGHT_ARROW, 4.35, 3.05, 0.5, 0.4), (MSO_SHAPE.DOWN_ARROW, 6.5, 4.35, 0.4, 0.45),
@@ -310,15 +311,15 @@ for shp, x, y, w, h in [(MSO_SHAPE.RIGHT_ARROW, 4.35, 3.05, 0.5, 0.4), (MSO_SHAP
     a = s.shapes.add_shape(shp, Inches(x), Inches(y), Inches(w), Inches(h))
     a.fill.solid(); a.fill.fore_color.rgb = rgb(ACC); a.line.fill.background(); a.shadow.inherit = False
 box(s, 8.9, 2.25, 3.6, 4.65, fill=TINT, line=None, pad=0.35, anchor=MSO_ANCHOR.MIDDLE,
-    lines=[("Most student tools stop at Observe.", 22, INK, {"bold": True, "after": 12}),
+    lines=[("Most student tools stop at reading.", 22, INK, {"bold": True, "after": 12}),
            ("Lauds closes the loop, every morning, before you open any other tab.", 16, BODY, {})])
 
 SCRIPT = {
  0: ("0:00", 15, "Hi, I'm Terrace from Team 26. This is Lauds: sensor fusion for student life. It's the first thing you check in the morning."),
  1: ("0:15", 35, "Meet Stu. Stu has Canvas, Piazza, WeBWorK, and a couple of PrairieLearns on different domains. Workday has his timetable. The Bookstore has his textbooks. None of them talk to each other. So a quiz posted on WeBWorK never shows up on Canvas's calendar. A three-hundred-dollar textbook turns up in week two. And nothing can answer the one question Stu has every morning: what do I need to do right now?"),
  2: ("0:50", 30, "Here's our idea. Every one of those platforms is a sensor. Each one sees its own slice of Stu's week, and nothing more. Lauds doesn't replace any of them. It reads them all, translates them into one shared model, and fuses them: duplicates merged, courses matched, everything ranked by what needs attention today."),
- 3: ("1:20", 35, "If that sounds familiar, it's the idea behind Palantir Gotham, which fuses many narrow intelligence feeds into one operating picture. We built Gotham for students. The sensors are across the top. Each one gets a small adapter that translates it into one shared model: courses, items and textbooks. Fusion only happens on that model. That's how CPSC underscore V 110 in Canvas and CPSC 110 in Piazza become one course. That's the product: the join, not any single connector."),
- 15: ("1:55", 35, "Gotham's users think in OODA loops: observe, orient, decide, act. Lauds runs that loop every morning. Observe: read every sensor. Orient: fuse it into one model, so one quiz on two platforms is one item. Decide: rank by urgency, weighted by what matters to you. Act: one click opens it where it lives, or checks it off. Most student tools stop at observe. Lauds closes the loop."),
+ 3: ("1:20", 35, "Here's how the sensors come together. Across the top are the systems Stu already uses: nine systems, nine logins, nine separate habits. Each one gets a small adapter that translates it into one shared model: courses, items and textbooks. Fusion only happens on that model. That's how CPSC underscore V 110 in Canvas and CPSC 110 in Piazza become one course. We fuse them into one morning check. The fusion layer is the product, not any single connector."),
+ 15: ("1:55", 35, "And it runs as a tight loop, every morning. See it: read every sensor. Fuse it: one model, so one quiz on two platforms is one item. Decide: rank by urgency, weighted by what matters to you. Act: one click opens it where it lives, or checks it off. Most student tools stop at reading. Lauds closes the loop, before you open any other tab."),
  5: ("2:30", 75, "Let me show you. [Switch to the browser.] This is the live site. No login: it's a made-up student in week five. [Overview] Twenty-five things due this week, five already overdue, ranked across every course. [Top assignments] The five most urgent, overdue first, and each one links straight back to the platform it came from. [Assignments tab] Here's Quiz 3. It was posted on both Canvas and PrairieLearn, and it shows up once. That's fusion. [Calendar, click Monday] Monday: a lecture, a lab and eleven deadlines from four platforms, on one screen. [Schedule tab] His timetable, straight from Workday. [Settings] And every one of these sensors is a plug-in. [Switch back to the slides.]"),
  6: ("3:45", 15, "Under the hood: any sensor, one adapter, one standard database, out to the web app and a calendar feed for your phone. A new platform is one adapter file."),
  7: ("4:00", 15, "Six platforms are merged today, and eight more are built and in review. Fourteen in the pipeline, and one student who never has to think about which one."),
@@ -338,8 +339,8 @@ for i, (start, secs, line) in SCRIPT.items():
         {0: "Say the name slowly: L-A-U-D-S. Lauds is the old name for the morning prayer.",
          1: "Stu is the demo student on the live site.",
          2: "The value proposition. Pause after 'fuses them'.",
-         3: "Gotham's word for the shared vocabulary is the ontology. If asked: Course, Item (anything due or announced), Textbook.",
-         15: "OODA is John Boyd's decision loop. Orient is highlighted because fusion is the product.",
+         3: "The ontology is the one shared vocabulary every source is translated into. If asked: Course, Item (anything due or announced), Textbook.",
+         15: "Fuse is highlighted because fusion is the product.",
          5: "Counts shift slightly by weekday. The Connections rows read 'Not connected' on purpose; don't click Connect on stage. If the site is down, go to the backup slide in the appendix.",
          6: "Every item's identity is its source plus its link; that's what lets duplicates merge.",
          7: "Orange means merged code. With a real account today: Canvas, PrairieLearn, Workday, key dates. WeBWorK and Brightspace connect is in review.",
