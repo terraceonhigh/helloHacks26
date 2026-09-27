@@ -8,12 +8,18 @@ screens live in hub/view.py so they can be pytest'd.
 import streamlit as st
 
 from hub.sample import load_sample
-from hub.view import badge, course_summary, flag, group_by_day, mask_secret
+from hub.view import badge, course_summary, filter_by_course, flag, group_by_day, mask_secret
 
 st.set_page_config(page_title="UBC Hub", page_icon="🎓", layout="wide")
 st.title("UBC Hub")
 
-courses, items, textbooks = load_sample()
+
+@st.cache_data(ttl=900)  # docs/design.md: Canvas/.ics-shaped data gets a 15-min cache
+def _load_sample_cached():
+    return load_sample()
+
+
+courses, items, textbooks = _load_sample_cached()
 course_code_by_key = {c.key: c.code for c in courses}
 
 tab_week, tab_courses, tab_setup = st.tabs(["This week", "Courses", "Setup"])
@@ -29,11 +35,7 @@ with tab_week:
     all_course_codes = sorted(set(course_code_by_key.values()))
     picked_codes = st.multiselect("Filter by course", all_course_codes, default=all_course_codes)
 
-    visible_items = [
-        item
-        for item in items
-        if item.course_key is None or course_code_by_key.get(item.course_key) in picked_codes
-    ]
+    visible_items = filter_by_course(items, course_code_by_key, picked_codes)
 
     if not visible_items:
         st.info("Nothing matches this filter.")
@@ -94,6 +96,10 @@ with tab_setup:
     if canvas_credential:
         st.session_state["canvas_credential"] = {"mode": canvas_mode, "value": canvas_credential}
         st.caption(f"Using: {mask_secret(canvas_credential)}")
+    else:
+        # Clearing the field should clear the stored credential too -- otherwise
+        # a token the student thinks they deleted is still sitting in session_state.
+        st.session_state.pop("canvas_credential", None)
 
     st.subheader("Workday")
     workday_file = st.file_uploader("View My Courses export (.xlsx)", type=["xlsx"])

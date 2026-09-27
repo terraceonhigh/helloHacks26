@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta, timezone
 
 from hub.models import Course, Item, Textbook
-from hub.view import badge, course_summary, flag, group_by_day, mask_secret, sort_items
+from hub.view import badge, course_summary, filter_by_course, flag, group_by_day, mask_secret, sort_items
 
 TZ = timezone(timedelta(hours=-7))  # America/Vancouver in September (no DST library needed here)
 
@@ -63,6 +63,30 @@ def test_course_summary_totals_required_textbooks_only():
 def test_course_summary_no_required_textbooks_gives_none_total():
     course = Course(key="K2", code="ENGL 110", section="005", term="2026W1", title="Lit")
     assert course_summary(course, [])["required_total"] is None
+
+
+def test_filter_by_course_keeps_matching_and_drops_unpicked():
+    course_code_by_key = {"K1": "CPSC 121", "K2": "MATH 100"}
+    a = _item("a", None, course_key="K1")
+    b = _item("b", None, course_key="K2")
+    assert [i.title for i in filter_by_course([a, b], course_code_by_key, ["CPSC 121"])] == ["a"]
+
+
+def test_filter_by_course_never_hides_items_with_no_course_key():
+    course_code_by_key = {"K1": "CPSC 121"}
+    no_course = _item("no course", None, course_key=None)
+    result = filter_by_course([no_course], course_code_by_key, [])  # nothing picked at all
+    assert result == [no_course]
+
+
+def test_filter_by_course_never_hides_an_unmapped_course_key():
+    # e.g. a raw, not-yet-normalised .ics course tag ("CPSC 121 101") that
+    # doesn't match any Course.key ("UBCV,2026W1,CPSC,CPSC121,101") -- this
+    # must not silently vanish from every course filter.
+    course_code_by_key = {"UBCV,2026W1,CPSC,CPSC121,101": "CPSC 121"}
+    unmapped = _item("raw tag item", None, course_key="CPSC 121 101")
+    result = filter_by_course([unmapped], course_code_by_key, ["CPSC 121"])
+    assert result == [unmapped]
 
 
 def test_badge_known_and_unknown_sources():

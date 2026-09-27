@@ -63,6 +63,24 @@ def group_by_day(items):
     return groups
 
 
+def filter_by_course(items, course_code_by_key, picked_codes):
+    """Keep items whose mapped course code is one of `picked_codes`.
+
+    An item whose `course_key` doesn't resolve to a known course code at all
+    (course_key is None, or -- see hub/ics.py's docstring -- a raw,
+    not-yet-normalised course tag from the .ics feed) is always kept: we
+    can't tell which course it's for, so the course filter can't rule it
+    out. Silently dropping it would hide real data instead of just failing
+    to categorise it.
+    """
+    kept = []
+    for item in items:
+        code = course_code_by_key.get(item.course_key)
+        if code is None or code in picked_codes:
+            kept.append(item)
+    return kept
+
+
 def course_summary(course, textbooks):
     """Data for one Course card (#10): required textbooks and their total price."""
     required = [t for t in textbooks if t.course_key == course.key and t.required]

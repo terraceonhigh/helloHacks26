@@ -16,18 +16,26 @@ import requests
 from icalendar import Calendar
 
 from hub.models import Item
-
-USER_AGENT = "UBCHub-student-project (hackathon)"
-TIMEOUT = 10
+from hub.net import get_text as _get
 
 _COURSE_TAG_RE = re.compile(r"\[([^\[\]]+)\]\s*$")
 
 
 def fetch(feed_url):
-    """GET an .ics feed URL and parse it into Items. Never log `feed_url`."""
-    resp = requests.get(feed_url, headers={"User-Agent": USER_AGENT}, timeout=TIMEOUT)
-    resp.raise_for_status()
-    return parse_ics(resp.text)
+    """GET an .ics feed URL and parse it into Items. Never log `feed_url`.
+
+    Returns [] (not an exception) if the feed can't be reached, or if what
+    comes back isn't valid .ics (e.g. a login page, if the feed URL has
+    expired) -- a bad feed degrades to "no items", not a crashed dashboard.
+    """
+    try:
+        text = _get(feed_url)
+    except requests.RequestException:
+        return []
+    try:
+        return parse_ics(text)
+    except ValueError:
+        return []
 
 
 def parse_ics(ics_text):
@@ -84,6 +92,6 @@ def _guess_kind(uid, title):
         return "exam"
     if "quiz" in low:
         return "quiz"
-    if "assignment" in uid:
+    if "assignment" in uid.lower():
         return "assignment"
     return "event"

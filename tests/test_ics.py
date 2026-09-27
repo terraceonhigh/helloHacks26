@@ -1,7 +1,10 @@
 from datetime import date, datetime
 from pathlib import Path
 
-from hub.ics import parse_ics
+import requests
+
+from hub import ics
+from hub.ics import _guess_kind, fetch, parse_ics
 
 FEED = (Path(__file__).parent.parent / "fixtures" / "canvas_calendar.ics").read_text()
 
@@ -52,3 +55,20 @@ def test_source_and_url_and_id():
     assert ps2.source == "ics"
     assert ps2.url == "https://canvas.ubc.ca/courses/1/assignments/1001"
     assert ps2.id == "ics:event:event-assignment-1001@canvas.instructure.com"
+
+
+def test_guess_kind_is_not_fooled_by_uid_casing():
+    # A non-Canvas (e.g. Moodle) feed might not use Canvas's exact lowercase
+    # "event-assignment-..." UID convention.
+    assert _guess_kind("Assignment-4521@moodle.example.edu", "Problem Set 2") == "assignment"
+
+
+def test_fetch_returns_empty_list_on_network_failure(monkeypatch):
+    monkeypatch.setattr(ics, "_get", lambda *a, **k: (_ for _ in ()).throw(requests.ConnectionError()))
+    assert fetch("https://canvas.ubc.ca/feeds/calendars/some_secret.ics") == []
+
+
+def test_fetch_returns_empty_list_on_unparsable_feed(monkeypatch):
+    # e.g. an expired feed URL redirected to an HTML login page instead of .ics
+    monkeypatch.setattr(ics, "_get", lambda *a, **k: "<html>please log in</html>")
+    assert fetch("https://canvas.ubc.ca/feeds/calendars/some_secret.ics") == []
