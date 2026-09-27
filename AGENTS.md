@@ -15,6 +15,16 @@ Standing instructions for any coding agent (Claude Code, Codex, Copilot, Cursorâ
 
 If a task seems to conflict with this section, this section wins. Stop and ask Terrace (PM).
 
+## Don't bike-shed (Terrace's rule: read this every session)
+
+**Ship what the demo needs before you polish what already works.** Bike-shedding means spending time on things that are easy to have opinions about (layout, nav order, icons, colour, wording) while the hard, important thing sits unclaimed.
+
+1. **Check the priority first.** Before you start anything, read the Agent board (#15) for the current top priority. If it's unclaimed and you could do it, claim that instead of something else.
+2. **Don't touch UI layout while an integration is broken.** Until the current top priority works (right now: #47, real connectors on the Vercel site with no hub), `web/` changes are limited to (a) bug fixes, (b) fixes flagged by the PM's checks, and (c) the UI that priority needs. No moving controls, renaming tabs, restyling or new pages. The PM won't approve them.
+3. **Move a control once.** If a control has already moved this session, don't move it again. Write down the design question on #15 and let Jacky decide it once.
+4. **Search before you build.** Check open PRs and branches for the same fix before you start (`gh pr list`, `git branch -r`). Duplicates cost everyone a round of rebases.
+5. **Small and finished beats big and half-done.** One PR per change, merged, before you start the next change in the same file.
+
 ## What we're building
 
 UBC Hub is a read-only dashboard that answers "what do I need to do this week?" by fusing a student's data from every provider they connect. The first providers are Canvas, Workday and the UBC Bookstore.
