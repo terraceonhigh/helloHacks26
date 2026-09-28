@@ -128,7 +128,11 @@ def resolve_campus(campus: str) -> tuple[str, str]:
 
 # UBC courses only ever show Pacific time. Fixed offsets, not zoneinfo/pytz:
 # good enough while every course seen is UBC; add zones if that changes.
-# "MST" included for BC's 2027-01-06 permanent-DST tzdata change: once BC
+# "MST" included for BC's 2026-11-01 permanent-DST tzdata change (BRIEF
+# minor finding: installed tzdata 2026c gives America/Vancouver's last
+# actual fall-back as 2026-11-02, i.e. the cutover is 2026-11-01 - not
+# 2027-01-06 as an earlier version of this comment said; webwork.py's own
+# docstring already has the corrected date): once BC
 # stops changing clocks, tzdata names the resulting fixed UTC-7 offset "MST"
 # (it coincides with Mountain Standard Time), even though it's still what
 # PrairieLearn shows as "Vancouver time".
