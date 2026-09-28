@@ -111,11 +111,15 @@ def connect(path=None):
 
 
 def connect_readonly(path=None):
-    """Read-only connection for `lauds sql`: writes fail at the SQLite level."""
+    """Read-only connection for `lauds sql`: writes fail at the SQLite level.
+    Built with `Path.as_uri()` (RFC 3986 percent-encoding), not an f-string -
+    a `LAUDS_HOME` containing `?`, `#` or `%` would otherwise land in the
+    URI unescaped and get misparsed as query string / fragment instead of
+    path."""
     path = Path(path or paths.db_path())
     if not path.exists():
         raise FileNotFoundError(f"no database at {path} - run `lauds sync` first")
-    return sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+    return sqlite3.connect(f"{path.as_uri()}?mode=ro", uri=True)
 
 
 def _course_id(conn, course):
