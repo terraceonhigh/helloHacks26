@@ -1,0 +1,20 @@
+{
+  "adapter": "moodle",
+  "case": "fake101",
+  "extra": {
+    "base": "http://100.124.35.27:3004",
+    "end": 1800929386,
+    "note": "Always empty on a real Moodle site: _run() batches core_enrol_get_users_courses with the calendar call, but that function has no 'ajax' => true in lib/db/services.php, so lib/ajax/service.php aborts the whole batch on it (see README's Oracle bugs found #1) and fetch() swallows the resulting exception.",
+    "start": 1780193386
+  },
+  "inputs": [
+    "moodle/live_00_get_my.html",
+    "moodle/live_01_post_lib_ajax_service_php.json"
+  ],
+  "now": "2026-09-28T02:09:46.153836+00:00",
+  "oracle_call": "hub.moodle.fetch(base), i.e. the try/except around hub.moodle._run(req, base, start, end)",
+  "output": {
+    "courses": [],
+    "items": []
+  }
+}

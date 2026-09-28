@@ -1,0 +1,86 @@
+{
+  "adapter": "moodle",
+  "case": "fake101_calendar_only",
+  "extra": {
+    "base": "http://100.124.35.27:3004",
+    "end": 1800929386,
+    "limitnum": 50,
+    "start": 1780193386
+  },
+  "inputs": [
+    "moodle/live_02_get_my.html",
+    "moodle/live_03_post_lib_ajax_service_php.json"
+  ],
+  "now": "2026-09-28T02:09:46.751992+00:00",
+  "oracle_call": "hub.moodle.to_item over each event from a single, unbatched core_calendar_get_action_events_by_timesort call (limitnum=50)",
+  "output": {
+    "items": [
+      {
+        "category": "task",
+        "course": "FAKE101",
+        "done": null,
+        "due": "2026-09-21T06:59:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "moodle",
+        "title": "FAKE_A1_Past_Due is due",
+        "url": "http://100.124.35.27:3004/mod/assign/view.php?id=8"
+      },
+      {
+        "category": "task",
+        "course": "FAKE101",
+        "done": null,
+        "due": "2026-09-29T13:54:38+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "moodle",
+        "title": "FAKE_A2_Due_Soon is due",
+        "url": "http://100.124.35.27:3004/mod/assign/view.php?id=9"
+      },
+      {
+        "category": "task",
+        "course": "FAKE101",
+        "done": null,
+        "due": "2026-09-30T07:00:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "moodle",
+        "title": "FAKE_A6_Vancouver_Midnight is due",
+        "url": "http://100.124.35.27:3004/mod/assign/view.php?id=13"
+      },
+      {
+        "category": "deadline",
+        "course": "FAKE101",
+        "done": null,
+        "due": "2026-10-06T06:59:00+00:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "moodle",
+        "title": "FAKE_Q1_Quiz closes",
+        "url": "http://100.124.35.27:3004/mod/quiz/view.php?id=15"
+      },
+      {
+        "category": "task",
+        "course": "FAKE101",
+        "done": null,
+        "due": "2026-10-23T06:59:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "moodle",
+        "title": "FAKE_A4_Not_Yet_Open is due",
+        "url": "http://100.124.35.27:3004/mod/assign/view.php?id=11"
+      },
+      {
+        "category": "task",
+        "course": "FAKE101",
+        "done": null,
+        "due": "2027-01-16T06:59:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "moodle",
+        "title": "FAKE_A3_January_2027 is due",
+        "url": "http://100.124.35.27:3004/mod/assign/view.php?id=10"
+      }
+    ]
+  }
+}
