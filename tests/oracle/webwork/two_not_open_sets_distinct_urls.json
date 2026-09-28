@@ -1,0 +1,38 @@
+{
+  "adapter": "webwork",
+  "case": "two_not_open_sets_distinct_urls",
+  "extra": {
+    "note": "regression: two not-yet-open sets in the same course must not collide on the same synthesized url"
+  },
+  "inputs": [
+    "webwork/two_not_open_sets.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.webwork.to_item",
+  "output": {
+    "items": [
+      {
+        "category": "task",
+        "course": "MATH 101",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "problemset",
+        "source": "webwork",
+        "title": "HW2",
+        "url": "https://webwork.example.edu/webwork2/MATH_101/HW2"
+      },
+      {
+        "category": "task",
+        "course": "MATH 101",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "problemset",
+        "source": "webwork",
+        "title": "HW3",
+        "url": "https://webwork.example.edu/webwork2/MATH_101/HW3"
+      }
+    ]
+  }
+}

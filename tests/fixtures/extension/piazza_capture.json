@@ -1,0 +1,25 @@
+{
+  "networks": [
+    {
+      "course_number": "",
+      "id": "abc123",
+      "name": "Models",
+      "posts": [
+        {
+          "bucket_name": "",
+          "history": [
+            {
+              "subject": "Room"
+            }
+          ],
+          "id": "post1",
+          "tags": [
+            "pin"
+          ]
+        }
+      ],
+      "term": ""
+    }
+  ],
+  "source": "piazza"
+}

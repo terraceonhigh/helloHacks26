@@ -1,0 +1,35 @@
+{
+  "item_a": {
+    "category": "task",
+    "course": "CPSC 121",
+    "done": null,
+    "due": "2026-09-30T06:59:00+00:00",
+    "files": [],
+    "kind": "assignment",
+    "source": "canvas",
+    "title": "Problem Set 3",
+    "url": "https://canvas.ubc.ca/courses/7/assignments/99"
+  },
+  "item_b": {
+    "category": "deadline",
+    "course": "MATH 100",
+    "done": null,
+    "due": "2026-10-09T17:00:00+00:00",
+    "files": [],
+    "kind": "exam",
+    "source": "canvas",
+    "title": "Midterm 1",
+    "url": "https://canvas.ubc.ca/courses/8/assignments/12"
+  },
+  "item_no_due": {
+    "category": "task",
+    "course": "CPSC 121",
+    "done": null,
+    "due": null,
+    "files": [],
+    "kind": "assignment",
+    "source": "canvas",
+    "title": "Reading response",
+    "url": "https://canvas.ubc.ca/courses/7/assignments/50"
+  }
+}

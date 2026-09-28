@@ -1,0 +1,24 @@
+{
+  "adapter": "blackboard",
+  "case": "to_course_missing_term_field",
+  "extra": {
+    "note": "?expand=term not honoured/absent -> term left blank",
+    "unverified": true
+  },
+  "inputs": [
+    "blackboard/to_course_no_term.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.blackboard.to_course",
+  "output": {
+    "courses": [
+      {
+        "code": "MATH200",
+        "grade": null,
+        "section": "",
+        "term": "",
+        "title": "Calculus"
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "networks": [
+    {
+      "id": "def456",
+      "name": "Some Class",
+      "posts": [
+        {
+          "bucket_name": "Today",
+          "history": [
+            {
+              "subject": "Just a question"
+            }
+          ],
+          "id": "postX",
+          "tags": []
+        }
+      ],
+      "term": ""
+    }
+  ],
+  "source": "piazza"
+}

@@ -1,0 +1,25 @@
+{
+  "adapter": "extension",
+  "case": "blackboard_capture_through_parse_capture",
+  "extra": {
+    "node_available": false,
+    "note": "extension/experimental-capture.test.mjs 'Blackboard capture returns courses only and blocks foreign pagination': the JS layer already refuses to follow a nextPage that left its own API origin, so only well-formed same-origin course rows ever reach Python"
+  },
+  "inputs": [
+    "extension/blackboard_capture.json"
+  ],
+  "now": null,
+  "oracle_call": "extension/providers/blackboard.js captureBlackboard() (literal, node unavailable), piped through the real hub.blackboard.parse_capture",
+  "output": {
+    "courses": [
+      {
+        "code": "BIOL101",
+        "grade": null,
+        "section": "",
+        "term": "Fall",
+        "title": "Biology"
+      }
+    ],
+    "items": []
+  }
+}

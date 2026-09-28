@@ -1,0 +1,31 @@
+{
+  "courses": [
+    {
+      "course_code": "CPSC 121",
+      "id": 7,
+      "name": "Models"
+    }
+  ],
+  "planner": [
+    {
+      "course_id": 7,
+      "html_url": "https://canvas.ubc.ca/courses/7/quizzes/3",
+      "plannable": {
+        "title": "Quiz 2"
+      },
+      "plannable_date": "2026-09-30T06:59:00Z",
+      "plannable_type": "quiz"
+    },
+    {
+      "course_id": 7,
+      "html_url": "https://canvas.ubc.ca/courses/7/quizzes/3",
+      "plannable": {
+        "title": "Quiz 2"
+      },
+      "plannable_date": "2026-09-30T06:59:00Z",
+      "plannable_type": "quiz"
+    }
+  ],
+  "source": "canvas",
+  "undated": []
+}

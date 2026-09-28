@@ -1,0 +1,30 @@
+{
+  "adapter": "brightspace",
+  "case": "to_course_mapping",
+  "extra": {
+    "note": "real response has no separate section/term field - left blank, not guessed; a minimal second-page item (paginated via D2L's Bookmark/HasMoreItems cursor) still maps cleanly"
+  },
+  "inputs": [
+    "brightspace/myenrollments_items.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.brightspace.to_course",
+  "output": {
+    "courses": [
+      {
+        "code": "MATH_V 100A ALL SECTIONS 2026W1",
+        "grade": null,
+        "section": "",
+        "term": "",
+        "title": "MATH_V 100A ALL SECTIONS 2026W1 Differential Calculus with Applications"
+      },
+      {
+        "code": "SECOND 200",
+        "grade": null,
+        "section": "",
+        "term": "",
+        "title": "A Second Course"
+      }
+    ]
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "adapter": "prairielearn",
+  "case": "assessment_rows",
+  "extra": {
+    "note": "rows in order: open/100%-done, not-yet-open/no-due, closed-under-100pct-done, closed-never-attempted-0pct-not-done, group->quiz, group->exam, MST offset (-07:00, same as PDT), and a second campus (prairielearn_ok) getting its own source/base"
+  },
+  "inputs": [
+    "prairielearn/open_row.html",
+    "prairielearn/not_open_row.html",
+    "prairielearn/closed_row.html",
+    "prairielearn/closed_never_attempted_row.html",
+    "prairielearn/open_row_mst.html"
+  ],
+  "now": null,
+  "oracle_call": "hub.prairielearn.to_item",
+  "output": {
+    "items": [
+      {
+        "category": "task",
+        "course": "CPSC 317",
+        "done": true,
+        "due": "2026-09-27T23:59:59-07:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "prairielearn",
+        "title": "A Dictionary Client",
+        "url": "https://us.prairielearn.com/pl/course_instance/221053/assessment_instance/14835025/"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 317",
+        "done": false,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "prairielearn",
+        "title": "Implementing a DNS Client",
+        "url": "https://us.prairielearn.com/pl/course_instance/221053/assessments#Implementing%20a%20DNS%20Client"
+      },
+      {
+        "category": "deadline",
+        "course": "CPSC 317",
+        "done": true,
+        "due": null,
+        "files": [],
+        "kind": "quiz",
+        "source": "prairielearn",
+        "title": "Network Delay",
+        "url": "https://us.prairielearn.com/pl/course_instance/221053/assessment_instance/1"
+      },
+      {
+        "category": "deadline",
+        "course": "CPSC 317",
+        "done": false,
+        "due": null,
+        "files": [],
+        "kind": "quiz",
+        "source": "prairielearn",
+        "title": "Modern Past Due Practice",
+        "url": "https://us.prairielearn.com/pl/course_instance/221053/assessment_instance/2"
+      },
+      {
+        "category": "deadline",
+        "course": "CPSC 317",
+        "done": true,
+        "due": "2026-09-27T23:59:59-07:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "prairielearn",
+        "title": "A Dictionary Client",
+        "url": "https://us.prairielearn.com/pl/course_instance/221053/assessment_instance/14835025/"
+      },
+      {
+        "category": "deadline",
+        "course": "CPSC 317",
+        "done": true,
+        "due": "2026-09-27T23:59:59-07:00",
+        "files": [],
+        "kind": "exam",
+        "source": "prairielearn",
+        "title": "A Dictionary Client",
+        "url": "https://us.prairielearn.com/pl/course_instance/221053/assessment_instance/14835025/"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 317",
+        "done": true,
+        "due": "2026-09-27T23:59:59-07:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "prairielearn",
+        "title": "A Dictionary Client",
+        "url": "https://us.prairielearn.com/pl/course_instance/221053/assessment_instance/14835025/"
+      },
+      {
+        "category": "task",
+        "course": "MECH 260",
+        "done": true,
+        "due": "2026-09-27T23:59:59-07:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "prairielearn_ok",
+        "title": "A Dictionary Client",
+        "url": "https://prairielearn.ok.ubc.ca/pl/course_instance/221053/assessment_instance/14835025/"
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "adapter": "bookstore",
+  "case": "textbooks_cpsc121",
+  "extra": {
+    "note": "real listing: required book, new price ($302.88) preferred over the cheaper digital tier"
+  },
+  "inputs": [
+    "bookstore/textbooks_cpsc121.html"
+  ],
+  "now": null,
+  "oracle_call": "hub.bookstore._parse_textbooks",
+  "output": {
+    "textbooks": [
+      {
+        "course": "CPSC 121",
+        "isbn": "9781337694193",
+        "price": 302.88,
+        "required": true,
+        "title": "Discrete Mathematics With Applications 5/E Ed: 5",
+        "url": ""
+      }
+    ]
+  }
+}

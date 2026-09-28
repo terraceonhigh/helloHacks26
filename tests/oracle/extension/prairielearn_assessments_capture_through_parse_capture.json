@@ -1,0 +1,37 @@
+{
+  "adapter": "extension",
+  "case": "prairielearn_assessments_capture_through_parse_capture",
+  "extra": {
+    "node_available": false,
+    "note": "extension/prairielearn-capture.test.mjs 'PrairieLearn assessment rows return selected fields, not the popover HTML': only title/group/href/due_text/score_text/credit_empty leave the tab, never the raw popover markup"
+  },
+  "inputs": [
+    "extension/prairielearn_assessments_capture.json"
+  ],
+  "now": null,
+  "oracle_call": "extension/providers/prairielearn-assessments.js capturePrairieLearnAssessments() (literal, node unavailable), piped through the real hub.prairielearn.parse_capture",
+  "output": {
+    "courses": [
+      {
+        "code": "CPSC 317",
+        "grade": null,
+        "section": "",
+        "term": "2026 Winter Term 1",
+        "title": "Internet Computing"
+      }
+    ],
+    "items": [
+      {
+        "category": "deadline",
+        "course": "CPSC 317",
+        "done": false,
+        "due": "2026-09-27T23:59:59-07:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "prairielearn",
+        "title": "Quiz 2",
+        "url": "https://us.prairielearn.com/pl/course_instance/221053/assessment_instance/14835025/"
+      }
+    ]
+  }
+}

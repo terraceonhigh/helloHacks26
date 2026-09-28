@@ -1,0 +1,196 @@
+{
+  "extra": {
+    "first_instalment_due_passed_at": "2026-09-28T09:00:00-07:00",
+    "seed": [
+      "hub.key_dates.fetch('UBCV', now=NOW_A) saved into hub.db - the 1st instalment (already passed at NOW_A) must read back done, never overdue"
+    ]
+  },
+  "inputs": [],
+  "now": [
+    "2026-09-28T09:00:00-07:00",
+    "2026-11-15T09:00:00-08:00"
+  ],
+  "query": "hub.db.upcoming()/undated()/by_course()/courses()/textbooks()/schedule() + hub.models.status_of()",
+  "result": {
+    "now_a": {
+      "by_course": {
+        "UBCV": [
+          [
+            "UBCV",
+            "deadline",
+            "payment",
+            "Tuition: 1st instalment due (Winter Session)",
+            "2026-09-09T23:59:00-07:00",
+            "https://vancouver.calendar.ubc.ca/fees/policies-fees#1st-instalment-2026w1",
+            1,
+            "ubc_key_dates"
+          ],
+          [
+            "UBCV",
+            "deadline",
+            "payment",
+            "Tuition: 2nd instalment due (Winter Session)",
+            "2027-01-06T23:59:00-07:00",
+            "https://vancouver.calendar.ubc.ca/fees/policies-fees#2nd-instalment-2026w1",
+            null,
+            "ubc_key_dates"
+          ]
+        ]
+      },
+      "courses": [
+        [
+          "UBCV",
+          "2026W1",
+          "UBC Vancouver",
+          null
+        ]
+      ],
+      "now": "2026-09-28T09:00:00-07:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "done",
+        "upcoming"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "UBCV",
+          "deadline",
+          "payment",
+          "Tuition: 1st instalment due (Winter Session)",
+          "2026-09-09T23:59:00-07:00",
+          "https://vancouver.calendar.ubc.ca/fees/policies-fees#1st-instalment-2026w1",
+          1,
+          "ubc_key_dates"
+        ],
+        [
+          "UBCV",
+          "deadline",
+          "payment",
+          "Tuition: 2nd instalment due (Winter Session)",
+          "2027-01-06T23:59:00-07:00",
+          "https://vancouver.calendar.ubc.ca/fees/policies-fees#2nd-instalment-2026w1",
+          null,
+          "ubc_key_dates"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [
+          [
+            "UBCV",
+            "deadline",
+            "payment",
+            "Tuition: 1st instalment due (Winter Session)",
+            "2026-09-09T23:59:00-07:00",
+            "https://vancouver.calendar.ubc.ca/fees/policies-fees#1st-instalment-2026w1",
+            1,
+            "ubc_key_dates"
+          ],
+          [
+            "UBCV",
+            "deadline",
+            "payment",
+            "Tuition: 2nd instalment due (Winter Session)",
+            "2027-01-06T23:59:00-07:00",
+            "https://vancouver.calendar.ubc.ca/fees/policies-fees#2nd-instalment-2026w1",
+            null,
+            "ubc_key_dates"
+          ]
+        ],
+        "material": [],
+        "task": []
+      }
+    },
+    "now_b": {
+      "by_course": {
+        "UBCV": [
+          [
+            "UBCV",
+            "deadline",
+            "payment",
+            "Tuition: 1st instalment due (Winter Session)",
+            "2026-09-09T23:59:00-07:00",
+            "https://vancouver.calendar.ubc.ca/fees/policies-fees#1st-instalment-2026w1",
+            1,
+            "ubc_key_dates"
+          ],
+          [
+            "UBCV",
+            "deadline",
+            "payment",
+            "Tuition: 2nd instalment due (Winter Session)",
+            "2027-01-06T23:59:00-07:00",
+            "https://vancouver.calendar.ubc.ca/fees/policies-fees#2nd-instalment-2026w1",
+            null,
+            "ubc_key_dates"
+          ]
+        ]
+      },
+      "courses": [
+        [
+          "UBCV",
+          "2026W1",
+          "UBC Vancouver",
+          null
+        ]
+      ],
+      "now": "2026-11-15T09:00:00-08:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "done",
+        "upcoming"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "UBCV",
+          "deadline",
+          "payment",
+          "Tuition: 1st instalment due (Winter Session)",
+          "2026-09-09T23:59:00-07:00",
+          "https://vancouver.calendar.ubc.ca/fees/policies-fees#1st-instalment-2026w1",
+          1,
+          "ubc_key_dates"
+        ],
+        [
+          "UBCV",
+          "deadline",
+          "payment",
+          "Tuition: 2nd instalment due (Winter Session)",
+          "2027-01-06T23:59:00-07:00",
+          "https://vancouver.calendar.ubc.ca/fees/policies-fees#2nd-instalment-2026w1",
+          null,
+          "ubc_key_dates"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [
+          [
+            "UBCV",
+            "deadline",
+            "payment",
+            "Tuition: 1st instalment due (Winter Session)",
+            "2026-09-09T23:59:00-07:00",
+            "https://vancouver.calendar.ubc.ca/fees/policies-fees#1st-instalment-2026w1",
+            1,
+            "ubc_key_dates"
+          ],
+          [
+            "UBCV",
+            "deadline",
+            "payment",
+            "Tuition: 2nd instalment due (Winter Session)",
+            "2027-01-06T23:59:00-07:00",
+            "https://vancouver.calendar.ubc.ca/fees/policies-fees#2nd-instalment-2026w1",
+            null,
+            "ubc_key_dates"
+          ]
+        ],
+        "material": [],
+        "task": []
+      }
+    }
+  }
+}

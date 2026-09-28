@@ -1,0 +1,93 @@
+[
+  {
+    "course_id": 7,
+    "html_url": "/a/1",
+    "plannable": {
+      "title": "A"
+    },
+    "plannable_type": "assignment",
+    "submissions": {
+      "excused": false,
+      "submitted": true
+    }
+  },
+  {
+    "course_id": 7,
+    "html_url": "/a/2",
+    "plannable": {
+      "title": "B"
+    },
+    "plannable_type": "assignment",
+    "submissions": {
+      "excused": true,
+      "submitted": false
+    }
+  },
+  {
+    "course_id": 7,
+    "html_url": "/a/3",
+    "plannable": {
+      "title": "C"
+    },
+    "plannable_type": "assignment",
+    "submissions": {
+      "excused": false,
+      "submitted": false
+    }
+  },
+  {
+    "course_id": 7,
+    "html_url": "/a/4",
+    "plannable": {
+      "title": "D"
+    },
+    "plannable_type": "assignment",
+    "submissions": false
+  },
+  {
+    "course_id": 7,
+    "html_url": "/a/5",
+    "plannable": {
+      "title": "E"
+    },
+    "plannable_type": "assignment",
+    "planner_override": {
+      "marked_complete": true
+    },
+    "submissions": false
+  },
+  {
+    "course_id": 7,
+    "html_url": "/a/6",
+    "plannable": {
+      "title": "F"
+    },
+    "plannable_type": "assignment",
+    "planner_override": {
+      "marked_complete": true
+    }
+  },
+  {
+    "course_id": 7,
+    "html_url": "/a/7",
+    "plannable": {
+      "title": "G"
+    },
+    "plannable_type": "assignment",
+    "planner_override": {
+      "marked_complete": false
+    },
+    "submissions": {
+      "submitted": false
+    }
+  },
+  {
+    "course_id": 7,
+    "html_url": "/a/8",
+    "plannable": {
+      "title": "H"
+    },
+    "plannable_type": "assignment",
+    "planner_override": null
+  }
+]

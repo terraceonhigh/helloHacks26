@@ -1,0 +1,119 @@
+{
+  "extra": {
+    "seed": [
+      "PR33: item saved, course not yet known"
+    ]
+  },
+  "inputs": [],
+  "now": [
+    "2026-09-28T09:00:00-07:00",
+    "2026-11-15T09:00:00-08:00"
+  ],
+  "query": "hub.db.upcoming()/undated()/by_course()/courses()/textbooks()/schedule() + hub.models.status_of()",
+  "result": {
+    "now_a": {
+      "by_course": {
+        "(unknown course)": [
+          [
+            "(unknown course)",
+            "deadline",
+            "quiz",
+            "Quiz 3",
+            "2026-10-02T06:59:00+00:00",
+            "https://canvas.example/quiz/3",
+            null,
+            "canvas"
+          ]
+        ]
+      },
+      "courses": [],
+      "now": "2026-09-28T09:00:00-07:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "upcoming"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "(unknown course)",
+          "deadline",
+          "quiz",
+          "Quiz 3",
+          "2026-10-02T06:59:00+00:00",
+          "https://canvas.example/quiz/3",
+          null,
+          "canvas"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [
+          [
+            "(unknown course)",
+            "deadline",
+            "quiz",
+            "Quiz 3",
+            "2026-10-02T06:59:00+00:00",
+            "https://canvas.example/quiz/3",
+            null,
+            "canvas"
+          ]
+        ],
+        "material": [],
+        "task": []
+      }
+    },
+    "now_b": {
+      "by_course": {
+        "(unknown course)": [
+          [
+            "(unknown course)",
+            "deadline",
+            "quiz",
+            "Quiz 3",
+            "2026-10-02T06:59:00+00:00",
+            "https://canvas.example/quiz/3",
+            null,
+            "canvas"
+          ]
+        ]
+      },
+      "courses": [],
+      "now": "2026-11-15T09:00:00-08:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "overdue"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "(unknown course)",
+          "deadline",
+          "quiz",
+          "Quiz 3",
+          "2026-10-02T06:59:00+00:00",
+          "https://canvas.example/quiz/3",
+          null,
+          "canvas"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [
+          [
+            "(unknown course)",
+            "deadline",
+            "quiz",
+            "Quiz 3",
+            "2026-10-02T06:59:00+00:00",
+            "https://canvas.example/quiz/3",
+            null,
+            "canvas"
+          ]
+        ],
+        "material": [],
+        "task": []
+      }
+    }
+  }
+}

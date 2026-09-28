@@ -1,0 +1,10 @@
+{
+  "course": {
+    "shortname": "CPSC101"
+  },
+  "id": 10,
+  "modulename": "assign",
+  "name": "HW1",
+  "timesort": 1798100000,
+  "url": "https://moodle.example.edu/mod/assign/view.php?id=10"
+}

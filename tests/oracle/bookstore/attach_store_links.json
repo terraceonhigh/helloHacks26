@@ -1,0 +1,34 @@
+{
+  "adapter": "bookstore",
+  "case": "attach_store_links",
+  "extra": {
+    "note": "a matching ISBN gets its real store link; an unmatched one keeps url='' rather than crashing"
+  },
+  "inputs": [
+    "bookstore/attach_store_links_input.json",
+    "bookstore/products_page1.json",
+    "bookstore/products_page2.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.bookstore.attach_store_links (network substituted with the paginated Shopify products.json fixtures above)",
+  "output": {
+    "textbooks": [
+      {
+        "course": "CPSC 121",
+        "isbn": "9781337694193",
+        "price": 302.88,
+        "required": true,
+        "title": "Discrete Math",
+        "url": "https://bookstore.ubc.ca/products/discrete-mathematics-with-applications-5e"
+      },
+      {
+        "course": "CPSC 121",
+        "isbn": "0000000000000",
+        "price": null,
+        "required": false,
+        "title": "Companion",
+        "url": ""
+      }
+    ]
+  }
+}

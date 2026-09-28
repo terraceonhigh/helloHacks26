@@ -1,0 +1,20 @@
+{
+  "courses": [
+    {
+      "assessments": [
+        {
+          "credit_empty": false,
+          "due_text": "",
+          "group": "Quizzes",
+          "href": "/pl/course_instance/221053/assessment_instance/14835025/",
+          "score_text": "100%",
+          "title": "Quiz 2"
+        }
+      ],
+      "ci_id": "221053",
+      "title": "CPSC 317: Internet Computing, 2026 Winter Term 1"
+    }
+  ],
+  "origin": "https://us.prairielearn.com",
+  "source": "prairielearn"
+}

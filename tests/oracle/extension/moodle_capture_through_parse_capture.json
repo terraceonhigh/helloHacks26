@@ -1,0 +1,37 @@
+{
+  "adapter": "extension",
+  "case": "moodle_capture_through_parse_capture",
+  "extra": {
+    "node_available": false,
+    "note": "extension/experimental-capture.test.mjs 'Moodle capture keeps only mapper fields and never includes its session key': the token/secret query params the JS layer already stripped from the event url are gone before this ever reaches Python"
+  },
+  "inputs": [
+    "extension/moodle_capture.json"
+  ],
+  "now": null,
+  "oracle_call": "extension/providers/moodle.js captureMoodle() (literal, node unavailable), piped through the real hub.moodle.parse_capture",
+  "output": {
+    "courses": [
+      {
+        "code": "CPSC101",
+        "grade": null,
+        "section": "",
+        "term": "",
+        "title": "Intro"
+      }
+    ],
+    "items": [
+      {
+        "category": "deadline",
+        "course": "CPSC101",
+        "done": null,
+        "due": "2026-12-23T04:26:40+00:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "moodle",
+        "title": "Quiz",
+        "url": "https://moodle.example.edu/mod/quiz/view.php?id=9"
+      }
+    ]
+  }
+}

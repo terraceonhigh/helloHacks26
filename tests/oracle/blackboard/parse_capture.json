@@ -1,0 +1,25 @@
+{
+  "adapter": "blackboard",
+  "case": "parse_capture",
+  "extra": {
+    "note": "no live Blackboard tenant exists anywhere on this project (module docstring: 'EVERYTHING IN THIS MODULE IS AN INFORMED HYPOTHESIS'); items is always [] - no confirmed JSON due-date endpoint",
+    "unverified": true
+  },
+  "inputs": [
+    "blackboard/parse_capture.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.blackboard.parse_capture",
+  "output": {
+    "courses": [
+      {
+        "code": "BIOL101",
+        "grade": null,
+        "section": "",
+        "term": "Fall 2026",
+        "title": "Biology"
+      }
+    ],
+    "items": []
+  }
+}

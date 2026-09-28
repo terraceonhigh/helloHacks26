@@ -1,0 +1,15 @@
+{
+  "adapter": "workday",
+  "case": "schedule_edge_unparseable_time",
+  "extra": {
+    "note": "must degrade to no Meetings for this line, never guess"
+  },
+  "inputs": [
+    "workday/edge_unparseable_time.xlsx"
+  ],
+  "now": null,
+  "oracle_call": "hub.workday.parse_workday_schedule(path, term='2026W1')",
+  "output": {
+    "meetings": []
+  }
+}

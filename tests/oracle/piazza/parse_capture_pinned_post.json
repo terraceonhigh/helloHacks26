@@ -1,0 +1,37 @@
+{
+  "adapter": "piazza",
+  "case": "parse_capture_pinned_post",
+  "extra": {
+    "note": "cited from the real piazza-api client source (module docstring), never run against a live Piazza network. due is always None (no real due-date field exists anywhere in scope); a pinned/instructor post's ORIGINAL subject (history[0].subject) becomes the title",
+    "unverified": true
+  },
+  "inputs": [
+    "piazza/parse_capture_pinned.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.piazza.parse_capture",
+  "output": {
+    "courses": [
+      {
+        "code": "CPSC 121",
+        "grade": null,
+        "section": "",
+        "term": "Fall 2026",
+        "title": "Models"
+      }
+    ],
+    "items": [
+      {
+        "category": "task",
+        "course": "CPSC 121",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "announcement",
+        "source": "piazza",
+        "title": "Quiz room",
+        "url": "https://piazza.com/class/abc123?cid=post123"
+      }
+    ]
+  }
+}

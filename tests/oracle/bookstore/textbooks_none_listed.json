@@ -1,0 +1,15 @@
+{
+  "adapter": "bookstore",
+  "case": "textbooks_none_listed",
+  "extra": {
+    "note": "'No course materials are currently listed' -> [], not a failure"
+  },
+  "inputs": [
+    "bookstore/textbooks_none.html"
+  ],
+  "now": null,
+  "oracle_call": "hub.bookstore._parse_textbooks",
+  "output": {
+    "textbooks": []
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "courses": [
+    {
+      "courseId": "BIOL101",
+      "id": "_1_1",
+      "name": "Biology",
+      "term": {
+        "name": "Fall 2026"
+      }
+    }
+  ],
+  "source": "blackboard"
+}

@@ -1,0 +1,119 @@
+{
+  "extra": {
+    "seed": [
+      "queries seed: item saved with no matching course at all -> '(unknown course)'"
+    ]
+  },
+  "inputs": [],
+  "now": [
+    "2026-09-28T09:00:00-07:00",
+    "2026-11-15T09:00:00-08:00"
+  ],
+  "query": "hub.db.upcoming()/undated()/by_course()/courses()/textbooks()/schedule() + hub.models.status_of()",
+  "result": {
+    "now_a": {
+      "by_course": {
+        "(unknown course)": [
+          [
+            "(unknown course)",
+            "task",
+            "assignment",
+            "Essay",
+            "2026-09-28T00:00:00+00:00",
+            "https://x/orphan",
+            null,
+            "canvas"
+          ]
+        ]
+      },
+      "courses": [],
+      "now": "2026-09-28T09:00:00-07:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "overdue"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "(unknown course)",
+          "task",
+          "assignment",
+          "Essay",
+          "2026-09-28T00:00:00+00:00",
+          "https://x/orphan",
+          null,
+          "canvas"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [],
+        "material": [],
+        "task": [
+          [
+            "(unknown course)",
+            "task",
+            "assignment",
+            "Essay",
+            "2026-09-28T00:00:00+00:00",
+            "https://x/orphan",
+            null,
+            "canvas"
+          ]
+        ]
+      }
+    },
+    "now_b": {
+      "by_course": {
+        "(unknown course)": [
+          [
+            "(unknown course)",
+            "task",
+            "assignment",
+            "Essay",
+            "2026-09-28T00:00:00+00:00",
+            "https://x/orphan",
+            null,
+            "canvas"
+          ]
+        ]
+      },
+      "courses": [],
+      "now": "2026-11-15T09:00:00-08:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "overdue"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "(unknown course)",
+          "task",
+          "assignment",
+          "Essay",
+          "2026-09-28T00:00:00+00:00",
+          "https://x/orphan",
+          null,
+          "canvas"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [],
+        "material": [],
+        "task": [
+          [
+            "(unknown course)",
+            "task",
+            "assignment",
+            "Essay",
+            "2026-09-28T00:00:00+00:00",
+            "https://x/orphan",
+            null,
+            "canvas"
+          ]
+        ]
+      }
+    }
+  }
+}

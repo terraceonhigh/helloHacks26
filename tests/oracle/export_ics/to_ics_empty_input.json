@@ -1,0 +1,13 @@
+{
+  "adapter": "export_ics",
+  "case": "to_ics_empty_input",
+  "extra": {
+    "note": "a valid calendar with zero events for empty input"
+  },
+  "inputs": [],
+  "now": null,
+  "query": "hub.export_ics.to_ics([])",
+  "result": {
+    "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//UBC Hub//ubchub//EN\r\nX-WR-CALNAME:Lauds\r\nEND:VCALENDAR\r\n"
+  }
+}

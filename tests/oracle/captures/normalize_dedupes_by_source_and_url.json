@@ -1,0 +1,38 @@
+{
+  "adapter": "captures",
+  "case": "normalize_dedupes_by_source_and_url",
+  "extra": {
+    "note": "two identical planner rows (same (source, url) identity) must dedupe to one item in the normalized output; due comes back as an ISO string"
+  },
+  "inputs": [
+    "captures/normalize_dedupe_input.json"
+  ],
+  "now": null,
+  "query": "hub.captures.normalize",
+  "result": {
+    "courses": [
+      {
+        "code": "CPSC 121",
+        "grade": null,
+        "section": "",
+        "term": "",
+        "title": "Models"
+      }
+    ],
+    "items": [
+      {
+        "category": "deadline",
+        "course": "CPSC 121",
+        "done": null,
+        "due": "2026-09-30T06:59:00+00:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "canvas",
+        "title": "Quiz 2",
+        "url": "https://canvas.ubc.ca/courses/7/quizzes/3"
+      }
+    ],
+    "source": "canvas",
+    "stored": false
+  }
+}

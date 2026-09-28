@@ -1,0 +1,37 @@
+{
+  "adapter": "workday",
+  "case": "courses_view_my_courses",
+  "extra": {
+    "note": "3 unique courses deduped from repeated meeting-component rows; BMEG 002 has no ' - ' separator -> raw listing text as title"
+  },
+  "inputs": [
+    "workday/view_my_courses.xlsx"
+  ],
+  "now": null,
+  "oracle_call": "hub.workday.parse_workday_courses(path, term='2026W1')",
+  "output": {
+    "courses": [
+      {
+        "code": "BMEG 000",
+        "grade": null,
+        "section": null,
+        "term": "2026W1",
+        "title": "Fake Thermodynamics"
+      },
+      {
+        "code": "BMEG 001",
+        "grade": null,
+        "section": null,
+        "term": "2026W1",
+        "title": "Fake Cell Systems"
+      },
+      {
+        "code": "BMEG 002",
+        "grade": null,
+        "section": null,
+        "term": "2026W1",
+        "title": "bmeg002"
+      }
+    ]
+  }
+}

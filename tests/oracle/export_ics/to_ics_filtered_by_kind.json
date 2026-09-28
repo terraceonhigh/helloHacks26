@@ -1,0 +1,15 @@
+{
+  "adapter": "export_ics",
+  "case": "to_ics_filtered_by_kind",
+  "extra": {
+    "note": "calname becomes 'Lauds: Exam'; only Midterm 1 (kind=exam) is included"
+  },
+  "inputs": [
+    "export_ics/items.json"
+  ],
+  "now": null,
+  "query": "hub.export_ics.to_ics([item_a, item_b], kind='exam')",
+  "result": {
+    "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//UBC Hub//ubchub//EN\r\nX-WR-CALNAME:Lauds: Exam\r\nBEGIN:VEVENT\r\nSUMMARY:Midterm 1 [MATH 100]\r\nDTSTART:20261009T170000Z\r\nUID:canvas-007c38055f7b7645@ubchub\r\nCATEGORIES:Exam\r\nURL:https://canvas.ubc.ca/courses/8/assignments/12\r\nBEGIN:VALARM\r\nACTION:DISPLAY\r\nDESCRIPTION:Midterm 1 [MATH 100]\r\nTRIGGER:-P2D\r\nEND:VALARM\r\nBEGIN:VALARM\r\nACTION:DISPLAY\r\nDESCRIPTION:Midterm 1 [MATH 100]\r\nTRIGGER:P0D\r\nEND:VALARM\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+  }
+}

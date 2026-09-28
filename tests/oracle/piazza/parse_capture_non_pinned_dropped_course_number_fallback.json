@@ -1,0 +1,25 @@
+{
+  "adapter": "piazza",
+  "case": "parse_capture_non_pinned_dropped_course_number_fallback",
+  "extra": {
+    "note": "course_number absent -> code falls back to name; an ordinary (non-pinned, non-instructor) post produces no Item at all",
+    "unverified": true
+  },
+  "inputs": [
+    "piazza/parse_capture_dropped_and_fallback_code.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.piazza.parse_capture",
+  "output": {
+    "courses": [
+      {
+        "code": "Some Class",
+        "grade": null,
+        "section": "",
+        "term": "",
+        "title": "Some Class"
+      }
+    ],
+    "items": []
+  }
+}

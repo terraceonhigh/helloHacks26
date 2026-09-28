@@ -1,0 +1,45 @@
+{
+  "announcement": {
+    "html_url": "/courses/7/announcements/1",
+    "plannable": {
+      "title": "Welcome!"
+    },
+    "plannable_date": "2026-01-05T12:00:00Z",
+    "plannable_type": "announcement"
+  },
+  "course": {
+    "course_code": "CPSC 121",
+    "enrollments": [
+      {
+        "computed_current_score": 88.5
+      }
+    ],
+    "id": 7,
+    "name": "Models of Computation",
+    "term": {
+      "name": "2026W1"
+    }
+  },
+  "discussion_default": {
+    "plannable": {
+      "title": "Untitled discussion"
+    },
+    "plannable_type": "discussion_topic"
+  },
+  "event": {
+    "html_url": "https://canvas.ubc.ca/calendar?event_id=9",
+    "plannable": {
+      "title": "Office hours"
+    },
+    "plannable_type": "calendar_event"
+  },
+  "quiz": {
+    "course_id": 7,
+    "html_url": "/courses/7/quizzes/3",
+    "plannable": {
+      "title": "Quiz 2"
+    },
+    "plannable_date": "2026-09-30T06:59:00Z",
+    "plannable_type": "quiz"
+  }
+}

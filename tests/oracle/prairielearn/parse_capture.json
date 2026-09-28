@@ -1,0 +1,36 @@
+{
+  "adapter": "prairielearn",
+  "case": "parse_capture",
+  "extra": {
+    "note": "must equal the real to_item() mapping of the equivalent live-scraped OPEN_ROW - the same assessment, captured by the extension instead of scraped server-side"
+  },
+  "inputs": [
+    "prairielearn/parse_capture.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.prairielearn.parse_capture",
+  "output": {
+    "courses": [
+      {
+        "code": "CPSC 317",
+        "grade": null,
+        "section": "",
+        "term": "2026 Winter Term 1",
+        "title": "Internet Computing"
+      }
+    ],
+    "items": [
+      {
+        "category": "task",
+        "course": "CPSC 317",
+        "done": true,
+        "due": "2026-09-27T23:59:59-07:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "prairielearn",
+        "title": "A Dictionary Client",
+        "url": "https://us.prairielearn.com/pl/course_instance/221053/assessment_instance/14835025/"
+      }
+    ]
+  }
+}

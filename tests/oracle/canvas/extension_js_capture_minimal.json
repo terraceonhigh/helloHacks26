@@ -1,0 +1,48 @@
+{
+  "adapter": "canvas",
+  "case": "extension_js_capture_minimal",
+  "extra": {
+    "node_available": false,
+    "note": "input hand-derived from extension/providers/canvas.js + extension/canvas-capture.test.mjs's 'captures minimum Canvas JSON and strips secret URL parameters' test (secret fields/access_token already stripped by the JS layer per that test); output is real hub.canvas.parse_capture, not hand-computed"
+  },
+  "inputs": [
+    "canvas/extension_js_capture_minimal.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.canvas.parse_capture",
+  "output": {
+    "courses": [
+      {
+        "code": "CPSC 121",
+        "grade": 88,
+        "section": "",
+        "term": "2026W1",
+        "title": "Models"
+      }
+    ],
+    "items": [
+      {
+        "category": "deadline",
+        "course": "CPSC 121",
+        "done": false,
+        "due": "2026-09-30T06:59:00+00:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "canvas",
+        "title": "Quiz 2",
+        "url": "https://canvas.ubc.ca/courses/7/quizzes/3"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121",
+        "done": true,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Reading",
+        "url": "https://canvas.ubc.ca/courses/7/assignments/9"
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "adapter": "extension",
+  "case": "piazza_capture_through_parse_capture",
+  "extra": {
+    "node_available": false,
+    "note": "extension/experimental-capture.test.mjs 'Piazza capture keeps pinned posts but drops ordinary posts': the JS layer's own feed->content.get loop already dropped the second, unpinned post before this capture was ever built - Python never sees it at all"
+  },
+  "inputs": [
+    "extension/piazza_capture.json"
+  ],
+  "now": null,
+  "oracle_call": "extension/providers/piazza.js capturePiazza() (literal, node unavailable), piped through the real hub.piazza.parse_capture",
+  "output": {
+    "courses": [
+      {
+        "code": "Models",
+        "grade": null,
+        "section": "",
+        "term": "",
+        "title": "Models"
+      }
+    ],
+    "items": [
+      {
+        "category": "task",
+        "course": "Models",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "announcement",
+        "source": "piazza",
+        "title": "Room",
+        "url": "https://piazza.com/class/abc123?cid=post1"
+      }
+    ]
+  }
+}

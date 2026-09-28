@@ -1,0 +1,14 @@
+{
+  "courses": [
+    {
+      "courseId": "BIOL101",
+      "id": "_1_1",
+      "name": "Biology",
+      "term": {
+        "name": "Fall"
+      }
+    }
+  ],
+  "origin": "https://bb.example.edu",
+  "source": "blackboard"
+}

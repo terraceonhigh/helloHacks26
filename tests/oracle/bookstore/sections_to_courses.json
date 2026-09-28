@@ -1,0 +1,562 @@
+{
+  "adapter": "bookstore",
+  "case": "sections_to_courses",
+  "extra": {
+    "note": "78 real CPSC sections, codes canonicalised (e.g. bookstore's 'CPSC121' -> 'CPSC 121')"
+  },
+  "inputs": [
+    "bookstore/sections_cpsc.html"
+  ],
+  "now": null,
+  "oracle_call": "hub.bookstore._parse_sections, hub.bookstore._course_from_section",
+  "output": {
+    "courses": [
+      {
+        "code": "CPSC 100",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Computational Thinking"
+      },
+      {
+        "code": "CPSC 103",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Introduction To Systematic Program Design"
+      },
+      {
+        "code": "CPSC 103",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Introduction To Systematic Program Design"
+      },
+      {
+        "code": "CPSC 110",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Computation, Programs, And Programming"
+      },
+      {
+        "code": "CPSC 110",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Computation, Programs, And Programming"
+      },
+      {
+        "code": "CPSC 110",
+        "grade": null,
+        "section": "103",
+        "term": "2026W1",
+        "title": "Computation, Programs, And Programming"
+      },
+      {
+        "code": "CPSC 110",
+        "grade": null,
+        "section": "CH1",
+        "term": "2026W1",
+        "title": "Computation, Programs, And Programming"
+      },
+      {
+        "code": "CPSC 121",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Models Of Computation"
+      },
+      {
+        "code": "CPSC 121",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Models Of Computation"
+      },
+      {
+        "code": "CPSC 203",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Programming, Problem Solving, And Algorithms"
+      },
+      {
+        "code": "CPSC 210",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Software Construction"
+      },
+      {
+        "code": "CPSC 210",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Software Construction"
+      },
+      {
+        "code": "CPSC 213",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Introduction To Computer Systems"
+      },
+      {
+        "code": "CPSC 213",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Introduction To Computer Systems"
+      },
+      {
+        "code": "CPSC 221",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Basic Algorithms And Data Structures"
+      },
+      {
+        "code": "CPSC 221",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Basic Algorithms And Data Structures"
+      },
+      {
+        "code": "CPSC 259",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Data Structures And Algorithms For Electrical Engi"
+      },
+      {
+        "code": "CPSC 302",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Numerical Computation For Algebraic Problems"
+      },
+      {
+        "code": "CPSC 304",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Introduction To Relational Databases"
+      },
+      {
+        "code": "CPSC 304",
+        "grade": null,
+        "section": "103",
+        "term": "2026W1",
+        "title": "Introduction To Relational Databases"
+      },
+      {
+        "code": "CPSC 310",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Introduction To Software Engineering"
+      },
+      {
+        "code": "CPSC 310",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Introduction To Software Engineering"
+      },
+      {
+        "code": "CPSC 310",
+        "grade": null,
+        "section": "103",
+        "term": "2026W1",
+        "title": "Introduction To Software Engineering"
+      },
+      {
+        "code": "CPSC 311",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Definition Of Programming Languages"
+      },
+      {
+        "code": "CPSC 313",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Computer Hardware And Operating Systems"
+      },
+      {
+        "code": "CPSC 313",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Computer Hardware And Operating Systems"
+      },
+      {
+        "code": "CPSC 314",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Computer Graphics"
+      },
+      {
+        "code": "CPSC 317",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Introduction To Computer Networking"
+      },
+      {
+        "code": "CPSC 317",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Introduction To Computer Networking"
+      },
+      {
+        "code": "CPSC 320",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Intermediate Algorithm Design And Analysis"
+      },
+      {
+        "code": "CPSC 320",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Intermediate Algorithm Design And Analysis"
+      },
+      {
+        "code": "CPSC 322",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Introduction To Artificial Intelligence"
+      },
+      {
+        "code": "CPSC 330",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Applied Machine Learning"
+      },
+      {
+        "code": "CPSC 330",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Applied Machine Learning"
+      },
+      {
+        "code": "CPSC 330",
+        "grade": null,
+        "section": "103",
+        "term": "2026W1",
+        "title": "Applied Machine Learning"
+      },
+      {
+        "code": "CPSC 340",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Machine Learning And Data Mining"
+      },
+      {
+        "code": "CPSC 340",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Machine Learning And Data Mining"
+      },
+      {
+        "code": "CPSC 344",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Introduction To Human Computer Interaction Methods"
+      },
+      {
+        "code": "CPSC 344",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Introduction To Human Computer Interaction Methods"
+      },
+      {
+        "code": "CPSC 349",
+        "grade": null,
+        "section": "001",
+        "term": "2026W1",
+        "title": "Honours Research Seminar"
+      },
+      {
+        "code": "CPSC 402",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Numerical Linear Algebra"
+      },
+      {
+        "code": "CPSC 404",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Advanced Relational Databases"
+      },
+      {
+        "code": "CPSC 410",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Advanced Software Engineering"
+      },
+      {
+        "code": "CPSC 415",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Operating Systems Design And Implementation"
+      },
+      {
+        "code": "CPSC 416",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Distributed Systems"
+      },
+      {
+        "code": "CPSC 418",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Parallel Computation"
+      },
+      {
+        "code": "CPSC 418",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Parallel Computation"
+      },
+      {
+        "code": "CPSC 421",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Introduction To Theory Of Computing"
+      },
+      {
+        "code": "CPSC 423",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Natural Language Processing"
+      },
+      {
+        "code": "CPSC 424",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Geometric Modelling"
+      },
+      {
+        "code": "CPSC 425",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Computer Vision"
+      },
+      {
+        "code": "CPSC 427",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Video Game Programming"
+      },
+      {
+        "code": "CPSC 430",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Computers And Society"
+      },
+      {
+        "code": "CPSC 436",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Computer Science - Cloud Computing"
+      },
+      {
+        "code": "CPSC 436",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Computer Science - Submodularity And Opt"
+      },
+      {
+        "code": "CPSC 501",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Theory Of Automata, Formal Languages And Computabi"
+      },
+      {
+        "code": "CPSC 507",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Software Engineering"
+      },
+      {
+        "code": "CPSC 511",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Implementation Of Programming Languages"
+      },
+      {
+        "code": "CPSC 521",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Parallel Algorithms And Architectures"
+      },
+      {
+        "code": "CPSC 532",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Artificial Intelligence - Cognitive Ai"
+      },
+      {
+        "code": "CPSC 532",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Artificial Intelligence - Open Questions"
+      },
+      {
+        "code": "CPSC 532",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Artificial Intelligence - Stat Learn Thr"
+      },
+      {
+        "code": "CPSC 532",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Artificial Intelligence - Llms Meet Info"
+      },
+      {
+        "code": "CPSC 532",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Artificial Intelligence - Interpretation"
+      },
+      {
+        "code": "CPSC 532",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Artificial Intelligence - Probabilistic"
+      },
+      {
+        "code": "CPSC 532",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Artificial Intelligence - Adaptation & A"
+      },
+      {
+        "code": "CPSC 532",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Artificial Intelligence - Physics-Inform"
+      },
+      {
+        "code": "CPSC 533",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Computer Graphics - Advances In Geometry"
+      },
+      {
+        "code": "CPSC 536",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Algorithms And Complexity - Algorithms F"
+      },
+      {
+        "code": "CPSC 536",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Algorithms And Complexity - Comp Bio"
+      },
+      {
+        "code": "CPSC 536",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Algorithms And Complexity - Submodularit"
+      },
+      {
+        "code": "CPSC 539",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Programming Languages - Programverifiers"
+      },
+      {
+        "code": "CPSC 540",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Machine Learning"
+      },
+      {
+        "code": "CPSC 540",
+        "grade": null,
+        "section": "102",
+        "term": "2026W1",
+        "title": "Machine Learning"
+      },
+      {
+        "code": "CPSC 541",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Computer Security And Privacy - Network"
+      },
+      {
+        "code": "CPSC 542",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Topics In Numerical Computation - Topics In Scient"
+      },
+      {
+        "code": "CPSC 545",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Algorithms For Bioinformatics"
+      },
+      {
+        "code": "CPSC 547",
+        "grade": null,
+        "section": "101",
+        "term": "2026W1",
+        "title": "Information Visualization"
+      }
+    ]
+  }
+}

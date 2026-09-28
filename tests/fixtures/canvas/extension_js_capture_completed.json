@@ -1,0 +1,25 @@
+{
+  "captured_at": "2026-09-27T00:00:00.000Z",
+  "courses": [],
+  "planner": [
+    {
+      "context_name": "",
+      "course_id": 7,
+      "html_url": "https://canvas.ubc.ca/courses/7/quizzes/3",
+      "plannable": {
+        "title": "Quiz 2"
+      },
+      "plannable_date": "2026-09-30T06:59:00Z",
+      "plannable_type": "quiz",
+      "planner_override": {
+        "marked_complete": false
+      },
+      "submissions": {
+        "excused": false,
+        "submitted": true
+      }
+    }
+  ],
+  "source": "canvas",
+  "undated": []
+}

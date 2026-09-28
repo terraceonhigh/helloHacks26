@@ -1,0 +1,37 @@
+{
+  "adapter": "moodle",
+  "case": "parse_capture",
+  "extra": {
+    "note": "no live Moodle account exists on this project (module docstring); input is tests/test_experimental_captures.py's own capture. An empty event url falls back to the real calendar/event.php?id=<id> route, joined against origin",
+    "unverified": true
+  },
+  "inputs": [
+    "moodle/parse_capture.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.moodle.parse_capture",
+  "output": {
+    "courses": [
+      {
+        "code": "CPSC101",
+        "grade": null,
+        "section": "",
+        "term": "",
+        "title": "Intro"
+      }
+    ],
+    "items": [
+      {
+        "category": "deadline",
+        "course": "CPSC101",
+        "done": null,
+        "due": "2026-12-23T04:26:40+00:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "moodle",
+        "title": "Quiz",
+        "url": "https://moodle.example.edu/calendar/event.php?id=9"
+      }
+    ]
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "adapter": "canvas",
+  "case": "done_from_submissions",
+  "extra": {
+    "note": "titles A..H exercise: submitted, excused, neither, submissions=False, marked_complete alone, marked_complete with no submissions key, submitted=False+marked_complete=False, planner_override=None"
+  },
+  "inputs": [
+    "canvas/done_from_submissions_cases.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.canvas.to_item (done_from_submissions cases)",
+  "output": {
+    "items": [
+      {
+        "category": "task",
+        "course": "CPSC 121",
+        "done": true,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "A",
+        "url": "https://canvas.ubc.ca/a/1"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121",
+        "done": true,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "B",
+        "url": "https://canvas.ubc.ca/a/2"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121",
+        "done": false,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "C",
+        "url": "https://canvas.ubc.ca/a/3"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "D",
+        "url": "https://canvas.ubc.ca/a/4"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121",
+        "done": true,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "E",
+        "url": "https://canvas.ubc.ca/a/5"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121",
+        "done": true,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "F",
+        "url": "https://canvas.ubc.ca/a/6"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121",
+        "done": false,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "G",
+        "url": "https://canvas.ubc.ca/a/7"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "H",
+        "url": "https://canvas.ubc.ca/a/8"
+      }
+    ]
+  }
+}

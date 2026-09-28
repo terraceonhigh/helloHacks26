@@ -1,0 +1,29 @@
+{
+  "adapter": "canvas",
+  "case": "extension_js_capture_completed",
+  "extra": {
+    "node_available": false,
+    "note": "extension/canvas-capture.test.mjs's 'completed planner submission survives the Canvas capture' test: submissions.submitted=True must still map to Item.done=True with no course rows at all"
+  },
+  "inputs": [
+    "canvas/extension_js_capture_completed.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.canvas.parse_capture",
+  "output": {
+    "courses": [],
+    "items": [
+      {
+        "category": "deadline",
+        "course": "",
+        "done": true,
+        "due": "2026-09-30T06:59:00+00:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "canvas",
+        "title": "Quiz 2",
+        "url": "https://canvas.ubc.ca/courses/7/quizzes/3"
+      }
+    ]
+  }
+}

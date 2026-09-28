@@ -1,0 +1,213 @@
+{
+  "extra": {
+    "seed": [
+      "queries seed: Q_COURSE + Q_OTHER_COURSE, Q_QUIZ + essay"
+    ]
+  },
+  "inputs": [],
+  "now": [
+    "2026-09-28T09:00:00-07:00",
+    "2026-11-15T09:00:00-08:00"
+  ],
+  "query": "hub.db.upcoming()/undated()/by_course()/courses()/textbooks()/schedule() + hub.models.status_of()",
+  "result": {
+    "now_a": {
+      "by_course": {
+        "CPSC 121": [
+          [
+            "CPSC 121",
+            "deadline",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            null,
+            "canvas"
+          ]
+        ],
+        "ENGL 112": [
+          [
+            "ENGL 112",
+            "task",
+            "assignment",
+            "Essay 1",
+            "2026-10-01T00:00:00+00:00",
+            "https://x/e/1",
+            null,
+            "canvas"
+          ]
+        ]
+      },
+      "courses": [
+        [
+          "CPSC 121",
+          "2026W1",
+          "Models of Computation",
+          88.5
+        ],
+        [
+          "ENGL 112",
+          "2026W1",
+          "Strategies for University Writing",
+          null
+        ]
+      ],
+      "now": "2026-09-28T09:00:00-07:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "soon",
+        "upcoming"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "CPSC 121",
+          "deadline",
+          "quiz",
+          "Quiz 2",
+          "2026-09-30T06:59:00+00:00",
+          "https://x/q/1",
+          null,
+          "canvas"
+        ],
+        [
+          "ENGL 112",
+          "task",
+          "assignment",
+          "Essay 1",
+          "2026-10-01T00:00:00+00:00",
+          "https://x/e/1",
+          null,
+          "canvas"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [
+          [
+            "CPSC 121",
+            "deadline",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            null,
+            "canvas"
+          ]
+        ],
+        "material": [],
+        "task": [
+          [
+            "ENGL 112",
+            "task",
+            "assignment",
+            "Essay 1",
+            "2026-10-01T00:00:00+00:00",
+            "https://x/e/1",
+            null,
+            "canvas"
+          ]
+        ]
+      }
+    },
+    "now_b": {
+      "by_course": {
+        "CPSC 121": [
+          [
+            "CPSC 121",
+            "deadline",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            null,
+            "canvas"
+          ]
+        ],
+        "ENGL 112": [
+          [
+            "ENGL 112",
+            "task",
+            "assignment",
+            "Essay 1",
+            "2026-10-01T00:00:00+00:00",
+            "https://x/e/1",
+            null,
+            "canvas"
+          ]
+        ]
+      },
+      "courses": [
+        [
+          "CPSC 121",
+          "2026W1",
+          "Models of Computation",
+          88.5
+        ],
+        [
+          "ENGL 112",
+          "2026W1",
+          "Strategies for University Writing",
+          null
+        ]
+      ],
+      "now": "2026-11-15T09:00:00-08:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "overdue",
+        "overdue"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "CPSC 121",
+          "deadline",
+          "quiz",
+          "Quiz 2",
+          "2026-09-30T06:59:00+00:00",
+          "https://x/q/1",
+          null,
+          "canvas"
+        ],
+        [
+          "ENGL 112",
+          "task",
+          "assignment",
+          "Essay 1",
+          "2026-10-01T00:00:00+00:00",
+          "https://x/e/1",
+          null,
+          "canvas"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [
+          [
+            "CPSC 121",
+            "deadline",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            null,
+            "canvas"
+          ]
+        ],
+        "material": [],
+        "task": [
+          [
+            "ENGL 112",
+            "task",
+            "assignment",
+            "Essay 1",
+            "2026-10-01T00:00:00+00:00",
+            "https://x/e/1",
+            null,
+            "canvas"
+          ]
+        ]
+      }
+    }
+  }
+}

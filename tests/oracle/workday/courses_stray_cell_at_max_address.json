@@ -1,0 +1,37 @@
+{
+  "adapter": "workday",
+  "case": "courses_stray_cell_at_max_address",
+  "extra": {
+    "note": "must still parse the same 3 courses without hanging on the full 1M x 16K grid (#49 item 13 / web/lib/workday.js#57's Python twin)"
+  },
+  "inputs": [
+    "workday/stray_cell.xlsx"
+  ],
+  "now": null,
+  "oracle_call": "hub.workday.parse_workday_courses(path, term='2026W1')",
+  "output": {
+    "courses": [
+      {
+        "code": "BMEG 000",
+        "grade": null,
+        "section": null,
+        "term": "2026W1",
+        "title": "Fake Thermodynamics"
+      },
+      {
+        "code": "BMEG 001",
+        "grade": null,
+        "section": null,
+        "term": "2026W1",
+        "title": "Fake Cell Systems"
+      },
+      {
+        "code": "BMEG 002",
+        "grade": null,
+        "section": null,
+        "term": "2026W1",
+        "title": "bmeg002"
+      }
+    ]
+  }
+}

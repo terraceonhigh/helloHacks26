@@ -1,0 +1,14 @@
+{
+  "catalog_pages": [
+    "bookstore/products_page1.json",
+    "bookstore/products_page2.json"
+  ],
+  "textbooks": [
+    {
+      "isbn": "9781337694193"
+    },
+    {
+      "isbn": "0000000000000"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "adapter": "prairielearn",
+  "case": "course_title_parsing",
+  "extra": {
+    "note": "second case: title doesn't match COURSE_TITLE -> falls back to the raw text as code/title, term left blank, rather than crashing"
+  },
+  "inputs": [
+    "prairielearn/course_titles.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.prairielearn.to_course",
+  "output": {
+    "courses": [
+      {
+        "code": "CPSC 317",
+        "grade": null,
+        "section": "",
+        "term": "2026 Winter Term 1",
+        "title": "Internet Computing"
+      },
+      {
+        "code": "Some unparseable title with no course code",
+        "grade": null,
+        "section": "",
+        "term": "",
+        "title": "Some unparseable title with no course code"
+      }
+    ]
+  }
+}

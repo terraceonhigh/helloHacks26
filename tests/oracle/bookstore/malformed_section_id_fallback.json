@@ -1,0 +1,23 @@
+{
+  "adapter": "bookstore",
+  "case": "malformed_section_id_fallback",
+  "extra": {
+    "note": "a section id with fewer than the usual 5 comma parts degrades instead of raising IndexError"
+  },
+  "inputs": [
+    "bookstore/malformed_section.html"
+  ],
+  "now": null,
+  "oracle_call": "hub.bookstore._parse_sections, hub.bookstore._course_from_section",
+  "output": {
+    "courses": [
+      {
+        "code": "weird-id",
+        "grade": null,
+        "section": "",
+        "term": "2026W1",
+        "title": "Not the usual format"
+      }
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "adapter": "moodle",
+  "case": "to_item_assign_default_kind",
+  "extra": {
+    "note": "modulename 'assign' -> kind 'assignment' (KINDS default), a real url already present is used as-is",
+    "unverified": true
+  },
+  "inputs": [
+    "moodle/to_item_assign_default_kind.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.moodle.to_item",
+  "output": {
+    "items": [
+      {
+        "category": "task",
+        "course": "CPSC101",
+        "done": null,
+        "due": "2026-12-24T08:13:20+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "moodle",
+        "title": "HW1",
+        "url": "https://moodle.example.edu/mod/assign/view.php?id=10"
+      }
+    ]
+  }
+}

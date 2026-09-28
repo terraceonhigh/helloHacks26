@@ -1,0 +1,69 @@
+{
+  "adapter": "canvas",
+  "case": "planner_items_mapping",
+  "extra": {
+    "note": "kinds: quiz(deadline/quiz), calendar_event(deadline/event, url already absolute -> not double-prefixed), discussion_topic(task/assignment default), announcement(task/announcement, due always None)"
+  },
+  "inputs": [
+    "canvas/planner_items.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.canvas.to_course, hub.canvas.to_item",
+  "output": {
+    "courses": [
+      {
+        "code": "CPSC 121",
+        "grade": 88.5,
+        "section": "",
+        "term": "2026W1",
+        "title": "Models of Computation"
+      }
+    ],
+    "items": [
+      {
+        "category": "deadline",
+        "course": "CPSC 121",
+        "done": null,
+        "due": "2026-09-30T06:59:00+00:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "canvas",
+        "title": "Quiz 2",
+        "url": "https://canvas.ubc.ca/courses/7/quizzes/3"
+      },
+      {
+        "category": "deadline",
+        "course": "",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "event",
+        "source": "canvas",
+        "title": "Office hours",
+        "url": "https://canvas.ubc.ca/calendar?event_id=9"
+      },
+      {
+        "category": "task",
+        "course": "",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Untitled discussion",
+        "url": "https://canvas.ubc.ca"
+      },
+      {
+        "category": "task",
+        "course": "",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "announcement",
+        "source": "canvas",
+        "title": "Welcome!",
+        "url": "https://canvas.ubc.ca/courses/7/announcements/1"
+      }
+    ]
+  }
+}

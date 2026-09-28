@@ -1,0 +1,40 @@
+{
+  "page1": [
+    {
+      "Access": {
+        "CanAccess": true,
+        "ClasslistRoleName": "Learner",
+        "EndDate": "2027-02-02T06:59:00.000Z",
+        "IsActive": true,
+        "LastAccessed": "2026-09-27T04:20:13.077Z",
+        "StartDate": "2026-09-08T07:00:00.000Z"
+      },
+      "OrgUnit": {
+        "Code": "MATH_V 100A ALL SECTIONS 2026W1",
+        "HomeUrl": "https://example.brightspace.com/d2l/home/12345",
+        "Id": 12345,
+        "ImageUrl": "https://example.brightspace.com/d2l/api/lp/1.9/courses/12345/image",
+        "Name": "MATH_V 100A ALL SECTIONS 2026W1 Differential Calculus with Applications",
+        "Type": {
+          "Code": "Course Offering",
+          "Id": 3,
+          "Name": "Course Offering"
+        }
+      },
+      "PinDate": null
+    }
+  ],
+  "page2": [
+    {
+      "Access": {
+        "IsActive": true
+      },
+      "OrgUnit": {
+        "Code": "SECOND 200",
+        "Id": 222,
+        "Name": "A Second Course"
+      },
+      "PinDate": null
+    }
+  ]
+}

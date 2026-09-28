@@ -1,0 +1,75 @@
+{
+  "adapter": "webwork",
+  "case": "problem_set_rows",
+  "extra": {
+    "note": "open(due+link, done always None - no score signal on this page), not-open(no link, synthetic stable url, no due - open date isn't a due date), past-due-with-date(no due - that date is when answers unlock, not the deadline), past-due-no-date(degrades cleanly), data-set-type=test -> kind quiz/category deadline"
+  },
+  "inputs": [
+    "webwork/open_row.html",
+    "webwork/not_open_row.html",
+    "webwork/past_due_with_date_row.html",
+    "webwork/past_due_no_date_row.html",
+    "webwork/quiz_row.html"
+  ],
+  "now": null,
+  "oracle_call": "hub.webwork.to_item",
+  "output": {
+    "items": [
+      {
+        "category": "task",
+        "course": "MATH 101",
+        "done": null,
+        "due": "2026-10-01T23:59:00-07:00",
+        "files": [],
+        "kind": "problemset",
+        "source": "webwork",
+        "title": "HW1",
+        "url": "https://webwork.example.edu/webwork2/MATH_101/HW1?effectiveUser=abc123"
+      },
+      {
+        "category": "task",
+        "course": "MATH 101",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "problemset",
+        "source": "webwork",
+        "title": "HW2",
+        "url": "https://webwork.example.edu/webwork2/MATH_101/HW2"
+      },
+      {
+        "category": "task",
+        "course": "MATH 101",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "problemset",
+        "source": "webwork",
+        "title": "HW0",
+        "url": "https://webwork.example.edu/webwork2/MATH_101/HW0?effectiveUser=abc123"
+      },
+      {
+        "category": "task",
+        "course": "MATH 101",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "problemset",
+        "source": "webwork",
+        "title": "Diagnostic",
+        "url": "/webwork2/MATH_101/Diagnostic?effectiveUser=abc123"
+      },
+      {
+        "category": "deadline",
+        "course": "MATH 101",
+        "done": null,
+        "due": "2026-10-03T23:59:00-07:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "webwork",
+        "title": "Quiz1",
+        "url": "/webwork2/MATH_101/Quiz1?effectiveUser=abc123"
+      }
+    ]
+  }
+}

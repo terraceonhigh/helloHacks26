@@ -1,0 +1,45 @@
+{
+  "extra": {
+    "seed": [
+      "Q_LECTURE saved with no matching course this call -> not orphaned, just skipped"
+    ]
+  },
+  "inputs": [],
+  "now": [
+    "2026-09-28T09:00:00-07:00",
+    "2026-11-15T09:00:00-08:00"
+  ],
+  "query": "hub.db.upcoming()/undated()/by_course()/courses()/textbooks()/schedule() + hub.models.status_of()",
+  "result": {
+    "now_a": {
+      "by_course": {},
+      "courses": [],
+      "now": "2026-09-28T09:00:00-07:00",
+      "schedule": [],
+      "status_of_upcoming": [],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [],
+      "upcoming_by_category": {
+        "deadline": [],
+        "material": [],
+        "task": []
+      }
+    },
+    "now_b": {
+      "by_course": {},
+      "courses": [],
+      "now": "2026-11-15T09:00:00-08:00",
+      "schedule": [],
+      "status_of_upcoming": [],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [],
+      "upcoming_by_category": {
+        "deadline": [],
+        "material": [],
+        "task": []
+      }
+    }
+  }
+}

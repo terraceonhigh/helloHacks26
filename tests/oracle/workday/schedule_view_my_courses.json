@@ -1,0 +1,76 @@
+{
+  "adapter": "workday",
+  "case": "schedule_view_my_courses",
+  "extra": {
+    "note": "one Meeting per component row (BMEG 000 keeps both its Lecture and Lab, unlike parse_workday_courses which dedupes to one Course)"
+  },
+  "inputs": [
+    "workday/view_my_courses.xlsx"
+  ],
+  "now": null,
+  "oracle_call": "hub.workday.parse_workday_schedule(path, term='2026W1')",
+  "output": {
+    "meetings": [
+      {
+        "course": "BMEG 000",
+        "days": [
+          "MO",
+          "WE",
+          "FR"
+        ],
+        "end_time": "11:00:00",
+        "kind": "lecture",
+        "location": "Fake Building (FAKE), Floor: 1, Room: 100",
+        "source": "workday",
+        "start_time": "10:00:00",
+        "term_end": "2026-12-05",
+        "term_start": "2026-09-08"
+      },
+      {
+        "course": "BMEG 000",
+        "days": [
+          "MO",
+          "WE",
+          "FR"
+        ],
+        "end_time": "11:00:00",
+        "kind": "lab",
+        "location": "Fake Building (FAKE), Floor: 1, Room: 100",
+        "source": "workday",
+        "start_time": "10:00:00",
+        "term_end": "2026-12-05",
+        "term_start": "2026-09-08"
+      },
+      {
+        "course": "BMEG 001",
+        "days": [
+          "MO",
+          "WE",
+          "FR"
+        ],
+        "end_time": "11:00:00",
+        "kind": "lecture",
+        "location": "Fake Building (FAKE), Floor: 1, Room: 100",
+        "source": "workday",
+        "start_time": "10:00:00",
+        "term_end": "2026-12-05",
+        "term_start": "2026-09-08"
+      },
+      {
+        "course": "BMEG 002",
+        "days": [
+          "MO",
+          "WE",
+          "FR"
+        ],
+        "end_time": "11:00:00",
+        "kind": "lecture",
+        "location": "Fake Building (FAKE), Floor: 1, Room: 100",
+        "source": "workday",
+        "start_time": "10:00:00",
+        "term_end": "2026-12-05",
+        "term_start": "2026-09-08"
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "adapter": "captures",
+  "case": "normalize_done_canvas",
+  "extra": {
+    "note": "submissions.submitted=True -> normalized item.done=True"
+  },
+  "inputs": [
+    "captures/normalize_done_canvas_input.json"
+  ],
+  "now": null,
+  "query": "hub.captures.normalize",
+  "result": {
+    "courses": [
+      {
+        "code": "CPSC 121",
+        "grade": null,
+        "section": "",
+        "term": "",
+        "title": "Models"
+      }
+    ],
+    "items": [
+      {
+        "category": "deadline",
+        "course": "CPSC 121",
+        "done": true,
+        "due": "2026-09-30T06:59:00+00:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "canvas",
+        "title": "Quiz 2",
+        "url": "https://canvas.ubc.ca/courses/7/quizzes/3"
+      }
+    ],
+    "source": "canvas",
+    "stored": false
+  }
+}

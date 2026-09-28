@@ -1,0 +1,24 @@
+{
+  "adapter": "bookstore",
+  "case": "textbooks_price_without_cents_and_not_required",
+  "extra": {
+    "note": "'$50' (no cents) must not be silently dropped by the price regex; 'Not Required' must not be flagged required by a naive substring check on 'required'"
+  },
+  "inputs": [
+    "bookstore/synthetic_price_and_status.html"
+  ],
+  "now": null,
+  "oracle_call": "hub.bookstore._parse_textbooks",
+  "output": {
+    "textbooks": [
+      {
+        "course": "K1",
+        "isbn": "1111111111",
+        "price": 50.0,
+        "required": false,
+        "title": "Some Optional Companion Book",
+        "url": ""
+      }
+    ]
+  }
+}

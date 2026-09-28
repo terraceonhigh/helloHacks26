@@ -1,0 +1,45 @@
+{
+  "adapter": "key_dates",
+  "case": "ubco_now_a",
+  "extra": {
+    "campus": "UBCO"
+  },
+  "inputs": [],
+  "now": "2026-09-28T09:00:00-07:00",
+  "oracle_call": "hub.key_dates.fetch(campus, term, now=now)",
+  "output": {
+    "courses": [
+      {
+        "code": "UBCO",
+        "grade": null,
+        "section": "",
+        "term": "2026W1",
+        "title": "UBC Okanagan"
+      }
+    ],
+    "items": [
+      {
+        "category": "deadline",
+        "course": "UBCO",
+        "done": true,
+        "due": "2026-09-09T23:59:00-07:00",
+        "files": [],
+        "kind": "payment",
+        "source": "ubc_key_dates",
+        "title": "Tuition: 1st instalment due (Winter Session)",
+        "url": "https://okanagan.calendar.ubc.ca/fees/policies-fees#1st-instalment-2026w1"
+      },
+      {
+        "category": "deadline",
+        "course": "UBCO",
+        "done": null,
+        "due": "2027-01-06T23:59:00-07:00",
+        "files": [],
+        "kind": "payment",
+        "source": "ubc_key_dates",
+        "title": "Tuition: 2nd instalment due (Winter Session)",
+        "url": "https://okanagan.calendar.ubc.ca/fees/policies-fees#2nd-instalment-2026w1"
+      }
+    ]
+  }
+}

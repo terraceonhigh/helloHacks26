@@ -1,0 +1,71 @@
+{
+  "adapter": "canvas_ics",
+  "case": "canvas_feed_as_moodle_source",
+  "extra": {
+    "note": "same feed text tagged source='moodle' - Moodle feeds don't carry a [COURSE] suffix, course comes back ''"
+  },
+  "inputs": [
+    "canvas_ics/canvas_feed_as_moodle.ics"
+  ],
+  "now": null,
+  "oracle_call": "hub.ics.parse(text, source='moodle')",
+  "output": {
+    "items": [
+      {
+        "category": "task",
+        "course": "CPSC 121 101",
+        "done": null,
+        "due": "2026-09-30T06:59:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "moodle",
+        "title": "Quiz 2",
+        "url": "https://canvas.ubc.ca/courses/7/assignments/99"
+      },
+      {
+        "category": "deadline",
+        "course": "CPSC 121 101",
+        "done": null,
+        "due": "2026-10-02T17:00:00+00:00",
+        "files": [],
+        "kind": "event",
+        "source": "moodle",
+        "title": "Office hours",
+        "url": "https://canvas.ubc.ca/calendar?event_id=55&include_contexts=course_7"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 101",
+        "done": null,
+        "due": "2026-10-05T23:59:00-07:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "moodle",
+        "title": "Reading week starts",
+        "url": "https://canvas.ubc.ca/courses/7/assignments/101"
+      },
+      {
+        "category": "task",
+        "course": "",
+        "done": null,
+        "due": "2026-10-10T00:00:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "moodle",
+        "title": "Untagged item",
+        "url": ""
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 101",
+        "done": null,
+        "due": "2026-10-12T06:59:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "moodle",
+        "title": "Lab [make-up]",
+        "url": "https://canvas.ubc.ca/courses/7/assignments/202"
+      }
+    ]
+  }
+}

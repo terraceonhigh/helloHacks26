@@ -1,0 +1,127 @@
+{
+  "adapter": "workday",
+  "case": "schedule_instructional_format_kind_mapping",
+  "extra": {
+    "note": "one single-row workbook per Instructional Format value, concatenated in the order: Lecture, Laboratory, Seminar, Tutorial, Discussion, Exam, Something Unseen (unlisted -> kind 'class')"
+  },
+  "inputs": [
+    "workday/kind_lecture.xlsx",
+    "workday/kind_laboratory.xlsx",
+    "workday/kind_seminar.xlsx",
+    "workday/kind_tutorial.xlsx",
+    "workday/kind_discussion.xlsx",
+    "workday/kind_exam.xlsx",
+    "workday/kind_something_unseen.xlsx"
+  ],
+  "now": null,
+  "oracle_call": "hub.workday.parse_workday_schedule(path, term='2026W1')",
+  "output": {
+    "meetings": [
+      {
+        "course": "BMEG 000",
+        "days": [
+          "MO",
+          "WE",
+          "FR"
+        ],
+        "end_time": "11:00:00",
+        "kind": "lecture",
+        "location": "Room 1",
+        "source": "workday",
+        "start_time": "10:00:00",
+        "term_end": "2026-12-05",
+        "term_start": "2026-09-08"
+      },
+      {
+        "course": "BMEG 000",
+        "days": [
+          "MO",
+          "WE",
+          "FR"
+        ],
+        "end_time": "11:00:00",
+        "kind": "lab",
+        "location": "Room 1",
+        "source": "workday",
+        "start_time": "10:00:00",
+        "term_end": "2026-12-05",
+        "term_start": "2026-09-08"
+      },
+      {
+        "course": "BMEG 000",
+        "days": [
+          "MO",
+          "WE",
+          "FR"
+        ],
+        "end_time": "11:00:00",
+        "kind": "seminar",
+        "location": "Room 1",
+        "source": "workday",
+        "start_time": "10:00:00",
+        "term_end": "2026-12-05",
+        "term_start": "2026-09-08"
+      },
+      {
+        "course": "BMEG 000",
+        "days": [
+          "MO",
+          "WE",
+          "FR"
+        ],
+        "end_time": "11:00:00",
+        "kind": "tutorial",
+        "location": "Room 1",
+        "source": "workday",
+        "start_time": "10:00:00",
+        "term_end": "2026-12-05",
+        "term_start": "2026-09-08"
+      },
+      {
+        "course": "BMEG 000",
+        "days": [
+          "MO",
+          "WE",
+          "FR"
+        ],
+        "end_time": "11:00:00",
+        "kind": "tutorial",
+        "location": "Room 1",
+        "source": "workday",
+        "start_time": "10:00:00",
+        "term_end": "2026-12-05",
+        "term_start": "2026-09-08"
+      },
+      {
+        "course": "BMEG 000",
+        "days": [
+          "MO",
+          "WE",
+          "FR"
+        ],
+        "end_time": "11:00:00",
+        "kind": "exam",
+        "location": "Room 1",
+        "source": "workday",
+        "start_time": "10:00:00",
+        "term_end": "2026-12-05",
+        "term_start": "2026-09-08"
+      },
+      {
+        "course": "BMEG 000",
+        "days": [
+          "MO",
+          "WE",
+          "FR"
+        ],
+        "end_time": "11:00:00",
+        "kind": "class",
+        "location": "Room 1",
+        "source": "workday",
+        "start_time": "10:00:00",
+        "term_end": "2026-12-05",
+        "term_start": "2026-09-08"
+      }
+    ]
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "adapter": "export_ics",
+  "case": "to_ics_all_items",
+  "extra": {
+    "note": "item_no_due is skipped, not crashed on (no DTSTART possible); UID is stable per (source, url) and distinct across items; known_kinds lists only kinds among items that HAVE a due date, sorted"
+  },
+  "inputs": [
+    "export_ics/items.json"
+  ],
+  "now": null,
+  "query": "hub.export_ics.to_ics([item_a, item_b, item_no_due])",
+  "result": {
+    "color_exam": "#DC2626",
+    "color_fallback": "#6B7280",
+    "color_quiz": "#7C3AED",
+    "color_unknown_kind": "#6B7280",
+    "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//UBC Hub//ubchub//EN\r\nX-WR-CALNAME:Lauds\r\nBEGIN:VEVENT\r\nSUMMARY:Problem Set 3 [CPSC 121]\r\nDTSTART:20260930T065900Z\r\nUID:canvas-5fb84c64b45ec5f9@ubchub\r\nCATEGORIES:Assignment\r\nURL:https://canvas.ubc.ca/courses/7/assignments/99\r\nBEGIN:VALARM\r\nACTION:DISPLAY\r\nDESCRIPTION:Problem Set 3 [CPSC 121]\r\nTRIGGER:-P2D\r\nEND:VALARM\r\nBEGIN:VALARM\r\nACTION:DISPLAY\r\nDESCRIPTION:Problem Set 3 [CPSC 121]\r\nTRIGGER:P0D\r\nEND:VALARM\r\nEND:VEVENT\r\nBEGIN:VEVENT\r\nSUMMARY:Midterm 1 [MATH 100]\r\nDTSTART:20261009T170000Z\r\nUID:canvas-007c38055f7b7645@ubchub\r\nCATEGORIES:Exam\r\nURL:https://canvas.ubc.ca/courses/8/assignments/12\r\nBEGIN:VALARM\r\nACTION:DISPLAY\r\nDESCRIPTION:Midterm 1 [MATH 100]\r\nTRIGGER:-P2D\r\nEND:VALARM\r\nBEGIN:VALARM\r\nACTION:DISPLAY\r\nDESCRIPTION:Midterm 1 [MATH 100]\r\nTRIGGER:P0D\r\nEND:VALARM\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n",
+    "known_kinds": [
+      "assignment",
+      "exam"
+    ],
+    "round_trip_items": [
+      {
+        "category": "task",
+        "course": "CPSC 121",
+        "done": null,
+        "due": "2026-09-30T06:59:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Problem Set 3",
+        "url": "https://canvas.ubc.ca/courses/7/assignments/99"
+      },
+      {
+        "category": "task",
+        "course": "MATH 100",
+        "done": null,
+        "due": "2026-10-09T17:00:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Midterm 1",
+        "url": "https://canvas.ubc.ca/courses/8/assignments/12"
+      }
+    ],
+    "uid_a": "canvas-5fb84c64b45ec5f9@ubchub",
+    "uid_b": "canvas-007c38055f7b7645@ubchub"
+  }
+}

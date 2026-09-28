@@ -1,0 +1,22 @@
+{
+  "courses": [
+    {
+      "fullname": "Intro",
+      "shortname": "CPSC101"
+    }
+  ],
+  "events": [
+    {
+      "course": {
+        "shortname": "CPSC101"
+      },
+      "id": 9,
+      "modulename": "quiz",
+      "name": "Quiz",
+      "timesort": 1798000000,
+      "url": "https://moodle.example.edu/mod/quiz/view.php?id=9"
+    }
+  ],
+  "origin": "https://moodle.example.edu",
+  "source": "moodle"
+}

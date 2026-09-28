@@ -1,0 +1,22 @@
+{
+  "adapter": "key_dates",
+  "case": "unknown_campus",
+  "extra": {
+    "note": "an unlisted campus still gets a Course row (the campus code itself), just no dated items"
+  },
+  "inputs": [],
+  "now": "2026-09-28T09:00:00-07:00",
+  "oracle_call": "hub.key_dates.fetch('MARS_U', now=now)",
+  "output": {
+    "courses": [
+      {
+        "code": "MARS_U",
+        "grade": null,
+        "section": "",
+        "term": "2026W1",
+        "title": "MARS_U"
+      }
+    ],
+    "items": []
+  }
+}

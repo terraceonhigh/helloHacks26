@@ -1,0 +1,27 @@
+{
+  "adapter": "canvas_ics",
+  "case": "naive_datetime_gets_vancouver_tz",
+  "extra": {
+    "note": "a feed with no timezone info at all must not produce a naive due"
+  },
+  "inputs": [
+    "canvas_ics/naive_datetime.ics"
+  ],
+  "now": null,
+  "oracle_call": "hub.ics.parse(text, source='moodle')",
+  "output": {
+    "items": [
+      {
+        "category": "task",
+        "course": "",
+        "done": null,
+        "due": "2026-10-05T23:59:00-07:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "moodle",
+        "title": "Naive deadline",
+        "url": ""
+      }
+    ]
+  }
+}

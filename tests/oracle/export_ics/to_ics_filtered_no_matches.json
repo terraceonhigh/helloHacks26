@@ -1,0 +1,15 @@
+{
+  "adapter": "export_ics",
+  "case": "to_ics_filtered_no_matches",
+  "extra": {
+    "note": "a valid, empty calendar (no VEVENT) when the kind filter matches nothing"
+  },
+  "inputs": [
+    "export_ics/items.json"
+  ],
+  "now": null,
+  "query": "hub.export_ics.to_ics([item_a], kind='exam')",
+  "result": {
+    "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//UBC Hub//ubchub//EN\r\nX-WR-CALNAME:Lauds: Exam\r\nEND:VCALENDAR\r\n"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "networks": [
+    {
+      "course_number": "CPSC 121",
+      "id": "abc123",
+      "name": "Models",
+      "posts": [
+        {
+          "bucket_name": "Pinned",
+          "history": [
+            {
+              "subject": "Quiz room"
+            }
+          ],
+          "id": "post123",
+          "tags": [
+            "pin"
+          ]
+        }
+      ],
+      "term": "Fall 2026"
+    }
+  ],
+  "source": "piazza"
+}

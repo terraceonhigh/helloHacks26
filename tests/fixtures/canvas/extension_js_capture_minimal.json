@@ -1,0 +1,47 @@
+{
+  "captured_at": "2026-09-27T12:00:00.000Z",
+  "courses": [
+    {
+      "course_code": "CPSC 121",
+      "enrollments": [
+        {
+          "computed_current_score": 88
+        }
+      ],
+      "id": 7,
+      "name": "Models",
+      "term": {
+        "name": "2026W1"
+      }
+    }
+  ],
+  "planner": [
+    {
+      "context_name": "",
+      "course_id": 7,
+      "html_url": "https://canvas.ubc.ca/courses/7/quizzes/3",
+      "plannable": {
+        "title": "Quiz 2"
+      },
+      "plannable_date": "2026-09-30T06:59:00Z",
+      "plannable_type": "quiz",
+      "planner_override": {
+        "marked_complete": false
+      },
+      "submissions": {
+        "excused": false,
+        "submitted": false
+      }
+    }
+  ],
+  "source": "canvas",
+  "undated": [
+    {
+      "course_id": 7,
+      "due_at": null,
+      "has_submitted_submissions": true,
+      "html_url": "https://canvas.ubc.ca/courses/7/assignments/9",
+      "name": "Reading"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "adapter": "workday",
+  "case": "schedule_no_meeting_patterns_column",
+  "extra": {
+    "note": "an older export missing the Meeting Patterns column degrades to [], never crashes"
+  },
+  "inputs": [
+    "workday/no_meeting_patterns_column.xlsx"
+  ],
+  "now": null,
+  "oracle_call": "hub.workday.parse_workday_schedule(path, term='2026W1')",
+  "output": {
+    "meetings": []
+  }
+}

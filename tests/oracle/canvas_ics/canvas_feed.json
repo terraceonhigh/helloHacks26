@@ -1,0 +1,71 @@
+{
+  "adapter": "canvas_ics",
+  "case": "canvas_feed",
+  "extra": {
+    "note": "covers: kind/category from UID not the shared generic calendar URL; deep link rebuilt from UID id + course id in the generic URL; two items sharing the same generic URL no longer collide; all-day DTSTART;VALUE=DATE -> 23:59 America/Vancouver; unrecognized UID falls back to url-sniffed kind with no course/url; a title containing its own [brackets] still gets the real trailing [COURSE] suffix stripped"
+  },
+  "inputs": [
+    "canvas_ics/canvas_feed.ics"
+  ],
+  "now": null,
+  "oracle_call": "hub.ics.parse(text, source='canvas')",
+  "output": {
+    "items": [
+      {
+        "category": "task",
+        "course": "CPSC 121 101",
+        "done": null,
+        "due": "2026-09-30T06:59:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Quiz 2",
+        "url": "https://canvas.ubc.ca/courses/7/assignments/99"
+      },
+      {
+        "category": "deadline",
+        "course": "CPSC 121 101",
+        "done": null,
+        "due": "2026-10-02T17:00:00+00:00",
+        "files": [],
+        "kind": "event",
+        "source": "canvas",
+        "title": "Office hours",
+        "url": "https://canvas.ubc.ca/calendar?event_id=55&include_contexts=course_7"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 101",
+        "done": null,
+        "due": "2026-10-05T23:59:00-07:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Reading week starts",
+        "url": "https://canvas.ubc.ca/courses/7/assignments/101"
+      },
+      {
+        "category": "task",
+        "course": "",
+        "done": null,
+        "due": "2026-10-10T00:00:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Untagged item",
+        "url": ""
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 101",
+        "done": null,
+        "due": "2026-10-12T06:59:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Lab [make-up]",
+        "url": "https://canvas.ubc.ca/courses/7/assignments/202"
+      }
+    ]
+  }
+}

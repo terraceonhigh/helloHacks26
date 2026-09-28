@@ -1,0 +1,38 @@
+{
+  "adapter": "captures",
+  "case": "normalize_done_prairielearn",
+  "extra": {
+    "note": "a 100% score with no due_text -> normalized item.done=True"
+  },
+  "inputs": [
+    "captures/normalize_done_prairielearn_input.json"
+  ],
+  "now": null,
+  "query": "hub.captures.normalize",
+  "result": {
+    "courses": [
+      {
+        "code": "CPSC 317",
+        "grade": null,
+        "section": "",
+        "term": "2026 Winter Term 1",
+        "title": "Internet Computing"
+      }
+    ],
+    "items": [
+      {
+        "category": "deadline",
+        "course": "CPSC 317",
+        "done": true,
+        "due": null,
+        "files": [],
+        "kind": "quiz",
+        "source": "prairielearn",
+        "title": "Quiz 2",
+        "url": "https://us.prairielearn.com/pl/course_instance/221053/assessment_instance/14835025/"
+      }
+    ],
+    "source": "prairielearn",
+    "stored": false
+  }
+}

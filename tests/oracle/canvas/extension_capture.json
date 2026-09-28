@@ -1,0 +1,45 @@
+{
+  "adapter": "canvas",
+  "case": "extension_capture",
+  "extra": {},
+  "inputs": [
+    "canvas/extension_capture.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.captures.parse (source=canvas)",
+  "output": {
+    "courses": [
+      {
+        "code": "CPSC 121",
+        "grade": null,
+        "section": "",
+        "term": "",
+        "title": "Models"
+      }
+    ],
+    "items": [
+      {
+        "category": "deadline",
+        "course": "CPSC 121",
+        "done": true,
+        "due": "2026-09-30T06:59:00+00:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "canvas",
+        "title": "Quiz 2",
+        "url": "https://canvas.ubc.ca/courses/7/quizzes/3"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121",
+        "done": false,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Reading",
+        "url": "https://canvas.ubc.ca/courses/7/assignments/9"
+      }
+    ]
+  }
+}

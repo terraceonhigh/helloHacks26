@@ -1,0 +1,133 @@
+{
+  "extra": {
+    "seed": [
+      "queries seed: Workday course 'CPSC 121', Canvas item under 'CPSC 121 101 2026W1'"
+    ]
+  },
+  "inputs": [],
+  "now": [
+    "2026-09-28T09:00:00-07:00",
+    "2026-11-15T09:00:00-08:00"
+  ],
+  "query": "hub.db.upcoming()/undated()/by_course()/courses()/textbooks()/schedule() + hub.models.status_of()",
+  "result": {
+    "now_a": {
+      "by_course": {
+        "CPSC 121": [
+          [
+            "CPSC 121",
+            "task",
+            "assignment",
+            "PS3",
+            "2026-09-28T00:00:00+00:00",
+            "https://canvas/1",
+            null,
+            "canvas"
+          ]
+        ]
+      },
+      "courses": [
+        [
+          "CPSC 121",
+          "2026W1",
+          "Models of Computation",
+          null
+        ]
+      ],
+      "now": "2026-09-28T09:00:00-07:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "overdue"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "CPSC 121",
+          "task",
+          "assignment",
+          "PS3",
+          "2026-09-28T00:00:00+00:00",
+          "https://canvas/1",
+          null,
+          "canvas"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [],
+        "material": [],
+        "task": [
+          [
+            "CPSC 121",
+            "task",
+            "assignment",
+            "PS3",
+            "2026-09-28T00:00:00+00:00",
+            "https://canvas/1",
+            null,
+            "canvas"
+          ]
+        ]
+      }
+    },
+    "now_b": {
+      "by_course": {
+        "CPSC 121": [
+          [
+            "CPSC 121",
+            "task",
+            "assignment",
+            "PS3",
+            "2026-09-28T00:00:00+00:00",
+            "https://canvas/1",
+            null,
+            "canvas"
+          ]
+        ]
+      },
+      "courses": [
+        [
+          "CPSC 121",
+          "2026W1",
+          "Models of Computation",
+          null
+        ]
+      ],
+      "now": "2026-11-15T09:00:00-08:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "overdue"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "CPSC 121",
+          "task",
+          "assignment",
+          "PS3",
+          "2026-09-28T00:00:00+00:00",
+          "https://canvas/1",
+          null,
+          "canvas"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [],
+        "material": [],
+        "task": [
+          [
+            "CPSC 121",
+            "task",
+            "assignment",
+            "PS3",
+            "2026-09-28T00:00:00+00:00",
+            "https://canvas/1",
+            null,
+            "canvas"
+          ]
+        ]
+      }
+    }
+  }
+}

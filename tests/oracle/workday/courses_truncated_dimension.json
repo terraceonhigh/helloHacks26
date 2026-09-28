@@ -1,0 +1,44 @@
+{
+  "adapter": "workday",
+  "case": "courses_truncated_dimension",
+  "extra": {
+    "note": "regression for e3db118: the file's declared <dimension ref> understates the real range (A1:A1, but 8 rows exist) - read_only openpyxl trusting it silently drops rows"
+  },
+  "inputs": [
+    "workday/truncated_dimension.xlsx"
+  ],
+  "now": null,
+  "oracle_call": "hub.workday.parse_workday_courses(path, term='2026W1')",
+  "output": {
+    "courses": [
+      {
+        "code": "FAKE 101",
+        "grade": null,
+        "section": null,
+        "term": "2026W1",
+        "title": "Truncation Studies I"
+      },
+      {
+        "code": "FAKE 202",
+        "grade": null,
+        "section": null,
+        "term": "2026W1",
+        "title": "Hidden Rows"
+      },
+      {
+        "code": "FAKE 303",
+        "grade": null,
+        "section": null,
+        "term": "2026W1",
+        "title": "Undercounted Ranges"
+      },
+      {
+        "code": "FAKE 404",
+        "grade": null,
+        "section": null,
+        "term": "2026W1",
+        "title": "Last Row Standing"
+      }
+    ]
+  }
+}

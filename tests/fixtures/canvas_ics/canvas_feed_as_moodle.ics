@@ -1,0 +1,32 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+UID:event-assignment-99
+DTSTART:20260930T065900Z
+SUMMARY:Quiz 2 [CPSC 121 101]
+URL:https://canvas.ubc.ca/calendar?include_contexts=course_7
+END:VEVENT
+BEGIN:VEVENT
+UID:event-calendar-event-55
+DTSTART:20261002T170000Z
+SUMMARY:Office hours [CPSC 121 101]
+URL:https://canvas.ubc.ca/calendar?include_contexts=course_7
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-101
+DTSTART;VALUE=DATE:20261005
+SUMMARY:Reading week starts [CPSC 121 101]
+URL:https://canvas.ubc.ca/calendar?include_contexts=course_7
+END:VEVENT
+BEGIN:VEVENT
+UID:3
+DTSTART:20261010T000000Z
+SUMMARY:Untagged item
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-202
+DTSTART:20261012T065900Z
+SUMMARY:Lab [make-up] [CPSC 121 101]
+URL:https://canvas.ubc.ca/calendar?include_contexts=course_7
+END:VEVENT
+END:VCALENDAR

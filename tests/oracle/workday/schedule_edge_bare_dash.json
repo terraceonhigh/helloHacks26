@@ -1,0 +1,15 @@
+{
+  "adapter": "workday",
+  "case": "schedule_edge_bare_dash",
+  "extra": {
+    "note": "must degrade to no Meetings for this line, never guess"
+  },
+  "inputs": [
+    "workday/edge_bare_dash.xlsx"
+  ],
+  "now": null,
+  "oracle_call": "hub.workday.parse_workday_schedule(path, term='2026W1')",
+  "output": {
+    "meetings": []
+  }
+}

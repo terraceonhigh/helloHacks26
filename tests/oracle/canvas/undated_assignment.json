@@ -1,0 +1,25 @@
+{
+  "adapter": "canvas",
+  "case": "undated_assignment",
+  "extra": {},
+  "inputs": [
+    "canvas/undated_assignment.json"
+  ],
+  "now": null,
+  "oracle_call": "hub.canvas.to_undated_item(a, 'CPSC 121')",
+  "output": {
+    "items": [
+      {
+        "category": "task",
+        "course": "CPSC 121",
+        "done": true,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Reading response",
+        "url": "https://canvas.ubc.ca/courses/7/assignments/9"
+      }
+    ]
+  }
+}
