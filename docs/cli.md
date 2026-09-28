@@ -10,6 +10,7 @@ lauds sync [source...] [--timeout SECONDS]
 lauds status [--json]
 lauds today [--json]
 lauds due [--week | --days N] [--course CODE] [--json]
+lauds undated [--course CODE] [--json]
 lauds course <code> [--json]
 lauds show <id> [--json]
 lauds schedule [--date YYYY-MM-DD] [--json]
@@ -56,8 +57,13 @@ lauds config set <key> <value>
 - **`due`** — items due within a window: `--week` (7 days), `--days N`, or
   14 days by default; includes anything already overdue. `--course` filters
   to one course (code is canonicalised, so `cpsc121` matches `CPSC 121`).
-- **`course <code>`** — that course's info, its due items, its textbooks and
-  its recurring meetings.
+- **`undated`** — items with no due date at all (a WeBWorK not-open/past-due
+  set, Canvas's own `to_undated_item`, ...), most recently saved first;
+  never shown by `today`/`due` (both filter on a due date) - BRIEF finding:
+  these used to be reachable only via `show <id>` or `sql`. `--course`
+  filters to one course code.
+- **`course <code>`** — that course's info, its due items *and* its undated
+  ones (see `undated` above), its textbooks and its recurring meetings.
 - **`show <id>`** — one item in full: description, points, files (name,
   kind, a direct download/deep link).
 - **`schedule`** — every recurring class meeting; `--date` narrows to

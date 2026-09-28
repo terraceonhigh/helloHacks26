@@ -1341,6 +1341,25 @@ def harvest_queries():
                         ["queries seed: Q_COURSE, optional_book + Q_BOOK (required orders first)"])
 
     conn = db.connect(":memory:")
+    # BRIEF major finding: two adapters writing the same (source, url) -
+    # e.g. Canvas's API adapter learning done=True for a quiz, then Canvas's
+    # own .ics feed adapter re-saving that same URL with done=None (an .ics
+    # feed carries no completion signal at all) - and main's own upsert
+    # (hub/db.py) unconditionally does `done=excluded.done`, so the second,
+    # less-informed write silently erases the first's real signal. This is
+    # oracle-inherited behaviour (not a lauds bug), captured here so lauds'
+    # own COALESCE fix (never let a None write clear a known done) has a
+    # real golden to diverge from, with evidence.
+    done_then_unknown = Item(course="CPSC 121", category="task", kind="quiz", title="Quiz 2",
+                             due=datetime(2026, 9, 30, 6, 59, tzinfo=timezone.utc),
+                             url="https://x/q/1", source="canvas", done=True)
+    done_then_unknown_reupsert = Item(**{**done_then_unknown.__dict__, "done": None})
+    db.save(conn, [Q_COURSE], [done_then_unknown])
+    db.save(conn, [Q_COURSE], [done_then_unknown_reupsert])
+    _write_query_golden("done_clobbered_by_a_later_unknown_write", conn,
+                        ["queries seed: Quiz 2 saved done=True, then re-saved (same source+url) done=None"])
+
+    conn = db.connect(":memory:")
     workday_course = Course(code="CPSC 121", section="", term="2026W1", title="Models of Computation")
     canvas_item = Item(course="CPSC 121 101 2026W1", category="task", kind="assignment", title="PS3",
                        due=datetime(2026, 9, 28, tzinfo=timezone.utc), url="https://canvas/1", source="canvas")

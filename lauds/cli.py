@@ -222,11 +222,24 @@ def cmd_due(args) -> int:
     return 0
 
 
+def cmd_undated(args) -> int:
+    conn = store.connect()
+    rows = store.undated(conn)
+    if args.course:
+        code = canonical_code(args.course)
+        rows = [r for r in rows if r[0] == code]
+    _emit(args, rows, ITEM_COLUMNS, _item_row_dict)
+    return 0
+
+
 def cmd_course(args) -> int:
     conn = store.connect()
     code = canonical_code(args.code)
     course_row = next((c for c in store.courses(conn) if c[0] == code), None)
-    items = store.by_course(conn).get(code, [])
+    # BRIEF major finding: an undated item (a WeBWorK not-open/past-due set,
+    # Canvas's own to_undated_item, ...) exists precisely so it doesn't "just
+    # vanish" - by_course() alone (upcoming()'s grouping) never carried it.
+    items = store.by_course(conn).get(code, []) + [r for r in store.undated(conn) if r[0] == code]
     textbooks = store.textbooks(conn, code)
     schedule = [s for s in store.schedule(conn) if s[0] == code]
     if args.json:
@@ -417,6 +430,11 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--course", help="filter to one course code")
     sp.add_argument("--json", action="store_true")
     sp.set_defaults(func=cmd_due)
+
+    sp = sub.add_parser("undated", help="items with no due date (never shown by `due`/`today`)")
+    sp.add_argument("--course", help="filter to one course code")
+    sp.add_argument("--json", action="store_true")
+    sp.set_defaults(func=cmd_undated)
 
     sp = sub.add_parser("course", help="one course's items, textbooks and schedule")
     sp.add_argument("code")

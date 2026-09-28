@@ -173,8 +173,9 @@ def save(conn, courses=(), items=(), textbooks=(), meetings=()):
             "course_raw, description, points, files, extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
             "ON CONFLICT(source, url) DO UPDATE SET course_id=COALESCE(excluded.course_id, course_id), "
             "category=excluded.category, kind=excluded.kind, title=excluded.title, due=excluded.due, "
-            "due_utc=excluded.due_utc, done=excluded.done, course_raw=excluded.course_raw, "
-            "description=excluded.description, points=excluded.points, files=excluded.files, extra=excluded.extra",
+            "due_utc=excluded.due_utc, done=COALESCE(excluded.done, done), course_raw=excluded.course_raw, "
+            "description=COALESCE(excluded.description, description), points=COALESCE(excluded.points, points), "
+            "files=CASE WHEN excluded.files = '[]' THEN files ELSE excluded.files END, extra=excluded.extra",
             (ids.get(_canonical_code(i.course)), i.category, i.kind, i.title,
              i.due.isoformat() if i.due else None, _utc(i.due), i.url, i.source,
              None if i.done is None else int(i.done), i.course,
@@ -226,12 +227,19 @@ def upcoming(conn, category=None):
 
 def undated(conn, category=None):
     """Items with no due date, most recently saved first. Same row shape as
-    upcoming(); `due` always NULL. Like main, only items with a course."""
-    # ponytail: main's INNER JOIN kept - an undated item with no course is
-    # hidden here (upcoming() shows its dated siblings). Switch to LEFT JOIN
-    # if that turns out to hide things students need.
-    q = ("SELECT courses.code, " + _ITEM_COLS +
-         " FROM items JOIN courses ON courses.id = items.course_id "
+    upcoming(); `due` always NULL.
+
+    LEFT JOIN, like upcoming() (BRIEF major finding): main's own undated()
+    is an INNER JOIN, and this is still a strict superset of it (every row
+    main's query returns still comes back unchanged, so parity holds - none
+    of the query goldens have a course-less undated row to contradict this)
+    - but an INNER JOIN here hid exactly the rows some adapters exist to
+    surface: WeBWorK's not-open/past-due sets and Canvas's own
+    to_undated_item both come back with due=None and, until now, were only
+    reachable via `lauds show <id>` or `lauds sql`, never `lauds course` or
+    any dedicated command."""
+    q = ("SELECT COALESCE(courses.code, '(unknown course)'), " + _ITEM_COLS +
+         " FROM items LEFT JOIN courses ON courses.id = items.course_id "
          "WHERE items.due IS NULL" + (" AND items.category = ?" if category else "") +
          " ORDER BY items.id DESC")
     return conn.execute(q, (category,) if category else ()).fetchall()

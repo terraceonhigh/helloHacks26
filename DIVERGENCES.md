@@ -34,5 +34,256 @@ Example (not live - shown outside the block):
 ## The list
 
 ```json
-[]
+[
+{
+  "adapter": "queries",
+  "case": "done_clobbered_by_a_later_unknown_write",
+  "key": [
+    "result"
+  ],
+  "field": "*",
+  "oracle": {
+    "now_a": {
+      "by_course": {
+        "CPSC 121": [
+          [
+            "CPSC 121",
+            "task",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            null,
+            "canvas"
+          ]
+        ]
+      },
+      "courses": [
+        [
+          "CPSC 121",
+          "2026W1",
+          "Models of Computation",
+          88.5
+        ]
+      ],
+      "now": "2026-09-28T09:00:00-07:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "soon"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "CPSC 121",
+          "task",
+          "quiz",
+          "Quiz 2",
+          "2026-09-30T06:59:00+00:00",
+          "https://x/q/1",
+          null,
+          "canvas"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [],
+        "material": [],
+        "task": [
+          [
+            "CPSC 121",
+            "task",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            null,
+            "canvas"
+          ]
+        ]
+      }
+    },
+    "now_b": {
+      "by_course": {
+        "CPSC 121": [
+          [
+            "CPSC 121",
+            "task",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            null,
+            "canvas"
+          ]
+        ]
+      },
+      "courses": [
+        [
+          "CPSC 121",
+          "2026W1",
+          "Models of Computation",
+          88.5
+        ]
+      ],
+      "now": "2026-11-15T09:00:00-08:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "overdue"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "CPSC 121",
+          "task",
+          "quiz",
+          "Quiz 2",
+          "2026-09-30T06:59:00+00:00",
+          "https://x/q/1",
+          null,
+          "canvas"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [],
+        "material": [],
+        "task": [
+          [
+            "CPSC 121",
+            "task",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            null,
+            "canvas"
+          ]
+        ]
+      }
+    }
+  },
+  "new": {
+    "now_a": {
+      "by_course": {
+        "CPSC 121": [
+          [
+            "CPSC 121",
+            "task",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            1,
+            "canvas"
+          ]
+        ]
+      },
+      "courses": [
+        [
+          "CPSC 121",
+          "2026W1",
+          "Models of Computation",
+          88.5
+        ]
+      ],
+      "now": "2026-09-28T09:00:00-07:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "done"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "CPSC 121",
+          "task",
+          "quiz",
+          "Quiz 2",
+          "2026-09-30T06:59:00+00:00",
+          "https://x/q/1",
+          1,
+          "canvas"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [],
+        "material": [],
+        "task": [
+          [
+            "CPSC 121",
+            "task",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            1,
+            "canvas"
+          ]
+        ]
+      }
+    },
+    "now_b": {
+      "by_course": {
+        "CPSC 121": [
+          [
+            "CPSC 121",
+            "task",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            1,
+            "canvas"
+          ]
+        ]
+      },
+      "courses": [
+        [
+          "CPSC 121",
+          "2026W1",
+          "Models of Computation",
+          88.5
+        ]
+      ],
+      "now": "2026-11-15T09:00:00-08:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "done"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "CPSC 121",
+          "task",
+          "quiz",
+          "Quiz 2",
+          "2026-09-30T06:59:00+00:00",
+          "https://x/q/1",
+          1,
+          "canvas"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [],
+        "material": [],
+        "task": [
+          [
+            "CPSC 121",
+            "task",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            1,
+            "canvas"
+          ]
+        ]
+      }
+    }
+  },
+  "evidence": "tests/oracle/queries/done_clobbered_by_a_later_unknown_write.json",
+  "reason": "main's own upsert (hub/db.py: \"done=excluded.done\", unconditional) lets a second, less-informed write to the same (source, url) - e.g. Canvas's .ics feed re-saving a quiz with no completion signal at all - silently erase an earlier done=True, live-verified by replaying this exact seed through the oracle's own hub.db.save/upcoming/status_of (the cited golden). lauds' store.py now does done=COALESCE(excluded.done, done): a write that genuinely doesn't know completion (done=None) never clears a previously-known one."
+}
+]
 ```

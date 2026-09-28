@@ -1,0 +1,133 @@
+{
+  "extra": {
+    "seed": [
+      "queries seed: Quiz 2 saved done=True, then re-saved (same source+url) done=None"
+    ]
+  },
+  "inputs": [],
+  "now": [
+    "2026-09-28T09:00:00-07:00",
+    "2026-11-15T09:00:00-08:00"
+  ],
+  "query": "hub.db.upcoming()/undated()/by_course()/courses()/textbooks()/schedule() + hub.models.status_of()",
+  "result": {
+    "now_a": {
+      "by_course": {
+        "CPSC 121": [
+          [
+            "CPSC 121",
+            "task",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            null,
+            "canvas"
+          ]
+        ]
+      },
+      "courses": [
+        [
+          "CPSC 121",
+          "2026W1",
+          "Models of Computation",
+          88.5
+        ]
+      ],
+      "now": "2026-09-28T09:00:00-07:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "soon"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "CPSC 121",
+          "task",
+          "quiz",
+          "Quiz 2",
+          "2026-09-30T06:59:00+00:00",
+          "https://x/q/1",
+          null,
+          "canvas"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [],
+        "material": [],
+        "task": [
+          [
+            "CPSC 121",
+            "task",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            null,
+            "canvas"
+          ]
+        ]
+      }
+    },
+    "now_b": {
+      "by_course": {
+        "CPSC 121": [
+          [
+            "CPSC 121",
+            "task",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            null,
+            "canvas"
+          ]
+        ]
+      },
+      "courses": [
+        [
+          "CPSC 121",
+          "2026W1",
+          "Models of Computation",
+          88.5
+        ]
+      ],
+      "now": "2026-11-15T09:00:00-08:00",
+      "schedule": [],
+      "status_of_upcoming": [
+        "overdue"
+      ],
+      "textbooks": [],
+      "undated": [],
+      "upcoming": [
+        [
+          "CPSC 121",
+          "task",
+          "quiz",
+          "Quiz 2",
+          "2026-09-30T06:59:00+00:00",
+          "https://x/q/1",
+          null,
+          "canvas"
+        ]
+      ],
+      "upcoming_by_category": {
+        "deadline": [],
+        "material": [],
+        "task": [
+          [
+            "CPSC 121",
+            "task",
+            "quiz",
+            "Quiz 2",
+            "2026-09-30T06:59:00+00:00",
+            "https://x/q/1",
+            null,
+            "canvas"
+          ]
+        ]
+      }
+    }
+  }
+}

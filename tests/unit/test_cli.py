@@ -39,6 +39,8 @@ def fetch(**kw):
                  due=datetime_fromiso("{mid}"), url="https://x/a/3", source="canvas"),
             Item(course="CPSC 121", category="task", kind="assignment", title="PS9 (far off)",
                  due=datetime_fromiso("{far}"), url="https://x/a/9", source="canvas"),
+            Item(course="CPSC 121", category="task", kind="assignment", title="Undated reading",
+                 due=None, url="https://x/a/undated", source="canvas"),
         ],
         textbooks=[Textbook(course="CPSC 121", title="Discrete Math", isbn="123",
                              required=True, price=80.0, url="https://x/b/1")],
@@ -209,9 +211,30 @@ def test_course_command(env, capsys):
     code, out, _ = _run(["course", "CPSC 121", "--json"], capsys)
     d = json.loads(out)
     assert d["course"]["code"] == "CPSC 121" and d["course"]["grade"] == 88.5
-    assert len(d["items"]) == 3
+    # BRIEF major finding: `course` used to only ever show by_course()'s
+    # dated items - an undated one (a WeBWorK not-open set, Canvas's own
+    # to_undated_item, ...) must show here too, not just via `show <id>`.
+    assert len(d["items"]) == 4
+    assert "Undated reading" in {i["title"] for i in d["items"]}
     assert len(d["textbooks"]) == 1 and d["textbooks"][0]["isbn"] == "123"
     assert len(d["schedule"]) == 1 and d["schedule"][0]["days"] == ["MO", "WE", "FR"]
+
+
+def test_undated_command(env, capsys):
+    _run(["sync"], capsys)
+    code, out, _ = _run(["undated", "--json"], capsys)
+    assert code == 0
+    titles = {r["title"] for r in json.loads(out)}
+    assert titles == {"Undated reading"}
+    assert all(r["due"] is None for r in json.loads(out))
+
+
+def test_undated_filters_by_course(env, capsys):
+    _run(["sync"], capsys)
+    code, out, _ = _run(["undated", "--course", "cpsc121", "--json"], capsys)  # canonicalises
+    assert {r["title"] for r in json.loads(out)} == {"Undated reading"}
+    code, out, _ = _run(["undated", "--course", "math100", "--json"], capsys)
+    assert json.loads(out) == []
 
 
 def test_show_full_item_and_unknown_id(env, capsys):
@@ -246,7 +269,7 @@ def test_textbooks_command(env, capsys):
 def test_sql_select_ok(env, capsys):
     _run(["sync"], capsys)
     code, out, _ = _run(["sql", "SELECT count(*) AS n FROM items", "--json"], capsys)
-    assert code == 0 and json.loads(out) == [{"n": 3}]
+    assert code == 0 and json.loads(out) == [{"n": 4}]
 
 
 def test_sql_rejects_writes(env, capsys):

@@ -70,6 +70,20 @@ def test_undated_separate_and_newest_first(conn):
     assert [r[3] for r in store.undated(conn)] == ["Second", "First"]
 
 
+def test_undated_shows_a_course_less_item_too(conn):
+    # BRIEF major finding: an undated item with no resolvable course (e.g.
+    # a WeBWorK not-open set, or an adapter's own course string that didn't
+    # match anything saved this run) used to be hidden entirely by
+    # undated()'s INNER JOIN - upcoming() already shows its dated siblings
+    # as "(unknown course)" via LEFT JOIN, so undated() now matches.
+    orphan = mk(course="NOSUCHCOURSE 999", kind="assignment", category="task",
+                title="Orphan", due=None, url="https://x/orphan/1")
+    store.save(conn, [], [orphan])  # no matching course this call
+    rows = store.undated(conn)
+    assert [r[3] for r in rows] == ["Orphan"]
+    assert rows[0][0] == "(unknown course)"
+
+
 def test_courses_and_by_course(conn):
     essay = mk(course="ENGL 112", kind="assignment", category="task", title="Essay 1", url="https://x/e/1",
                due=datetime(2026, 10, 1, tzinfo=UTC))

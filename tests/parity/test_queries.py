@@ -59,6 +59,21 @@ def _seed_undated_most_recent_first(conn):
     store.save(conn, [COURSE], [second])
 
 
+def _seed_done_clobbered_by_a_later_unknown_write(conn):
+    # BRIEF major finding + DIVERGENCES.md: main's own upsert (hub/db.py)
+    # unconditionally does `done=excluded.done`, so a second, less-informed
+    # write (e.g. Canvas's .ics feed re-saving the same (source, url) with
+    # no completion signal at all) erases a real done=True. lauds' store
+    # now uses COALESCE(excluded.done, done) instead - a documented,
+    # evidenced divergence from this exact golden's "done" field.
+    done_then_unknown = Item(course="CPSC 121", category="task", kind="quiz", title="Quiz 2",
+                              due=datetime(2026, 9, 30, 6, 59, tzinfo=UTC), url="https://x/q/1",
+                              source="canvas", done=True)
+    done_then_unknown_reupsert = Item(**{**done_then_unknown.__dict__, "done": None})
+    store.save(conn, [COURSE], [done_then_unknown])
+    store.save(conn, [COURSE], [done_then_unknown_reupsert])
+
+
 def _seed_courses_and_by_course_grouping(conn):
     essay = Item(course="ENGL 112", category="task", kind="assignment", title="Essay 1",
                  due=datetime(2026, 10, 1, tzinfo=UTC), url="https://x/e/1", source="canvas")
