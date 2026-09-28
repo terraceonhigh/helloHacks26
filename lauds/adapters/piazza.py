@@ -245,13 +245,18 @@ def _run(req, limit):
 
 def fetch(limit=DEFAULT_POST_LIMIT, **opts) -> Bundle:
     """Return a Bundle for the student's own Piazza classes. Logs in (opens
-    a browser window) if there's no saved session. Never raises: any
-    login/parse/network failure returns an empty Bundle, same as every
-    other adapter here."""
-    try:
-        return session.fetch_with_session(NAME, BASE, lambda req: _run(req, limit))
-    except Exception:
-        return Bundle()
+    a browser window) if there's no saved session.
+
+    Does NOT swallow every failure into an empty Bundle any more (BRIEF
+    major finding): that blanket `except Exception` hid a genuine
+    `NotLoggedIn` (an expired/no session) as a silent, successful, empty
+    sync - `lauds status` would say "ok" with 0 items instead of "stale,
+    re-login needed", exactly the failure mode BRIEF's "never silently
+    partial" rule is about. `_run`'s own per-network try/except already
+    isolates one broken class's feed from the rest (see above); `sync_one`
+    isolates one broken adapter from the rest of `sync` - piazza needs no
+    extra safety net on top of either."""
+    return session.fetch_with_session(NAME, BASE, lambda req: _run(req, limit))
 
 
 if __name__ == "__main__":

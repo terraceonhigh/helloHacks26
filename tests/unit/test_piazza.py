@@ -97,12 +97,27 @@ def test_login_delegates_to_shared_session_login(monkeypatch):
     assert calls == [("piazza", "https://piazza.com", {"headless": True})]
 
 
-def test_fetch_never_raises_on_failure(monkeypatch):
+def test_fetch_lets_not_logged_in_propagate(monkeypatch):
+    # BRIEF major finding: fetch() used to swallow every failure - including
+    # a genuine NotLoggedIn - into an empty, successful-looking Bundle;
+    # sync_one's own except NotLoggedIn (lauds/sync.py) is what should turn
+    # this into "stale, re-login needed", and it can only do that if this
+    # doesn't eat the exception first.
     def boom(site, base, run):
-        raise RuntimeError("no session / network down / whatever")
+        raise session.NotLoggedIn("piazza")
 
     monkeypatch.setattr(session, "fetch_with_session", boom)
-    assert piazza.fetch() == Bundle()
+    with pytest.raises(session.NotLoggedIn):
+        piazza.fetch()
+
+
+def test_fetch_lets_an_unrelated_failure_propagate_too(monkeypatch):
+    def boom(site, base, run):
+        raise RuntimeError("network down / whatever")
+
+    monkeypatch.setattr(session, "fetch_with_session", boom)
+    with pytest.raises(RuntimeError):
+        piazza.fetch()
 
 
 def test_fetch_returns_what_run_produces(monkeypatch):

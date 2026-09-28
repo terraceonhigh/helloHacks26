@@ -1,0 +1,211 @@
+
+    <!doctype html>
+    <html lang="en">
+      <head>
+        
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <title>[DEV]  PrairieLearn</title>
+    <link href="/assets/node_modules/f5a36452276fee8a/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link
+      href="/assets/node_modules/a38a1050d45a66fa/bootstrap-icons/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link href="/assets/public/6c2a4b5ed3ce70bc/stylesheets/colors.css" rel="stylesheet" />
+    <link href="/assets/public/a5a370bb2af3150f/stylesheets/local.css" rel="stylesheet" />
+    <script src="/assets/node_modules/332b5ada10be1415/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/node_modules/f5a36452276fee8a/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <link
+      href="/assets/node_modules/78be53807783b6e1/@fortawesome/fontawesome-free/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/assets/build/stylesheets/prairielearn-ui.css" /> <script src="/assets/build/scripts/application.js"></script>
+    <script src="/assets/build/scripts/navbarClient.js"></script>
+  
+        <style>
+          html,
+          body {
+            min-height: 100vh;
+          }
+
+          .login-container-wrapper {
+            width: 100%;
+            height: 100%;
+          }
+
+          .login-container {
+            background-color: white;
+            padding: 20px;
+            height: 100%;
+          }
+
+          @media (min-width: 576px) {
+            html,
+            body {
+              background-color: var(--bs-dark);
+            }
+
+            .login-container-wrapper {
+              max-width: 500px;
+              margin: auto;
+              height: auto;
+            }
+
+            .login-container {
+              border-radius: 5px;
+              box-shadow:
+                0 19px 38px rgba(0, 0, 0, 0.3),
+                0 15px 12px rgba(0, 0, 0, 0.22);
+              height: auto;
+              margin: 20px;
+            }
+          }
+
+          .subheader {
+            font-weight: 300;
+            font-size: 1.2rem;
+          }
+
+          .btn .social-icon {
+            position: absolute;
+            left: 7px;
+            height: 24px;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+          }
+
+          .btn-shib {
+            background-color: #E84A27;
+            border-color: #E84A27;
+            color: white;
+          }
+
+          .btn-shib:hover {
+            background-color: #D04223;
+            border-color: #D04223;
+            color: white;
+          }
+
+          .btn-shib:focus {
+            box-shadow: 0 0 0 0.2rem rgba(255, 83, 0, 0.35);
+          }
+
+          .btn-shib:active {
+            background-color: #B93B1F;
+            border-color: #B93B1F;
+            color: white;
+          }
+
+          .institution-header {
+            overflow: hidden;
+            text-align: center;
+          }
+
+          .institution-header:before,
+          .institution-header:after {
+            background-color: #000;
+            content: '';
+            display: inline-block;
+            height: 1px;
+            position: relative;
+            vertical-align: middle;
+            width: 50%;
+          }
+
+          .institution-header:before {
+            right: 0.5em;
+            margin-left: -50%;
+          }
+
+          .institution-header:after {
+            left: 0.5em;
+            margin-right: -50%;
+          }
+        </style>
+      </head>
+      <body class="d-flex flex-column">
+        <main class="login-container-wrapper">
+          <div class="login-container">
+            <div>
+              <h1 class="text-center">
+                <a
+                  href="https://www.prairielearn.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                  class="text-body"
+                >
+                  PrairieLearn
+                </a>
+              </h1>
+              <h2 class="text-center subheader mb-5">
+                Sign in 
+              </h2>
+              
+      
+              
+    <a class="btn btn-success w-100" href="/pl/dev_login">
+      <span class="fw-bold">Dev Mode Bypass</span>
+    </a>
+    <small class="text-muted">You will be authenticated as <code>dev@example.com</code>.</small>
+  
+              <hr />
+              
+    <form method="POST">
+      <div class="mb-3">
+        <label class="form-label" for="dev_uid">UID</label>
+        <input type="email" class="form-control" id="dev_uid" name="uid" required />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="dev_name">Name</label>
+        <input type="text" class="form-control" id="dev_name" name="name" required />
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="dev_uin">UIN</label>
+        <input
+          type="text"
+          class="form-control"
+          id="dev_uin"
+          name="uin"
+          aria-describedby="dev_uin_help"
+        />
+        <small id="dev_uin_help" class="form-text text-muted">
+          Optional; will be set to <code>null</code> if not specified.
+        </small>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="dev_email">Email</label>
+        <input
+          type="email"
+          class="form-control"
+          id="dev_email"
+          name="email"
+          aria-describedby="dev_email_help"
+        />
+        <small id="dev_email_help" class="form-text text-muted">
+          Optional; will be set to <code>null</code> if not specified.
+        </small>
+      </div>
+      <input type="hidden" name="__csrf_token" value="" />
+      <button type="submit" class="btn btn-primary d-block w-100" name="__action" value="dev_login">
+        <span class="fw-bold">Dev Mode Login</span>
+      </button>
+    </form>
+  
+              <hr />
+            
+      <div class="d-flex flex-column gap-2 mt-4">
+        
+        
+        
+      </div>
+      
+    
+            </div>
+          </div>
+        </main>
+      </body>
+    </html>
+  

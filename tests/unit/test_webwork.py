@@ -2,8 +2,14 @@
 Same fixtures (structurally identical to a real UBC course's WeBWorK page,
 webwork.elearning.ubc.ca, checked live 2026-09-26), same assertions -- via
 `parse_row`/`to_item` instead of a fetched-and-souped `<li>`."""
-from lauds.adapters.webwork import due_from_text, parse_row, to_item
+from pathlib import Path
+
+import pytest
+
+from lauds.adapters.webwork import due_from_text, looks_logged_out, parse_row, to_item
 from lauds.models import Item, ItemFile
+
+FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "webwork"
 
 OPEN_ROW = """
 <li class="list-group-item d-flex align-items-center justify-content-between" data-set-status="open"
@@ -153,6 +159,46 @@ def test_due_from_text_none_for_blank_or_no_date():
     assert due_from_text("") is None
     assert due_from_text("Answers available for review.") is None
     assert due_from_text(None) is None
+
+
+def test_due_from_text_rejects_an_unrecognized_timezone_abbreviation_instead_of_silently_using_utc():
+    # BRIEF finding: silently treating e.g. AST/NST/AKST/HST as +00:00 is
+    # hours off with no error - matches prairielearn.due_from_end_text's
+    # rule (raise, don't guess).
+    with pytest.raises(ValueError, match="AST"):
+        due_from_text("Open. Due October 1, 2026, 11:59:00 PM AST.")
+
+
+# --- logged-out detection (BRIEF major finding) ------------------------------
+
+def test_looks_logged_out_true_on_the_real_captured_login_page():
+    html = (FIXTURES / "live_loggedout.html").read_text()
+    assert looks_logged_out(html)
+
+
+def test_looks_logged_out_false_on_a_real_set_list_page():
+    assert not looks_logged_out(f'<div id="set-list-container">{OPEN_ROW}</div>')
+
+
+def test_fetch_raises_not_logged_in_on_a_logged_out_page(monkeypatch):
+    from lauds.adapters import webwork
+    from lauds import session as session_mod
+
+    class FakeResp:
+        status = 200
+        ok = True
+
+        def text(self):
+            return (FIXTURES / "live_loggedout.html").read_text()
+
+    class FakeReq:
+        def get(self, url):
+            return FakeResp()
+
+    monkeypatch.setattr(session_mod, "fetch_with_session",
+                         lambda site, base, run, **kw: run(FakeReq()))
+    with pytest.raises(session_mod.NotLoggedIn):
+        webwork.fetch("https://ww.example.edu/webwork2/fake101", "MATH 101")
 
 
 def test_to_item_and_parse_row_agree():

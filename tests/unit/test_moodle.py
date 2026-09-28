@@ -45,6 +45,16 @@ def test_to_item_due_is_never_naive():
     assert moodle.to_item(CPSC101_EVENT).due.tzinfo is not None
 
 
+def test_to_item_fallback_url_is_absolute_against_base_when_given():
+    i = moodle.to_item(CPSC101_EVENT, base="https://moodle.example.edu")
+    assert i.url == "https://moodle.example.edu/calendar/event.php?id=9"
+
+
+def test_to_item_fallback_url_never_synthesizes_a_ambiguous_id_none():
+    i = moodle.to_item({**CPSC101_EVENT, "id": None}, base="https://moodle.example.edu")
+    assert "id=None" not in i.url
+
+
 def test_extract_sesskey_finds_the_mcfg_value():
     page = '<script>M.cfg = {"wwwroot":"https:\\/\\/x","sesskey":"AbCd1234"};</script>'
     assert moodle.extract_sesskey(page) == "AbCd1234"
@@ -159,6 +169,27 @@ def test_sesskey_raises_not_logged_in_when_page_has_no_sesskey():
         moodle._sesskey(_NoSessReq(), "https://moodle.example.edu")
 
 
+def test_sesskey_raises_not_logged_in_on_the_real_captured_login_redirect_page():
+    # BRIEF finding, live-verified against a real self-hosted Moodle 4.5:
+    # a logged-out /my/ 302s to /login/index.php, and that page STILL
+    # renders a usable M.cfg.sesskey (its own CSRF token) - the old code
+    # read that as "logged in" because extract_sesskey succeeded.
+    import pathlib
+    html = (pathlib.Path(__file__).resolve().parents[1] / "fixtures" / "moodle"
+            / "live_loggedout_login_page.html").read_text()
+    assert moodle.extract_sesskey(html) is not None  # the trap: a sesskey really is present
+
+    class _RespWithUrl(_Resp):
+        url = "https://moodle.example.edu/login/index.php"
+
+    class _LoginRedirectReq:
+        def get(self, url):
+            return _RespWithUrl(html)
+
+    with pytest.raises(moodle.session.NotLoggedIn):
+        moodle._sesskey(_LoginRedirectReq(), "https://moodle.example.edu")
+
+
 def test_ajax_call_raises_runtime_error_on_a_moodle_reported_error():
     class _ErrReq:
         def post(self, url, data=None, headers=None):
@@ -166,6 +197,53 @@ def test_ajax_call_raises_runtime_error_on_a_moodle_reported_error():
 
     with pytest.raises(RuntimeError, match="boom"):
         moodle._ajax_call(_ErrReq(), "https://x", "sk", "some_function", {})
+
+
+def test_ajax_call_raises_not_logged_in_on_servicerequireslogin():
+    # BRIEF finding, live-verified: an expired session's AJAX call reports
+    # error {"errorcode": "servicerequireslogin", ...}, which the old code
+    # turned into a generic RuntimeError (sync recorded a stale session as
+    # a bare failure, never as "re-login needed").
+    class _ExpiredReq:
+        def post(self, url, data=None, headers=None):
+            return _Resp(json.dumps([{"error": True, "exception": {
+                "message": "Web service is not available. (The session has been logged out or has expired.)",
+                "errorcode": "servicerequireslogin"}}]))
+
+    with pytest.raises(moodle.session.NotLoggedIn):
+        moodle._ajax_call(_ExpiredReq(), "https://x", "sk", "core_calendar_get_action_events_by_timesort", {})
+
+
+def test_calendar_events_pages_past_the_servers_limitnum_cap():
+    # Unit test with two fake pages (BRIEF finding's own suggested fix).
+    page_1 = [{"id": i, "name": f"e{i}", "modulename": "quiz", "timesort": 1798000000 + i,
+               "url": "", "course": {"shortname": "CPSC101"}} for i in range(moodle.MAX_LIMITNUM)]
+    page_2 = [{"id": 999, "name": "last", "modulename": "quiz", "timesort": 1798100000,
+               "url": "", "course": {"shortname": "CPSC101"}}]
+    calls = []
+
+    class _PagedReq:
+        def post(self, url, data=None, headers=None):
+            args = json.loads(data)[0]["args"]
+            calls.append(args.get("aftereventid"))
+            page = page_1 if args.get("aftereventid") is None else page_2
+            return _Resp(json.dumps([{"error": False, "data": {"events": page}}]))
+
+    events = moodle._calendar_events(_PagedReq(), "https://moodle.example.edu", "sk", 0, 1)
+    assert len(events) == moodle.MAX_LIMITNUM + 1
+    assert calls == [None, moodle.MAX_LIMITNUM - 1]  # second page asked after the first page's last id
+
+
+def test_calendar_events_raises_if_pagination_never_ends():
+    full_page = [{"id": i, "name": "e", "modulename": "quiz", "timesort": 1798000000,
+                  "url": "", "course": {}} for i in range(moodle.MAX_LIMITNUM)]
+
+    class _NeverEndingReq:
+        def post(self, url, data=None, headers=None):
+            return _Resp(json.dumps([{"error": False, "data": {"events": full_page}}]))
+
+    with pytest.raises(RuntimeError, match="pagination"):
+        moodle._calendar_events(_NeverEndingReq(), "https://moodle.example.edu", "sk", 0, 1)
 
 
 def test_parse_capture_rejects_wrong_source():

@@ -86,24 +86,37 @@ def to_course(c: dict) -> Course:
     )
 
 
-def to_item(e: dict) -> Item:
+def to_item(e: dict, base: str = "") -> Item:
     """core_calendar_get_action_events_by_timesort event dict -> Item. Each
     event embeds its own course sub-object, so no separate course_id -> code
     lookup is needed. `url` is Moodle's own per-event link; when missing, we
     fall back to Moodle's real `calendar/event.php?id=<event id>` route keyed
     on the event's own id, never an empty url twice over (lauds' store
-    upserts on `(source, url)`)."""
+    upserts on `(source, url)`).
+
+    The fallback is built against `base` (BRIEF minor finding: a bare
+    relative path collides across sites the moment two Moodle adapters are
+    ever synced together, since lauds' upsert key is `(source, url)`, not
+    `(source, base, url)`) and only for a real numeric id - a synthesized
+    `?id=None` would otherwise collide every id-less event with every
+    other one, which is worse than the relative path it replaces."""
     course = e.get("course") or {}
     kind = KINDS.get(e.get("modulename", ""), "assignment")
     timesort = e.get("timesort")
     event_id = e.get("id")
+    url = e.get("url")
+    if not url:
+        numeric_id = event_id if isinstance(event_id, int) else (
+            int(event_id) if isinstance(event_id, str) and event_id.isdigit() else None)
+        path = f"calendar/event.php?id={numeric_id}" if numeric_id is not None else "calendar/event.php"
+        url = urljoin(base, path) if base else path
     return Item(
         course=course.get("shortname", ""),
         category=category_for(kind),
         kind=kind,
         title=e.get("name", ""),
         due=datetime.fromtimestamp(timesort, tz=timezone.utc) if timesort else None,
-        url=e.get("url") or f"calendar/event.php?id={event_id}",
+        url=url,
         source=NAME,
         description=e.get("description") or None,
     )
@@ -116,12 +129,26 @@ def extract_sesskey(page_text: str) -> str | None:
     return m.group(1) if m else None
 
 
+# Moodle errorcodes an AJAX call reports when the session has expired/logged
+# out (live-verified against a real self-hosted Moodle 4.5, BRIEF finding):
+# an anonymous session still gets its own M.cfg.sesskey (extract_sesskey's
+# "no sesskey" check never fires for it), so the *call* is what has to say
+# "not logged in", not the dashboard page.
+LOGGED_OUT_ERRORCODES = {"servicerequireslogin", "requireloginerror", "invalidsesskey"}
+
+
 def _sesskey(req, base: str) -> str:
     r = req.get(f"{base}/my/")  # dashboard: always rendered for a logged-in user
     if r.status == 401:
         raise session.NotLoggedIn(base)
     if not r.ok:
         raise RuntimeError(f"{base}/my/ -> {r.status}")
+    # A logged-out /my/ 302s to /login/index.php (live-verified) - that page
+    # still renders a usable M.cfg.sesskey (Moodle's own login-form CSRF
+    # token), so it must be caught here, before extract_sesskey's own
+    # "missing sesskey" check ever gets a chance not to fire.
+    if "/login/" in (getattr(r, "url", None) or ""):
+        raise session.NotLoggedIn(base)
     key = extract_sesskey(r.text())
     if key is None:
         raise session.NotLoggedIn(base)  # no sesskey on the page => not actually logged in
@@ -144,7 +171,13 @@ def _ajax_call(req, base: str, sesskey: str, methodname: str, args: dict):
         raise RuntimeError(f"lib/ajax/service.php ({methodname}) -> {r.status}")
     (result,) = json.loads(r.text())
     if result.get("error"):
-        message = (result.get("exception") or {}).get("message", "moodle ajax error")
+        exc = result.get("exception") or {}
+        if exc.get("errorcode") in LOGGED_OUT_ERRORCODES:
+            # Live-verified: a logged-out session's sesskey still parses
+            # (see _sesskey), so this call - not the dashboard page - is
+            # where a stale session actually surfaces (BRIEF major finding).
+            raise session.NotLoggedIn(base)
+        message = exc.get("message", "moodle ajax error")
         raise RuntimeError(f"{methodname}: {message}")
     return result.get("data")
 
@@ -166,12 +199,40 @@ def _courses_from_events(events: list[dict]) -> list[Course]:
     return courses
 
 
+# A page cap for the calendar loop below - not a real ceiling on how many
+# events a student can have, just a "a self-linking/misbehaving server must
+# not hang us" guard, same idea as lauds.session.get_all's max_pages.
+MAX_CALENDAR_PAGES = 40
+
+
+def _calendar_events(req, base: str, sesskey: str, start: int, end: int) -> list[dict]:
+    """Every calendar event in [start, end), paging past the server's own
+    `limitnum` cap (BRIEF finding: a single call silently truncates at 50 -
+    live-verified, 51+ is rejected outright - and main's own 100 fares no
+    better). Moodle's own `aftereventid` cursor: page again starting after
+    the last event's id whenever a page comes back full; a page with fewer
+    than MAX_LIMITNUM events is the last one."""
+    events: list[dict] = []
+    after: int | None = None
+    for _ in range(MAX_CALENDAR_PAGES):
+        args = {"timesortfrom": start, "timesortto": end, "limitnum": MAX_LIMITNUM}
+        if after is not None:
+            args["aftereventid"] = after
+        calendar = _ajax_call(req, base, sesskey, "core_calendar_get_action_events_by_timesort", args)
+        page = (calendar or {}).get("events", [])
+        events += page
+        if len(page) < MAX_LIMITNUM:
+            return events
+        after = page[-1].get("id")
+        if after is None:
+            return events
+    raise RuntimeError(f"moodle calendar pagination did not end after {MAX_CALENDAR_PAGES} pages")
+
+
 def _run(req, base: str, start: int, end: int) -> tuple[list[Course], list[Item]]:
     sesskey = _sesskey(req, base)
-    calendar = _ajax_call(req, base, sesskey, "core_calendar_get_action_events_by_timesort",
-                           {"timesortfrom": start, "timesortto": end, "limitnum": MAX_LIMITNUM})
-    events = (calendar or {}).get("events", [])
-    items = [to_item(e) for e in events]
+    events = _calendar_events(req, base, sesskey, start, end)
+    items = [to_item(e, base) for e in events]
     try:
         raw_courses = _ajax_call(req, base, sesskey, "core_enrol_get_users_courses", {"userid": 0})
         courses = [to_course(c) for c in raw_courses or []]

@@ -347,12 +347,29 @@ def parse_capture(capture: dict) -> tuple[list[Course], list[Item]]:
     return courses, items
 
 
+def looks_logged_out(url: str | None) -> bool:
+    """True if the response's final URL is PrairieLearn's own login page,
+    not the page that was actually requested. Live-verified (BRIEF
+    finding): a logged-out request 302s to `/pl/login`, and Playwright's
+    request context follows that redirect itself, so the response still
+    comes back 200/ok - `_get` used to happily hand the login page's HTML
+    to `_course_instances`, which then silently found zero
+    `/pl/course_instance/` links and reported success with no courses at
+    all, instead of a stale session. `url` is the response's own final URL
+    (Playwright's `APIResponse.url`, after any redirect) - a request object
+    that doesn't expose one (e.g. a minimal test double) is simply never
+    flagged this way, same as before this fix."""
+    return "/pl/login" in (url or "")
+
+
 def _get(req, path: str, base: str):
     r = req.get(f"{base}{path}")
     if r.status == 401:
         raise session.NotLoggedIn
     if not r.ok:
         raise RuntimeError(f"{path} -> {r.status}")
+    if looks_logged_out(getattr(r, "url", None)):
+        raise session.NotLoggedIn(base)
     return r.text()
 
 

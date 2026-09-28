@@ -1,14 +1,18 @@
 """Unit tests ported (behaviourally, not literally) from the oracle's
 tests/test_prairielearn.py."""
+from pathlib import Path
+
 import pytest
 from bs4 import BeautifulSoup
 
+from lauds import session as session_mod
 from lauds.adapters.prairielearn import (
-    done_from_credit, done_from_score, due_from_popover, parse_row,
-    resolve_campus, to_course, _course_instances, _run,
+    done_from_credit, done_from_score, due_from_popover, looks_logged_out, parse_row,
+    resolve_campus, to_course, _course_instances, _get, _run,
 )
 
 BASE = "https://us.prairielearn.com"
+FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "prairielearn"
 
 # Real markup captured from a live UBC PrairieLearn course (CPSC 317, 2026W1).
 OPEN_ROW = """
@@ -288,3 +292,40 @@ def test_run_skips_a_course_instance_whose_title_is_not_a_recognisable_course_co
     }
     courses, items = _run(_FakeMultiPageReq(pages), "prairielearn", BASE)
     assert [c.code for c in courses] == ["CPSC 317"]
+
+
+# --- logged-out detection (BRIEF major finding) ------------------------------
+
+def test_looks_logged_out_true_when_the_final_url_is_the_login_page():
+    assert looks_logged_out("https://us.prairielearn.com/pl/login")
+
+
+def test_looks_logged_out_false_for_a_real_page_url():
+    assert not looks_logged_out("https://us.prairielearn.com/pl/course_instance/1/assessments")
+    assert not looks_logged_out(None)  # a request object with no .url: never flagged this way
+
+
+class _RedirectedToLoginReq:
+    """A request whose response reports the final (post-redirect) URL, like
+    Playwright's real APIResponse.url - live-verified: a logged-out GET /
+    lands here after following PrairieLearn's own 302."""
+
+    def __init__(self, html):
+        self.html = html
+
+    def get(self, url):
+        class R:
+            status = 200
+            ok = True
+            url = "https://us.prairielearn.com/pl/login"
+
+            def text(self_):
+                return self.html
+
+        return R()
+
+
+def test_get_raises_not_logged_in_on_the_real_captured_login_redirect_page():
+    html = (FIXTURES / "live_loggedout_login_page.html").read_text()
+    with pytest.raises(session_mod.NotLoggedIn):
+        _get(_RedirectedToLoginReq(html), "/", BASE)

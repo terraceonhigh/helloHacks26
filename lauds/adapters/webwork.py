@@ -68,6 +68,7 @@ TZ_OFFSET = {
     "MST": -7, "MDT": -6,
     "CST": -6, "CDT": -5,
     "EST": -5, "EDT": -4,
+    "UTC": 0, "GMT": 0,
 }
 
 # The verified format: "October 1, 2026, 11:59:00 PM PDT." (full month name,
@@ -98,7 +99,13 @@ def due_from_text(text: str | None) -> datetime | None:
     if m.group("ampm").upper() == "PM":
         hour += 12
     dt = datetime(int(m.group("year")), month, int(m.group("day")), hour, int(m.group("minute")), int(m.group("second")))
-    return dt.replace(tzinfo=timezone(timedelta(hours=TZ_OFFSET.get(m.group("tz").upper(), 0))))
+    tz = m.group("tz").upper()
+    if tz not in TZ_OFFSET:
+        # Matches prairielearn.due_from_end_text's rule (BRIEF finding): an
+        # unknown abbreviation silently mapping to UTC (AST/NST/AKST/HST, ...)
+        # would be hours off with no error at all - better to fail loudly.
+        raise ValueError(f"unrecognized WeBWorK timezone abbreviation: {tz!r}")
+    return dt.replace(tzinfo=timezone(timedelta(hours=TZ_OFFSET[tz])))
 
 
 def _synthetic_url(base: str, title: str) -> str:
@@ -176,6 +183,17 @@ def login(base, **opts):
     session.login(NAME, base, **opts)
 
 
+def looks_logged_out(html: str) -> bool:
+    """True if `html` is WeBWorK's own login page, not the Assignments list.
+
+    Live-verified (BRIEF finding): a logged-out `GET <course-url>/` still
+    answers 200, not 401 - it silently serves `<form id="login_form">`
+    instead of `#set-list-container`, which `parse_problem_sets` then reads
+    as "zero sets" rather than a stale session (tests/fixtures/webwork/
+    live_loggedout.html, captured against the self-hosted fake101 course)."""
+    return 'id="login_form"' in html and "set-list-container" not in html
+
+
 def fetch(base: str, course_code: str) -> Bundle:
     """Items for the WeBWorK course at `base` (e.g.
     "https://webwork.example.edu/webwork2/math101"). `course_code` is
@@ -190,7 +208,10 @@ def fetch(base: str, course_code: str) -> Bundle:
             raise session.NotLoggedIn(base)
         if not r.ok:
             raise RuntimeError(f"{base} -> {r.status}")
-        return Bundle(items=parse_problem_sets(r.text(), course_code, base))
+        text = r.text()
+        if looks_logged_out(text):
+            raise session.NotLoggedIn(base)
+        return Bundle(items=parse_problem_sets(text, course_code, base))
 
     return session.fetch_with_session(NAME, base, _run)
 
