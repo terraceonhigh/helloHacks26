@@ -105,6 +105,32 @@ def test_get_json_raises_not_logged_in_on_401(monkeypatch):
         blackboard._get_json(req, "https://bb.example.edu", "/x")
 
 
+def test_get_json_refuses_an_absolute_nextpage_off_the_course_origin():
+    # BRIEF minor finding: a misbehaving tenant handing back an absolute
+    # nextPage must never be followed to a different host.
+    req = _FakeRequest({})
+    with pytest.raises(RuntimeError, match="own origin"):
+        blackboard._get_json(req, "https://bb.example.edu", "https://evil.example/steal")
+    assert req.calls == []  # refused before ever making the request
+
+
+def test_get_json_allows_an_absolute_nextpage_on_the_same_origin():
+    req = _FakeRequest({"https://bb.example.edu/learn/api/public/v1/x": _Resp({"results": []})})
+    blackboard._get_json(req, "https://bb.example.edu", "https://bb.example.edu/learn/api/public/v1/x")
+    assert req.calls == ["https://bb.example.edu/learn/api/public/v1/x"]
+
+
+def test_get_all_raises_if_pagination_never_ends():
+    # Unit test with a self-linking page (BRIEF minor finding's own
+    # suggested fix - same idea as lauds.session's self-linking test).
+    class _LoopingRequest:
+        def get(self, u):
+            return _Resp({"results": [], "paging": {"nextPage": "/learn/api/public/v1/x"}})
+
+    with pytest.raises(RuntimeError, match="pagination"):
+        blackboard._get_all(_LoopingRequest(), "https://bb.example.edu", "/learn/api/public/v1/x")
+
+
 def test_parse_capture_maps_courses_and_never_invents_items():
     capture = {"source": "blackboard", "courses": [COURSE]}
     courses, items = blackboard.parse_capture(capture)

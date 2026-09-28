@@ -54,7 +54,16 @@ def _get_json(req, base: str, path: str):
     # forwards whatever a tenant's own `paging.nextPage` field contains - if
     # some tenant version ever hands back a full absolute URL there instead,
     # don't silently glue it onto `base` and build a broken, doubled-up URL.
-    url = path if path.startswith(("http://", "https://")) else f"{base}{path}"
+    if path.startswith(("http://", "https://")):
+        # BRIEF minor finding: an absolute nextPage must still be refused
+        # off `base`'s own origin - a misbehaving (or compromised) tenant
+        # response must never redirect the saved session's requests to an
+        # attacker-controlled host.
+        if not path.startswith(base.rstrip("/") + "/") and path.rstrip("/") != base.rstrip("/"):
+            raise RuntimeError(f"Blackboard nextPage left the course's own origin: {path!r}")
+        url = path
+    else:
+        url = f"{base}{path}"
     r = req.get(url)
     if r.status == 401:
         raise session.NotLoggedIn(path)
@@ -73,13 +82,21 @@ def next_page(page: dict) -> str | None:
     return (page.get("paging") or {}).get("nextPage")
 
 
+# A page cap, not a real ceiling on how many courses a student can have -
+# "a server that repeats a Bookmark/nextPage must not hang us" (BRIEF minor
+# finding), same idea as lauds.session.get_all's own max_pages.
+MAX_PAGES = 1000
+
+
 def _get_all(req, base: str, path: str) -> list[dict]:
     out: list[dict] = []
-    while path:
+    for _ in range(MAX_PAGES):
         page = _get_json(req, base, path)
         out += page.get("results", [])
         path = next_page(page)
-    return out
+        if not path:
+            return out
+    raise RuntimeError(f"Blackboard pagination did not end after {MAX_PAGES} pages")
 
 
 def to_course(course: dict) -> Course:

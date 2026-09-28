@@ -83,20 +83,26 @@ def _get_json(req, base: str, path: str):
     return json.loads(r.text())
 
 
+# A page cap, not a real ceiling on how many enrollments a student can have -
+# "a server that repeats a Bookmark must not hang us" (BRIEF minor finding),
+# same idea as lauds.session.get_all's own max_pages.
+MAX_PAGES = 1000
+
+
 def _enrollments(req, base: str) -> list[dict]:
     """All of the student's active enrollments, following D2L's own bookmark
     pagination (`PagingInfo.Bookmark`/`HasMoreItems`, the standard, documented
     paging fields for this API)."""
     path = MYENROLLMENTS
     items: list[dict] = []
-    while path:
+    for _ in range(MAX_PAGES):
         page = _get_json(req, base, path)
         items += page.get("Items", [])
         paging = page.get("PagingInfo", {})
         if not paging.get("HasMoreItems") or not paging.get("Bookmark"):
-            break
+            return items
         path = f"{MYENROLLMENTS}&bookmark={paging['Bookmark']}"
-    return items
+    raise RuntimeError(f"Brightspace enrollment pagination did not end after {MAX_PAGES} pages")
 
 
 def _run(req, base: str) -> tuple[list[Course], list]:

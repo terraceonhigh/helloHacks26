@@ -1,6 +1,8 @@
 """Behavioural port of main's tests/test_brightspace.py onto
 lauds.adapters.brightspace - same enrollment shape (anonymised copy of a real
 UBC course response, checked live 2026-09-26), same assertions."""
+import pytest
+
 from lauds.adapters import brightspace
 from lauds.models import Course
 
@@ -112,6 +114,19 @@ def test_fetch_follows_pagination_across_multiple_enrollment_pages(monkeypatch):
                          lambda site_name, base, run: run(_PagedRequest()))
     bundle = brightspace.fetch("https://example.brightspace.com")
     assert [c.code for c in bundle.courses] == ["MATH_V 100A ALL SECTIONS 2026W1", "SECOND 200"]
+
+
+def test_enrollments_raises_if_pagination_never_ends():
+    # BRIEF minor finding's own suggested fix: a max_pages guard, same idea
+    # as blackboard._get_all's and lauds.session.get_all's.
+    class _LoopingRequest:
+        def get(self, url):
+            if url.endswith("/whoami"):
+                return _FakeResponse({"Identifier": "1"})
+            return _FakeResponse({"PagingInfo": {"Bookmark": "same", "HasMoreItems": True}, "Items": []})
+
+    with pytest.raises(RuntimeError, match="pagination"):
+        brightspace._enrollments(_LoopingRequest(), "https://example.brightspace.com")
 
 
 def test_fetch_raises_rather_than_swallow_a_failure(monkeypatch):
