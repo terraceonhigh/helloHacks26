@@ -1,0 +1,148 @@
+{
+  "adapter": "prairielearn",
+  "case": "selfhost",
+  "extra": {
+    "base": "http://100.124.35.27:3002",
+    "campus_key": "prairielearn-selfhost"
+  },
+  "inputs": [
+    "prairielearn/live_00_home.html",
+    "prairielearn/live_01_pl_course_instance_1_assessments.html"
+  ],
+  "now": "2026-09-28T01:52:33.904491+00:00",
+  "oracle_call": "hub.prairielearn._run(req, campus_key, base)",
+  "output": {
+    "courses": [
+      {
+        "code": "FAKE 101",
+        "grade": null,
+        "section": "",
+        "term": "2026 Winter Term 1",
+        "title": "Oracle Test Course"
+      }
+    ],
+    "items": [
+      {
+        "category": "task",
+        "course": "FAKE 101",
+        "done": false,
+        "due": "2026-09-29T23:59:59-07:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "prairielearn-selfhost",
+        "title": "Due Soon Homework",
+        "url": "http://100.124.35.27:3002/pl/course_instance/1/assessment_instance/1/"
+      },
+      {
+        "category": "task",
+        "course": "FAKE 101",
+        "done": false,
+        "due": "2026-11-15T23:59:59-07:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "prairielearn-selfhost",
+        "title": "After BC Clock Change Homework",
+        "url": "http://100.124.35.27:3002/pl/course_instance/1/assessment_instance/2/"
+      },
+      {
+        "category": "task",
+        "course": "FAKE 101",
+        "done": false,
+        "due": "2027-01-15T23:59:59-07:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "prairielearn-selfhost",
+        "title": "January 2027 Homework",
+        "url": "http://100.124.35.27:3002/pl/course_instance/1/assessment_instance/3/"
+      },
+      {
+        "category": "task",
+        "course": "FAKE 101",
+        "done": false,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "prairielearn-selfhost",
+        "title": "No End Date Practice",
+        "url": "http://100.124.35.27:3002/pl/course_instance/1/assessment_instance/4/"
+      },
+      {
+        "category": "deadline",
+        "course": "FAKE 101",
+        "done": false,
+        "due": "2026-10-10T18:00:00-07:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "prairielearn-selfhost",
+        "title": "Timed Quiz",
+        "url": "http://100.124.35.27:3002/pl/course_instance/1/assessment/8/"
+      },
+      {
+        "category": "deadline",
+        "course": "FAKE 101",
+        "done": false,
+        "due": "2026-10-20T20:00:00-07:00",
+        "files": [],
+        "kind": "exam",
+        "source": "prairielearn-selfhost",
+        "title": "Midterm Exam",
+        "url": "http://100.124.35.27:3002/pl/course_instance/1/assessment/1/"
+      },
+      {
+        "category": "task",
+        "course": "FAKE 101",
+        "done": false,
+        "due": "2026-10-02T23:59:59-07:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "prairielearn-selfhost",
+        "title": "Modern Due Soon With Late",
+        "url": "http://100.124.35.27:3002/pl/course_instance/1/assessment_instance/5/"
+      },
+      {
+        "category": "task",
+        "course": "FAKE 101",
+        "done": false,
+        "due": "2027-01-15T23:59:59-07:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "prairielearn-selfhost",
+        "title": "Modern January 2027",
+        "url": "http://100.124.35.27:3002/pl/course_instance/1/assessment_instance/6/"
+      },
+      {
+        "category": "task",
+        "course": "FAKE 101",
+        "done": false,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "prairielearn-selfhost",
+        "title": "Modern Not Yet Released",
+        "url": "http://100.124.35.27:3002/pl/course_instance/1/assessments#Modern%20Not%20Yet%20Released"
+      },
+      {
+        "category": "task",
+        "course": "FAKE 101",
+        "done": false,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "prairielearn-selfhost",
+        "title": "Modern Past Due Practice",
+        "url": "http://100.124.35.27:3002/pl/course_instance/1/assessment_instance/7/"
+      },
+      {
+        "category": "task",
+        "course": "FAKE 101",
+        "done": false,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "prairielearn-selfhost",
+        "title": "Modern No Due Date",
+        "url": "http://100.124.35.27:3002/pl/course_instance/1/assessment_instance/8/"
+      }
+    ]
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "adapter": "webwork",
+  "case": "selfhost",
+  "extra": {
+    "base": "http://100.124.35.27:3003/webwork2/fake101",
+    "course_code": "FAKE101"
+  },
+  "inputs": [
+    "webwork/live_00_webwork2_fake101.html"
+  ],
+  "now": "2026-09-28T01:53:17.955367+00:00",
+  "oracle_call": "hub.webwork.to_item over each <li> from hub.webwork._problem_sets(req, base, course_code)",
+  "output": {
+    "items": [
+      {
+        "category": "task",
+        "course": "FAKE101",
+        "done": null,
+        "due": "2026-09-28T17:00:00-07:00",
+        "files": [],
+        "kind": "problemset",
+        "source": "webwork",
+        "title": "FAKE HW2 Due Soon",
+        "url": "http://100.124.35.27:3003/webwork2/fake101/FAKE_HW2_Due_Soon?effectiveUser=fakestudent"
+      },
+      {
+        "category": "task",
+        "course": "FAKE101",
+        "done": null,
+        "due": "2027-01-15T23:59:00-08:00",
+        "files": [],
+        "kind": "problemset",
+        "source": "webwork",
+        "title": "FAKE HW3 January 2027",
+        "url": "http://100.124.35.27:3003/webwork2/fake101/FAKE_HW3_January_2027?effectiveUser=fakestudent"
+      },
+      {
+        "category": "task",
+        "course": "FAKE101",
+        "done": null,
+        "due": "2099-12-31T23:59:00-08:00",
+        "files": [],
+        "kind": "problemset",
+        "source": "webwork",
+        "title": "FAKE HW5 Far Future",
+        "url": "http://100.124.35.27:3003/webwork2/fake101/FAKE_HW5_Far_Future?effectiveUser=fakestudent"
+      },
+      {
+        "category": "task",
+        "course": "FAKE101",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "problemset",
+        "source": "webwork",
+        "title": "FAKE HW4 Not Yet Open",
+        "url": "http://100.124.35.27:3003/webwork2/fake101/FAKE_HW4_Not_Yet_Open?effectiveUser=fakestudent"
+      },
+      {
+        "category": "task",
+        "course": "FAKE101",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "problemset",
+        "source": "webwork",
+        "title": "FAKE HW1 Past Due",
+        "url": "http://100.124.35.27:3003/webwork2/fake101/FAKE_HW1_Past_Due?effectiveUser=fakestudent"
+      }
+    ]
+  }
+}

@@ -1,0 +1,235 @@
+{
+  "adapter": "canvas",
+  "case": "selfhost",
+  "extra": {
+    "base": "http://100.124.35.27:3001",
+    "end": "2027-01-26",
+    "start": "2026-05-31"
+  },
+  "inputs": [
+    "canvas/live_00_api_v1_courses.json",
+    "canvas/live_01_api_v1_planner_items.json",
+    "canvas/live_02_api_v1_courses_2_assignments.json",
+    "canvas/live_03_api_v1_courses_1_assignments.json"
+  ],
+  "now": "2026-09-28T01:52:52.349385+00:00",
+  "oracle_call": "hub.canvas._run(req, start, end)",
+  "output": {
+    "courses": [
+      {
+        "code": "CPSC 121 L1A 2026W1",
+        "grade": 80.0,
+        "section": "",
+        "term": "2026 Winter Term 1",
+        "title": "[oracle] CPSC 121 L1A 2026W1 Lab"
+      },
+      {
+        "code": "CPSC 121 101 2026W1",
+        "grade": null,
+        "section": "",
+        "term": "2026W1",
+        "title": "CPSC 121 101 2026W1 Models of Computation"
+      }
+    ],
+    "items": [
+      {
+        "category": "task",
+        "course": "CPSC 121 101 2026W1",
+        "done": false,
+        "due": "2026-09-24T20:38:16+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Problem Set 1",
+        "url": "http://100.124.35.27:3001/courses/1/assignments/1"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 L1A 2026W1",
+        "done": null,
+        "due": null,
+        "files": [],
+        "kind": "announcement",
+        "source": "canvas",
+        "title": "FAKE feed-oracle announcement",
+        "url": "http://100.124.35.27:3001/courses/2/discussion_topics/1"
+      },
+      {
+        "category": "deadline",
+        "course": "CPSC 121 101 2026W1",
+        "done": null,
+        "due": "2026-09-28T20:38:16+00:00",
+        "files": [],
+        "kind": "event",
+        "source": "canvas",
+        "title": "CPSC 121 office hours",
+        "url": "http://100.124.35.27:3001/calendar?event_id=1&include_contexts=course_1"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 101 2026W1",
+        "done": false,
+        "due": "2026-09-28T20:44:12+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Loop test 3: Demo assignment",
+        "url": "http://100.124.35.27:3001/courses/1/assignments/9"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 101 2026W1",
+        "done": false,
+        "due": "2026-09-29T20:38:16+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Problem Set 2",
+        "url": "http://100.124.35.27:3001/courses/1/assignments/2"
+      },
+      {
+        "category": "deadline",
+        "course": "CPSC 121 101 2026W1",
+        "done": false,
+        "due": "2026-09-30T20:38:16+00:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "canvas",
+        "title": "Quiz 1",
+        "url": "http://100.124.35.27:3001/courses/1/quizzes/1"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 101 2026W1",
+        "done": false,
+        "due": "2026-10-01T20:38:41+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Loop test: Problem Set 4",
+        "url": "http://100.124.35.27:3001/courses/1/assignments/7"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 101 2026W1",
+        "done": false,
+        "due": "2026-10-02T20:38:16+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Lab 3: Circuits",
+        "url": "http://100.124.35.27:3001/courses/1/assignments/3"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 101 2026W1",
+        "done": false,
+        "due": "2026-10-03T20:42:24+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Loop test 2: Reading Quiz prep",
+        "url": "http://100.124.35.27:3001/courses/1/assignments/8"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 101 2026W1",
+        "done": false,
+        "due": "2026-10-06T20:38:16+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "Problem Set 3",
+        "url": "http://100.124.35.27:3001/courses/1/assignments/4"
+      },
+      {
+        "category": "deadline",
+        "course": "CPSC 121 101 2026W1",
+        "done": false,
+        "due": "2026-10-09T20:38:16+00:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "canvas",
+        "title": "Midterm 1",
+        "url": "http://100.124.35.27:3001/courses/1/quizzes/2"
+      },
+      {
+        "category": "deadline",
+        "course": "CPSC 121 L1A 2026W1",
+        "done": null,
+        "due": "2026-10-14T22:00:00+00:00",
+        "files": [],
+        "kind": "event",
+        "source": "canvas",
+        "title": "[oracle] lab office hours",
+        "url": "http://100.124.35.27:3001/calendar?event_id=2&include_contexts=course_2"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 L1A 2026W1",
+        "done": false,
+        "due": "2026-10-16T06:59:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "[oracle] due 23:59 Vancouver",
+        "url": "http://100.124.35.27:3001/courses/2/assignments/10"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 L1A 2026W1",
+        "done": false,
+        "due": "2026-10-16T07:01:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "[oracle] due 00:01 Vancouver",
+        "url": "http://100.124.35.27:3001/courses/2/assignments/11"
+      },
+      {
+        "category": "deadline",
+        "course": "CPSC 121 L1A 2026W1",
+        "done": false,
+        "due": "2026-10-18T06:59:00+00:00",
+        "files": [],
+        "kind": "quiz",
+        "source": "canvas",
+        "title": "[oracle] quiz",
+        "url": "http://100.124.35.27:3001/courses/2/quizzes/3"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 L1A 2026W1",
+        "done": true,
+        "due": "2026-10-21T06:59:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "[oracle] submitted",
+        "url": "http://100.124.35.27:3001/courses/2/assignments/14/submissions/2"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 L1A 2026W1",
+        "done": false,
+        "due": "2027-01-07T06:59:00+00:00",
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "[oracle] due 2027-01-06",
+        "url": "http://100.124.35.27:3001/courses/2/assignments/12"
+      },
+      {
+        "category": "task",
+        "course": "CPSC 121 L1A 2026W1",
+        "done": false,
+        "due": null,
+        "files": [],
+        "kind": "assignment",
+        "source": "canvas",
+        "title": "[oracle] no due date",
+        "url": "http://100.124.35.27:3001/courses/2/assignments/13"
+      }
+    ]
+  }
+}
