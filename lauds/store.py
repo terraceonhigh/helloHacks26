@@ -101,10 +101,14 @@ def connect(path=None):
     if path != ":memory:":
         path = Path(path)
         paths.ensure_dir(path.parent)
-        new = not path.exists()
+        if not path.exists():
+            # 0600 before sqlite3.connect() ever creates the file (BRIEF
+            # minor finding: the same create-then-chmod race as a saved
+            # session/config write) - opening an existing file doesn't
+            # reset its mode, so this closes the window instead of leaving
+            # it briefly world-readable.
+            paths.touch_secure(path)
     conn = sqlite3.connect(path if path == ":memory:" else str(path))
-    if path != ":memory:" and new:
-        paths.secure_file(path)
     conn.execute("PRAGMA foreign_keys = ON")
     conn.executescript(SCHEMA)
     return conn

@@ -72,8 +72,7 @@ def login(feed_url, **opts):
         raise ValueError("that isn't an allowed Canvas calendar-feed host")
     path = _feed_path()
     paths.ensure_dir(path.parent)
-    path.write_text(feed_url, encoding="utf-8")
-    paths.secure_file(path)
+    paths.secure_write_text(path, feed_url)  # 0600 from creation - the URL is a secret, like a token
     return path
 
 
