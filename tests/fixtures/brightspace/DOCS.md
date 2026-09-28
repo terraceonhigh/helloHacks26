@@ -1,14 +1,18 @@
 # Brightspace (D2L Valence) — what was checked against vendor docs
 
-`lauds/adapters/brightspace.py` is a clean port of main's `hub/brightspace.py`,
-which is **already live-verified** (its own module docstring: Terrace,
-2026-09-26, against a real UBC course on `ubc.brightspace.com`) —
-`tests/fixtures/brightspace/myenrollments_items.json` and
+`lauds/adapters/brightspace.py` is a clean port of main's `hub/brightspace.py`.
+Main's own module docstring cites a live check (Terrace, 2026-09-26, against
+a real UBC course on `ubc.brightspace.com`), and
+`tests/fixtures/brightspace/myenrollments_items.json` /
 `tests/oracle/brightspace/to_course_mapping.json` are that real, anonymised
-response shape. This file adds a second, independent check against D2L's
+response shape reused as a fixture — but that check was main's, not this
+port's own (BRIEF major finding: repeating another project's live-verified
+claim as if this branch had run it itself is exactly the overclaiming that
+finding is about; see `lauds/adapters/brightspace.py`'s own docstring for the
+correction). This file adds a second, independent check against D2L's
 **published** Valence API docs (no sandbox signed up for, per BRIEF.md), to
-corroborate the same shape from the vendor's own reference rather than only
-from one real account.
+corroborate the same shape from the vendor's own reference — this file's own
+"docs-verified" conclusion stands on its own regardless of that grading fix.
 
 ## What was fetched and quoted
 
@@ -41,11 +45,13 @@ from one real account.
 
 ## Result
 
-**Grade: live-verified** (carried over from main's real UBC-account check;
-unchanged by this port). The Valence docs check above is a second,
-independent corroboration of the same field names and the same paging
-mechanism, from the vendor's own reference — it found nothing that
-contradicts main's live-tested mapping, and needed no code change.
+**Grade for this port: docs-verified** (not live-verified — see the
+correction above; main's own account is live-verified, this port's is not,
+until a real `tests/live/brightspace_live.py` three-way check exists). The
+Valence docs check above is an independent corroboration of the same field
+names and the same paging mechanism, from the vendor's own reference — it
+found nothing that contradicts main's live-tested mapping, and needed no
+code change.
 
 No `tools/harvest_docs.py` fixture was added: the pages found are schema/
 field-shape references (types and property names, e.g. `Bookmark: <string>`),

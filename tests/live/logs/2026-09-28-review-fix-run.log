@@ -1,0 +1,68 @@
+Live three-way checks re-run 2026-09-28, during the reviewer-findings fix
+pass (BRIEF major finding: "verification grades claimed without backing
+artefacts" - this is the run log that finding asked for).
+
+Command (from lauds-cli, its own venv - equally valid per each script's own
+docstring):
+
+    export UV_PROJECT_ENVIRONMENT=/home/.venvs/lauds UV_LINK_MODE=copy
+    ~/.local/bin/uv run --no-sync python tests/live/canvas_live.py
+    ~/.local/bin/uv run --no-sync python tests/live/prairielearn_live.py
+    ~/.local/bin/uv run --no-sync python tests/live/webwork_live.py
+
+Servers: humboldt (100.124.35.27), Canvas :3001, PrairieLearn :3002,
+WeBWorK :3003/fake101 - per BRIEF.md's "Live servers" section.
+
+All three PASS (exit 0), reproducing the reviewer's own re-run:
+
+== oracle run (http://100.124.35.27:3001) ==
+  2 course(s), 18 item(s)
+== lauds run (http://100.124.35.27:3001) ==
+  2 course(s), 18 item(s)
+  [2: lauds-now vs golden] assert_superset: PASS
+
+All three comparisons agree: oracle-now == golden, lauds-now superset-matches golden, oracle-now == lauds-now.
+== oracle run (http://100.124.35.27:3002) ==
+  1 course(s), 11 item(s)
+== lauds run (http://100.124.35.27:3002) ==
+  1 course(s), 11 item(s)
+  [2: lauds-now vs golden] assert_superset: PASS
+
+All three comparisons agree: oracle-now == golden, lauds-now superset-matches golden, oracle-now == lauds-now.
+== logging in (http://100.124.35.27:3003/webwork2/fake101) ==
+  logged in
+== oracle run ==
+  5 item(s)
+== lauds run ==
+  5 item(s)
+  [2: lauds-now vs golden] assert_superset: PASS
+  [PST rule] 2 item(s) correctly kept at -08:00 (page said PST; a real zoneinfo lookup for that date would differ)
+
+All three comparisons agree: oracle-now == golden, lauds-now superset-matches golden, oracle-now == lauds-now. PST-abbreviation rule holds.
+
+Grading, corrected per the finding (see individual adapter docstrings and
+BRIEF.md's per-adapter grade list for the full reasoning):
+
+- canvas:       live-verified  (this run; covers the API-mapping path only,
+                not lauds' own fetch/session transport - see webwork_live.py's
+                own docstring, point 3, for the caveat this shares)
+- prairielearn: live-verified  (this run, same caveat)
+- webwork:      live-verified  (this run, through the real fetch_with_session
+                transport - see webwork_live.py's docstring)
+- brightspace:  fixture-only for THIS port (no tests/live/brightspace script
+                exists; the "verified live" claim in lauds/adapters/
+                brightspace.py's old docstring was main's own docstring's
+                claim, copied forward uncritically, not a check this branch
+                ran itself - corrected in that file)
+- moodle:       items live-verified for the to_item mapping only (via
+                live_00/live_02's captured pages, see lauds/adapters/
+                moodle.py); courses/_run's own batching/pagination fix is
+                fixture-only until a real tests/live/moodle_live.py three-way
+                check exists (none does yet - left for a follow-up agent,
+                Moodle is stood up on humboldt:3004 per BRIEF.md)
+- key_dates:    docs-verified (lauds/adapters/key_dates.py's own docstring
+                already says this correctly)
+- queries, export_ics: fixture-only (BRIEF.md defines docs-verified as
+                vendor docs; neither has a vendor doc to cite)
+- piazza, blackboard: fixture-only (module docstrings already say so;
+                no live/self-hostable target exists for either)

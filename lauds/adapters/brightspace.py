@@ -5,14 +5,23 @@ rewritten against lauds' plugin protocol (pure parse functions + fetch via
 lauds.session, no swallow-to-([],[]) - lauds.sync isolates one broken
 adapter from the rest, see lauds/sync.py:sync_one).
 
-**Verified live** (main's own docstring: Terrace, 2026-09-26, a real UBC
-course on ubc.brightspace.com - UBC's main LMS is Canvas; this one course
-happens to also run through Brightspace):
+**Endpoint shape, cited from main's own docstring** (Terrace, 2026-09-26, a
+real UBC course on ubc.brightspace.com - UBC's main LMS is Canvas; this one
+course happens to also run through Brightspace too):
 
 - `GET /d2l/api/lp/unstable/users/whoami` confirms the session is live.
 - `GET /d2l/api/lp/1.50/enrollments/myenrollments/?orgUnitTypeId=3&isActive=true&canAccess=true`
   returns the student's own active enrollments as JSON, paginated via D2L's
   documented `PagingInfo` cursor (`Bookmark`/`HasMoreItems`).
+
+**Grade for THIS port: fixture-only, not live-verified** (BRIEF major
+finding) - the line above is main's own live check, not one this branch
+ran itself: there is no `tests/live/brightspace_live.py`, and this
+adapter's only golden (`to_course_mapping`) replays a fixture, never a
+live payload. Repeating main's claim here as if it were this port's own
+verification is exactly the overclaiming that finding calls out; don't
+re-add it without a real three-way check backing it (see
+`tests/live/webwork_live.py`'s docstring for the pattern).
 
 **Items (due dates): not built here, on purpose** - same as main. Brightspace's
 own Calendar screens are built from an older format that isn't plain JSON and
