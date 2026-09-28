@@ -143,10 +143,13 @@ def _login():
     return s
 
 
+SKIP = 77  # distinct from 0 (BRIEF minor finding): "ran it, exit 0" must not also mean "skipped it"
+
+
 def main():
     if not _reachable():
         print("WeBWorK self-hosted server did not answer - skipping (n/a, not a failure).")
-        return 0
+        return SKIP
 
     print(f"== logging in ({BASE}) ==")
     session = _login()

@@ -103,16 +103,19 @@ class _Resp:
         return self._text
 
 
+SKIP = 77  # distinct from 0 (BRIEF minor finding): "ran it, exit 0" must not also mean "skipped it"
+
+
 def main():
     if not _reachable():
         print("Canvas self-hosted server did not answer - skipping (n/a, not a failure).")
-        return 0
+        return SKIP
 
     try:
         token = _canvas_token()
     except Exception as e:
         print(f"couldn't read CANVAS_TOKEN over ssh ({type(e).__name__}) - skipping (n/a, not a failure).")
-        return 0
+        return SKIP
 
     start = dt.date.today() - dt.timedelta(days=120)
     end = dt.date.today() + dt.timedelta(days=120)
