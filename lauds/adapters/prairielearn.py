@@ -295,6 +295,55 @@ def parse_assessments_page(html: str, *, course_code: str, campus_key: str, base
     return items
 
 
+def capture_index_links(anchors: list[dict]) -> list[dict]:
+    """Pure port of `extension/providers/prairielearn-index.js`'s
+    `capturePrairieLearnIndex()` (BRIEF blocker finding: this JS-side
+    normalisation had no Python port at all). `anchors`: `[{"href": ...,
+    "text": ...}]` in DOM order, mimicking
+    `root.querySelectorAll('a[href^="/pl/course_instance/"]')`'s
+    `.getAttribute("href")`/`.textContent.trim()`. Dedupes by course-
+    instance id (the student link and its `/instructor` twin for the same
+    course must collapse to one entry, first title wins) and skips
+    anything that isn't exactly a course-instance link - `_CI_LINK` is the
+    same full-match regex the real JS uses, so e.g. that same course's own
+    `/assessments` link is never mistaken for one."""
+    seen: set[str] = set()
+    courses: list[dict] = []
+    for a in anchors:
+        href = (a or {}).get("href") or ""
+        m = _CI_LINK.match(href)
+        if not m or m.group(1) in seen:
+            continue
+        seen.add(m.group(1))
+        courses.append({"ci_id": m.group(1), "title": (a.get("text") or "").strip()})
+        if len(courses) > 100:
+            raise ValueError("PrairieLearn course limit exceeded")
+    if not courses:
+        raise ValueError("No PrairieLearn course links found. Sign in and reopen the home page.")
+    return courses
+
+
+def combine_capture(origin: str, index_courses: list[dict], page_captures: list[dict]) -> dict:
+    """Port of `extension/background.js`'s `captureNavigated()`: the real
+    extension visits the home page once (`capturePrairieLearnIndex()` ->
+    `index_courses`, `[{ci_id, title}]`), then each course's own assessments
+    page (`capturePrairieLearnAssessments()` -> one of `page_captures`,
+    `{ci_id, assessments}`), and merges them - `{**course, assessments:
+    detail["assessments"]}`, matched by `ci_id`, in the index's own order -
+    into the `{source, origin, courses}` envelope `parse_capture` above
+    expects. BRIEF blocker finding: nothing did this merge in Python at
+    all, so a raw per-page assessments capture (`{ci_id, assessments}`, no
+    title) could never actually reach `parse_capture`."""
+    by_id = {d.get("ci_id"): d for d in page_captures}
+    courses = []
+    for course in index_courses:
+        detail = by_id.get(course.get("ci_id"))
+        if detail is None:
+            continue  # background.js's own captureNavigated never reaches this far without one
+        courses.append({**course, "assessments": detail.get("assessments")})
+    return {"source": NAME, "origin": origin, "courses": courses}
+
+
 def parse_capture(capture: dict) -> tuple[list[Course], list[Item]]:
     """Map an extension-captured PrairieLearn payload through the same
     mapping rules as a server-side scrape.

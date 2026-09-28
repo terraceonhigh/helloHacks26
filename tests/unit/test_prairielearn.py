@@ -7,8 +7,8 @@ from bs4 import BeautifulSoup
 
 from lauds import session as session_mod
 from lauds.adapters.prairielearn import (
-    done_from_credit, done_from_score, due_from_popover, looks_logged_out, parse_row,
-    resolve_campus, to_course, _course_instances, _get, _run,
+    capture_index_links, combine_capture, done_from_credit, done_from_score, due_from_popover,
+    looks_logged_out, parse_row, resolve_campus, to_course, _course_instances, _get, _run,
 )
 
 BASE = "https://us.prairielearn.com"
@@ -329,3 +329,61 @@ def test_get_raises_not_logged_in_on_the_real_captured_login_redirect_page():
     html = (FIXTURES / "live_loggedout_login_page.html").read_text()
     with pytest.raises(session_mod.NotLoggedIn):
         _get(_RedirectedToLoginReq(html), "/", BASE)
+
+
+# --- extension capture normalisation (BRIEF blocker finding) -----------------
+# Pure ports of extension/providers/prairielearn-index.js's
+# capturePrairieLearnIndex() and extension/background.js's captureNavigated()
+# merge step - see tests/parity/test_extension.py for the oracle-golden
+# replay of the same functions.
+
+def test_capture_index_links_dedupes_the_instructor_twin_first_title_wins():
+    anchors = [
+        {"href": "/pl/course_instance/221053/", "text": "CPSC 317: Internet Computing, 2026 Winter Term 1"},
+        {"href": "/pl/course_instance/221053/instructor", "text": "CPSC 317 (instructor view)"},
+    ]
+    assert capture_index_links(anchors) == [
+        {"ci_id": "221053", "title": "CPSC 317: Internet Computing, 2026 Winter Term 1"}]
+
+
+def test_capture_index_links_rejects_a_same_course_link_on_a_different_route():
+    # A /assessments link for the same ci_id must never be mistaken for a
+    # course-instance link (the real JS regex full-matches, it doesn't just
+    # check the prefix).
+    anchors = [{"href": "/pl/course_instance/221053/assessments", "text": "Assessments"}]
+    with pytest.raises(ValueError, match="No PrairieLearn course links"):
+        capture_index_links(anchors)
+
+
+def test_capture_index_links_enforces_the_same_course_limit_as_the_real_js():
+    anchors = [{"href": f"/pl/course_instance/{i}/", "text": f"C{i}"} for i in range(102)]
+    with pytest.raises(ValueError, match="limit exceeded"):
+        capture_index_links(anchors)
+
+
+def test_combine_capture_merges_index_title_with_the_pages_own_assessments():
+    index_courses = [{"ci_id": "221053", "title": "CPSC 317: Internet Computing, 2026 Winter Term 1"}]
+    page_captures = [{"ci_id": "221053", "assessments": [
+        {"title": "Quiz 2", "group": "Quizzes",
+         "href": "/pl/course_instance/221053/assessment_instance/14835025/",
+         "due_text": "2026-09-27 23:59:59 (PDT)", "score_text": "80%", "credit_empty": False}]}]
+    envelope = combine_capture(BASE, index_courses, page_captures)
+    assert envelope == {"source": "prairielearn", "origin": BASE, "courses": [
+        {"ci_id": "221053", "title": "CPSC 317: Internet Computing, 2026 Winter Term 1",
+         "assessments": page_captures[0]["assessments"]}]}
+    # and the merged envelope really does drive parse_capture end to end:
+    from lauds.adapters.prairielearn import parse_capture
+    courses, items = parse_capture(envelope)
+    assert [c.code for c in courses] == ["CPSC 317"]
+    assert items[0].title == "Quiz 2"
+
+
+def test_combine_capture_skips_a_course_the_page_visit_never_reached():
+    # background.js's own captureNavigated() only ever calls saveCapture()
+    # once every indexed course has a matching page capture - this is the
+    # defensive counterpart in case combine_capture is ever handed a partial
+    # set (e.g. a course whose assessments-page visit failed).
+    index_courses = [{"ci_id": "1", "title": "A"}, {"ci_id": "2", "title": "B"}]
+    page_captures = [{"ci_id": "1", "assessments": []}]
+    envelope = combine_capture(BASE, index_courses, page_captures)
+    assert [c["ci_id"] for c in envelope["courses"]] == ["1"]

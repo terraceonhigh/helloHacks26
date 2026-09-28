@@ -1099,18 +1099,31 @@ def harvest_captures():
 def harvest_extension():
     adapter = "extension"
 
+    # Raw anchors, in DOM order, as capturePrairieLearnIndex() itself reads
+    # them (`root.querySelectorAll('a[href^="/pl/course_instance/"]')` ->
+    # each `<a>`'s own `href`/`textContent`) - not the already-deduped
+    # result. The scenario the note below describes needs all three: the
+    # student link, its `/instructor` twin for the same ci_id (deduped,
+    # first title wins), and a same-course `/assessments` link, which
+    # `_CI_LINK`'s full match (`^/pl/course_instance/(\d+)(?:/instructor)?/?$`)
+    # correctly refuses to treat as a course link at all.
+    prairielearn_index_anchors = [
+        {"href": "/pl/course_instance/221053/", "text": "CPSC 317: Internet Computing, 2026 Winter Term 1"},
+        {"href": "/pl/course_instance/221053/instructor", "text": "CPSC 317 (instructor view)"},
+        {"href": "/pl/course_instance/221053/assessments", "text": "Assessments"},
+    ]
     prairielearn_index_links = [
         {"ci_id": "221053", "title": "CPSC 317: Internet Computing, 2026 Winter Term 1"},
     ]
-    inputs_path = fixture_json(adapter, "prairielearn_index_capture.json", prairielearn_index_links)
+    inputs_path = fixture_json(adapter, "prairielearn_index_capture.json", prairielearn_index_anchors)
     result_golden(adapter, "prairielearn_index_capture_literal", [inputs_path],
            "extension/providers/prairielearn-index.js capturePrairieLearnIndex() (literal, node unavailable)",
            {"courses": prairielearn_index_links},
            extra={"node_available": False,
                   "note": "extension/prairielearn-capture.test.mjs 'PrairieLearn index discovers "
                           "distinct course instances...': the instructor-link duplicate of the same "
-                          "ci_id (221053) is deduped, and a link matching a DIFFERENT route "
-                          "(/assessments) is not treated as a course link at all"})
+                          "ci_id (221053) is deduped (first title wins), and a link matching a "
+                          "DIFFERENT route (/assessments) is not treated as a course link at all"})
 
     pl_assessment_capture = {"ci_id": "221053", "assessments": [
         {"title": "Quiz 2", "group": "Quizzes",

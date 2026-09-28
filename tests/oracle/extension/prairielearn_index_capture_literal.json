@@ -3,7 +3,7 @@
   "case": "prairielearn_index_capture_literal",
   "extra": {
     "node_available": false,
-    "note": "extension/prairielearn-capture.test.mjs 'PrairieLearn index discovers distinct course instances...': the instructor-link duplicate of the same ci_id (221053) is deduped, and a link matching a DIFFERENT route (/assessments) is not treated as a course link at all"
+    "note": "extension/prairielearn-capture.test.mjs 'PrairieLearn index discovers distinct course instances...': the instructor-link duplicate of the same ci_id (221053) is deduped (first title wins), and a link matching a DIFFERENT route (/assessments) is not treated as a course link at all"
   },
   "inputs": [
     "extension/prairielearn_index_capture.json"
