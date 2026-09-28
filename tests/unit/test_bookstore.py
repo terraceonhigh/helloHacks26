@@ -198,11 +198,36 @@ def test_fetch_returns_courses_and_textbooks_with_links(monkeypatch, tmp_path):
     assert cpsc121_books[0].url == "https://bookstore.ubc.ca/products/discrete-mathematics-with-applications-5e"
 
 
-def test_fetch_degrades_to_empty_on_total_failure(monkeypatch, tmp_path):
+def test_fetch_raises_on_total_failure_and_never_caches_it(monkeypatch, tmp_path):
+    # BRIEF major finding: a sections-page network failure used to degrade
+    # to an empty Bundle and, worse, cache that empty result as a healthy
+    # 6h snapshot. It must now raise, and use_cache=True must not write a
+    # cache file for it (the next sync should retry fresh, not be stuck
+    # serving "no courses" until the TTL expires).
     monkeypatch.setenv("LAUDS_HOME", str(tmp_path))
     monkeypatch.setattr(bookstore, "_get", lambda *a, **k: (_ for _ in ()).throw(requests.ConnectionError()))
-    bundle = bookstore.fetch("CPSC", "2026W1", use_cache=False)
-    assert bundle.courses == [] and bundle.textbooks == []
+    with pytest.raises(RuntimeError, match="sections page"):
+        bookstore.fetch("CPSC", "2026W1", use_cache=True)
+    assert not bookstore._cache_path("CPSC", "2026W1", "UBCV").exists()
+
+
+def test_fetch_raises_on_a_partial_textbook_failure_and_never_caches_it(monkeypatch, tmp_path):
+    # BRIEF major finding: one section's textbook page failing was only
+    # `continue`d past, silently, and the resulting partial result was
+    # still cached as a success.
+    monkeypatch.setenv("LAUDS_HOME", str(tmp_path))
+
+    def fake_get(url, **params):
+        if url.endswith("/Course/course"):
+            return _html("sections_cpsc.html")
+        if url.endswith("/CourseSearch/"):
+            raise requests.ConnectionError("boom")
+        return json.dumps({"products": []})
+
+    monkeypatch.setattr(bookstore, "_get", fake_get)
+    with pytest.raises(RuntimeError, match="textbooks for"):
+        bookstore.fetch("CPSC", "2026W1", use_cache=True)
+    assert not bookstore._cache_path("CPSC", "2026W1", "UBCV").exists()
 
 
 def test_fetch_reuses_the_per_term_cache_without_a_second_network_round(monkeypatch, tmp_path):

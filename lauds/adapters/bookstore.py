@@ -239,8 +239,17 @@ def fetch(program: str, term: str, campus: str = "UBCV", use_cache: bool = True)
     links. Reuses a same-day-ish disk cache (BRIEF.md's "per-term cache")
     instead of re-scraping the department + the whole storefront catalog on
     every `lauds sync` - a course with no textbooks listed still comes back
-    (an empty page is a normal state, not a failure); a Bookstore outage
-    just means an empty result, never a crash."""
+    (an empty page is a normal state, not a failure).
+
+    A genuine network failure - the sections page itself, or any one
+    section's textbook page - now raises instead of degrading to an empty
+    or partial Bundle (BRIEF major finding): silently caching that partial
+    scrape used to serve it back as a healthy result for CACHE_TTL (6h)
+    even after the site recovered, and `lauds sync` reported "ok" the whole
+    time. `_fetch_catalog()`'s own degrade-to-partial is unchanged and
+    deliberate (module docstring): store links are a nice-to-have on top of
+    the real course/textbook data this function is actually responsible
+    for, not core data."""
     cache_path = _cache_path(program, term, campus)
     if use_cache:
         cached = _cache_load(cache_path)
@@ -251,17 +260,17 @@ def fetch(program: str, term: str, campus: str = "UBCV", use_cache: bool = True)
     try:
         sections_html = _get(f"{TEXTBOOK_BASE}/Course/course", campus=campus, term=term, program=program)
         sections = parse_sections(sections_html)
-    except requests.RequestException:
-        sections = []
+    except requests.RequestException as e:
+        raise RuntimeError(f"bookstore: could not load the sections page: {e}") from e
 
     courses = [course_from_section(s, term) for s in sections]
     textbooks = []
     for section, course in zip(sections, courses):
         try:
             html = _get(f"{TEXTBOOK_BASE}/CourseSearch/", source="course", **{"course[]": section["key"]})
-            textbooks.extend(parse_textbooks(html, course.code))
-        except requests.RequestException:
-            continue
+        except requests.RequestException as e:
+            raise RuntimeError(f"bookstore: could not load textbooks for {course.code}: {e}") from e
+        textbooks.extend(parse_textbooks(html, course.code))
     textbooks = attach_store_links(textbooks, _fetch_catalog())
 
     if use_cache:
