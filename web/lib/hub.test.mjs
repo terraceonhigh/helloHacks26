@@ -24,6 +24,20 @@ test("selectConnections: source-tagged items mark that provider connected, other
   assert.equal(byId.workday.connected, false);
 });
 
+test("selectConnections: WeBWorK items never get swept into the custom-PrairieLearn-instance bucket", () => {
+  // Verified live: a real account's WeBWorK items all had due=None (every
+  // set was closed or not-yet-open - hub/webwork.py's own module docstring
+  // says a due date only exists for a currently-open set), so /api/upcoming
+  // never returns them and this can't be tracked by item count like
+  // Canvas/PrairieLearn - it's tracked in page.js off the connect response
+  // instead. What still matters here: "webwork" must not fall through to
+  // the "any other source is a pasted PrairieLearn instance" fallback.
+  const items = [{ source: "webwork" }, { source: "webwork" }, { source: "webwork" }];
+  const connections = selectConnections(items, []);
+  assert.equal(connections.find((c) => c.id === "webwork"), undefined);
+  assert.equal(connections.find((c) => c.label?.includes("webwork")), undefined);
+});
+
 test("selectConnections: loaded Workday meetings count as connected regardless of items", () => {
   // Workday feeds the Schedule tab only, never the course list (no
   // assignment data ever comes from it) - "connected" tracks meetings, not

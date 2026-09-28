@@ -2,12 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  connectBrightspace,
   connectCanvas,
   connectPrairieLearn,
   connectPrairieLearnCustom,
   connectPrairieLearnOk,
+  connectWebWork,
   displayLabel,
   fetchAnnouncements,
+  fetchUndatedTasks,
   fetchDemoMeetings,
   connectCanvasFeed as postCanvasFeed,
   refreshCanvasFeed,
@@ -293,12 +296,15 @@ const SOURCE_LABELS = {
   push: "Push to hosted",
 };
 
-function SettingsPage({ theme, setTheme, customColors, setCustomColors, connections, sampleMode, onSampleModeChange, onConnected, onScheduleImported, meetings = [], allCourses, hiddenCourses, onToggleCourseHidden, feedConnected, feedItemCount, feedError, onConnectFeed, onDisconnectFeed, preferredKinds, onTogglePreferredKind, onConnectHosted, onSynced, hostedConnected, allItems, allCoursesForPush }) {
+function SettingsPage({ theme, setTheme, customColors, setCustomColors, connections, sampleMode, onSampleModeChange, onConnected, onScheduleImported, meetings = [], allCourses, hiddenCourses, onToggleCourseHidden, feedConnected, feedItemCount, feedError, onConnectFeed, onDisconnectFeed, preferredKinds, onTogglePreferredKind, onConnectHosted, onSynced, hostedConnected, allItems, allCoursesForPush, brightspaceCourseCount, onBrightspaceConnected, webworkConnections, onWebworkConnected }) {
   const [term, setTerm] = useState("2026W1");
   const [workdayStatus, setWorkdayStatus] = useState(null);
   const [reminderText, setReminderText] = useState("");
   const [customDomain, setCustomDomain] = useState("");
   const [feedUrlInput, setFeedUrlInput] = useState("");
+  const [brightspaceUrl, setBrightspaceUrl] = useState("");
+  const [webworkUrl, setWebworkUrl] = useState("");
+  const [webworkCourseCode, setWebworkCourseCode] = useState("");
   const [hostedKeyInput, setHostedKeyInput] = useState("");
   const [extensionId, setExtensionId] = useState("");
   const [syncResults, setSyncResults] = useState(null);
@@ -308,7 +314,7 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState(null);
   const byId = Object.fromEntries(connections.map((c) => [c.id, c]));
-  const FIXED_IDS = new Set(["canvas", "prairielearn", "prairielearn_ok", "workday"]);
+  const FIXED_IDS = new Set(["canvas", "prairielearn", "prairielearn_ok", "webwork", "workday"]);
   const customConnections = connections.filter((c) => !FIXED_IDS.has(c.id));
 
   useEffect(() => {
@@ -664,6 +670,103 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
             </div>
           )}
 
+          <div className="flex flex-col gap-3 py-3">
+            <div className="flex items-center gap-3">
+              <span className={`size-2.5 rounded-full ${webworkConnections.length > 0 ? "bg-[var(--success)]" : "bg-[var(--muted-light)]"}`} />
+              <div className="font-bold">WeBWorK</div>
+            </div>
+            {/* one row per connected course - a school can run separate WeBWorK
+                instances per course, so each keeps its own url/courseCode and
+                reconnects independently (issue raised live: one real account
+                had WeBWorK for exactly one course, but that's not true generally) */}
+            {webworkConnections.map((conn) => (
+              <div key={conn.courseCode} className="flex flex-wrap items-center justify-between gap-3 pl-6">
+                <div className="text-xs text-[var(--muted)]">
+                  <span className="font-semibold text-[var(--fg)]">{conn.courseCode}</span>
+                  {" · "}
+                  {conn.itemCount > 0
+                    ? `${conn.itemCount} item${conn.itemCount === 1 ? "" : "s"}`
+                    : "nothing currently open"}
+                </div>
+                {isLocalMode() && !sampleMode && (
+                  <AppButton
+                    disabled={busy !== null}
+                    onClick={() => run("webwork", async () => onWebworkConnected(conn.url, conn.courseCode, (await connectWebWork(conn.url, conn.courseCode)).items))}
+                    className="toggle-pill"
+                  >
+                    {busy === "webwork" ? "Signing in…" : "Reconnect"}
+                  </AppButton>
+                )}
+              </div>
+            ))}
+            {isLocalMode() && !sampleMode && (
+              <div className="flex flex-wrap items-center gap-2 pl-6">
+                <input
+                  type="text"
+                  value={webworkUrl}
+                  onChange={(e) => setWebworkUrl(e.target.value)}
+                  placeholder="https://webwork.example.edu/webwork2/math101"
+                  aria-label="WeBWorK course URL"
+                  className="w-56 rounded-md border border-[var(--line)] bg-[var(--surface-soft)] px-2 py-1 text-xs"
+                />
+                <input
+                  type="text"
+                  value={webworkCourseCode}
+                  onChange={(e) => setWebworkCourseCode(e.target.value)}
+                  placeholder="MATH 100"
+                  aria-label="WeBWorK course code"
+                  size={9}
+                  className="rounded-md border border-[var(--line)] bg-[var(--surface-soft)] px-2 py-1 text-xs"
+                />
+                <AppButton
+                  disabled={busy !== null || !webworkUrl || !webworkCourseCode}
+                  onClick={() =>
+                    run("webwork", async () => {
+                      const { items } = await connectWebWork(webworkUrl, webworkCourseCode);
+                      onWebworkConnected(webworkUrl, webworkCourseCode, items);
+                      setWebworkUrl("");
+                      setWebworkCourseCode("");
+                    })
+                  }
+                  className="toggle-pill"
+                >
+                  {busy === "webwork" ? "Signing in…" : "Add course"}
+                </AppButton>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 py-3">
+            <div className="flex items-center gap-3">
+              <span className={`size-2.5 rounded-full ${brightspaceCourseCount > 0 ? "bg-[var(--success)]" : "bg-[var(--muted-light)]"}`} />
+              <div>
+                <div className="font-bold">Brightspace</div>
+                <div className="text-xs text-[var(--muted)]">
+                  {brightspaceCourseCount > 0 ? `Connected · ${brightspaceCourseCount} course${brightspaceCourseCount === 1 ? "" : "s"}` : "Not connected · courses only, no due dates yet"}
+                </div>
+              </div>
+            </div>
+            {isLocalMode() && !sampleMode && (
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  type="text"
+                  value={brightspaceUrl}
+                  onChange={(e) => setBrightspaceUrl(e.target.value)}
+                  placeholder="https://ubc.brightspace.com"
+                  aria-label="Brightspace URL"
+                  className="w-56 rounded-md border border-[var(--line)] bg-[var(--surface-soft)] px-2 py-1 text-xs"
+                />
+                <AppButton
+                  disabled={busy !== null || !brightspaceUrl}
+                  onClick={() => run("brightspace", async () => onBrightspaceConnected((await connectBrightspace(brightspaceUrl)).courses))}
+                  className="toggle-pill"
+                >
+                  {busy === "brightspace" ? "Signing in…" : brightspaceCourseCount > 0 ? "Reconnect" : "Connect"}
+                </AppButton>
+              </div>
+            )}
+          </div>
+
           <div className="flex flex-wrap items-center justify-between gap-3 py-3">
             <div className="flex items-center gap-3">
               <span className={`size-2.5 rounded-full ${byId.workday.connected ? "bg-[var(--success)]" : "bg-[var(--muted-light)]"}`} />
@@ -812,12 +915,28 @@ export default function App() {
   const [sampleMode, setSampleMode] = useState(!isLocalMode());
   const [items, setItems] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
+  const [undatedTasks, setUndatedTasks] = useState([]);
   const [fetchedCourses, setFetchedCourses] = useState([]);
   const [meetings, setMeetings] = useState([]);
   const [demoMeetings, setDemoMeetings] = useState([]);
   const [loadError, setLoadError] = useState(null);
   const [hiddenCourses, setHiddenCourses] = useState([]);
   const [manuallyDoneKeys, setManuallyDoneKeys] = useState([]);
+  // Brightspace/WeBWorK's own "connected" status can't be read back from
+  // /api/upcoming (see hub.js's comment above KNOWN_PROVIDERS) - it has to
+  // be tracked directly off their own connect responses instead. That
+  // state used to live inside SettingsPage itself, which meant it reset to
+  // "not connected" the moment you navigated away and back, even though
+  // the real connection was still there in hub.db - persisted like every
+  // other Connections-tab fact.
+  const [brightspaceCourseCount, setBrightspaceCourseCount] = useState(null);
+  // A list, not one value - more than one course can run its own WeBWorK
+  // (issue raised live: a student's real account had WeBWorK for exactly
+  // one course, but that's not true generally). Each entry is its own
+  // independent connection - own url, own course code, own item count -
+  // keyed by courseCode so reconnecting the same course updates it in
+  // place instead of appending a duplicate.
+  const [webworkConnections, setWebworkConnections] = useState([]);
   const [feedConnected, setFeedConnected] = useState(false);
   const [feedItems, setFeedItems] = useState([]);
   const [feedError, setFeedError] = useState(null);
@@ -854,6 +973,14 @@ export default function App() {
       if (Array.isArray(saved)) setManuallyDoneKeys(saved);
     } catch {
       // ignore malformed/missing storage - keep the default (nothing checked off)
+    }
+    const savedBrightspaceCount = localStorage.getItem("gather-brightspace-course-count");
+    if (savedBrightspaceCount !== null) setBrightspaceCourseCount(Number(savedBrightspaceCount));
+    try {
+      const saved = JSON.parse(localStorage.getItem("gather-webwork-connections"));
+      if (Array.isArray(saved)) setWebworkConnections(saved);
+    } catch {
+      // ignore malformed/missing storage - keep the default (no connections yet)
     }
     setPreferredKinds(readPreferredKindsCookie());
     // The feed URL is a secret (works like a password): it lives only in an
@@ -916,6 +1043,17 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("gather-manually-done", JSON.stringify(manuallyDoneKeys));
   }, [manuallyDoneKeys]);
+  useEffect(() => {
+    if (brightspaceCourseCount === null) return;
+    localStorage.setItem("gather-brightspace-course-count", String(brightspaceCourseCount));
+  }, [brightspaceCourseCount]);
+  useEffect(() => {
+    localStorage.setItem("gather-webwork-connections", JSON.stringify(webworkConnections));
+  }, [webworkConnections]);
+
+  function upsertWebworkConnection(url, courseCode, itemCount) {
+    setWebworkConnections((prev) => [...prev.filter((c) => c.courseCode !== courseCode), { url, courseCode, itemCount }]);
+  }
 
   function toggleCourseHidden(code, visible) {
     setHiddenCourses((prev) => (visible ? prev.filter((c) => c !== code) : [...prev, code]));
@@ -976,6 +1114,15 @@ export default function App() {
     } catch {
       setAnnouncements([]);
     }
+    // Same best-effort treatment as announcements above - and for the same
+    // reason: a real, successfully-connected source (WeBWorK) can have
+    // every one of its items come back due=None, which used to mean
+    // invisible everywhere (see hub/api.py's _undated_tasks()).
+    try {
+      setUndatedTasks(await fetchUndatedTasks(useSample));
+    } catch {
+      setUndatedTasks([]);
+    }
     // The demo student's class meetings (hosted Sample mode; [] otherwise).
     // Kept apart from `meetings` (the student's own Workday import) so they
     // never count as a real connection and vanish when Sample goes off.
@@ -1012,7 +1159,7 @@ export default function App() {
   const now = new Date();
   const allCourses = mergeCourses(fetchedCourses, storeCourses);
   const courses = selectVisibleCourses(allCourses, hiddenCourses);
-  const allItems = mergeItems(mergeItems(items, storeItems), feedItems);
+  const allItems = mergeItems(mergeItems(mergeItems(items, storeItems), feedItems), undatedTasks);
   const activeItems = hideCourseItems(selectActiveItems(allItems, manuallyDoneKeys), hiddenCourses);
   const doneCount = hideCourseItems(allItems, hiddenCourses).filter((item) => isDone(item, manuallyDoneKeys)).length;
   const overdueCount = activeItems.filter((item) => isOverdue(item, now)).length;
@@ -1145,6 +1292,10 @@ export default function App() {
               hostedConnected={storeItems.length > 0 || storeCourses.length > 0}
               allItems={allItems}
               allCoursesForPush={allCourses}
+              brightspaceCourseCount={brightspaceCourseCount}
+              onBrightspaceConnected={setBrightspaceCourseCount}
+              webworkConnections={webworkConnections}
+              onWebworkConnected={upsertWebworkConnection}
             />
           ) : activeNav === "Schedule" ? (
             <section className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface)] shadow-[var(--shadow-card)]">
@@ -1217,7 +1368,7 @@ export default function App() {
                   </div>
                   <div>
                     {topAssignments.map((item) => (
-                      <div key={item.id} className="assignment-row">
+                      <div key={itemKey(item)} className="assignment-row">
                         <input
                           type="checkbox"
                           aria-label={`Mark "${item.title}" as done`}
@@ -1310,7 +1461,7 @@ export default function App() {
                     </div>
                   ) : (
                     visibleAnnouncements.map((item) => (
-                      <div key={item.id} className="assignment-row">
+                      <div key={itemKey(item)} className="assignment-row">
                         <span className="course-mark">{item.course.slice(0, 2)}</span>
                         <div className="min-w-0 flex-1">
                           <div className="truncate font-bold">{item.title}</div>
@@ -1335,7 +1486,7 @@ export default function App() {
                           {course.term} &middot; Grade: {course.grade == null ? "—" : `${course.grade}%`}
                         </div>
                         {selectCourseItems(activeItems, course.code, preferredKinds).map((item) => (
-                          <div key={item.id} className={`assignment-row ${isOverdue(item, now) ? "due-now" : ""}`}>
+                          <div key={itemKey(item)} className={`assignment-row ${isOverdue(item, now) ? "due-now" : ""}`}>
                             <input
                               type="checkbox"
                               aria-label={`Mark "${item.title}" as done`}
@@ -1359,7 +1510,7 @@ export default function App() {
                 ) : (
                   <>
                     {visible.map((item) => (
-                      <div key={item.id} className="assignment-row">
+                      <div key={itemKey(item)} className="assignment-row">
                         <input
                           type="checkbox"
                           aria-label={`Mark "${item.title}" as done`}

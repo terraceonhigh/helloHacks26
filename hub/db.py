@@ -243,6 +243,74 @@ def courses(conn):
     return conn.execute("SELECT code, term, title, grade FROM courses ORDER BY code").fetchall()
 
 
+def find_matching_course(conn, text):
+    """Best existing course match for `text` - for a provider with no real
+    catalogue join key of its own (hub/webwork.py: "there's no student-
+    facing course-catalogue join key on this page", so the student types a
+    course identifier by hand). Returns the matching course's own
+    (id, code, term) - the caller needs the real id, not just code/term,
+    because a fresh save() always re-canonicalizes whatever code/term it's
+    given (_course_id()), so simply reusing this match's code/term through
+    the normal save() path would just recreate a second canonical-form row
+    instead of finding this one - see merge_course_into() below, meant to
+    run right after such a save().
+
+    Two passes:
+    1. Canonical identity - text and an existing code both parse to the same
+       (faculty, number) via normalise_course_code (rule 4's course-join
+       logic, hub/logic.py). Catches "BMEG 230" matching a pre-existing
+       "BMEG_V 230 101 2026W1" row that predates canonical course codes
+       (see the ponytail note above SCHEMA) - _course_id()'s own
+       WHERE code=? can't find that, since the *stored* code was never
+       rewritten to canonical form, only what's freshly saved is.
+    2. A fuzzy match against every course's own code and title, for
+       anything the canonical parse doesn't catch (e.g. typing a course's
+       actual title instead of a code-shaped string).
+
+    Returns None if nothing is close enough - the caller decides what a
+    non-match means (typically: make a new course of its own)."""
+    rows = conn.execute("SELECT id, code, term, title FROM courses").fetchall()
+    faculty, number, _section = normalise_course_code(text)
+    if faculty and number:
+        for cid, code, term, _title in rows:
+            f2, n2, _s2 = normalise_course_code(code)
+            if (f2, n2) == (faculty, number):
+                return cid, code, term
+
+    import difflib
+    labels = {}
+    for cid, code, term, title in rows:
+        labels.setdefault(code, (cid, code, term))
+        labels.setdefault(title, (cid, code, term))
+    match = difflib.get_close_matches(text, labels.keys(), n=1, cutoff=0.6)
+    return labels[match[0]] if match else None
+
+
+def merge_course_into(conn, code, term, target_id):
+    """Fold whatever fresh row a normal save(Course(code=code, term=term,
+    ...)) just created/updated into target_id instead - meant to run
+    immediately after such a save(), when find_matching_course() found an
+    existing course (target_id) that save()'s own re-canonicalization can't
+    discover on its own (see find_matching_course()'s docstring). Re-
+    canonicalizes `code`/`term` itself, the same way _course_id() does, so
+    the caller can just pass what it gave save() - not what's already
+    stored anywhere.
+
+    A no-op if that row doesn't exist or already *is* target_id (nothing to
+    fold in)."""
+    row = conn.execute(
+        "SELECT id FROM courses WHERE code=? AND term=?",
+        (_canonical_code(code), _canonical_term(term)),
+    ).fetchone()
+    if not row or row[0] == target_id:
+        return
+    source_id = row[0]
+    conn.execute("UPDATE items SET course_id=? WHERE course_id=?", (target_id, source_id))
+    conn.execute("UPDATE textbooks SET course_id=? WHERE course_id=?", (target_id, source_id))
+    conn.execute("DELETE FROM courses WHERE id=?", (source_id,))
+    conn.commit()
+
+
 def by_course(conn, category=None):
     """upcoming(), grouped under each course code - what a Course card wants:
     "this course's" tasks/deadlines/materials, each list still soonest-first."""

@@ -141,3 +141,59 @@ def test_connect_migrates_a_db_from_before_done_existed(tmp_path):
     rows = db.upcoming(conn)
     assert rows[0][3] == "old row"
     assert rows[0][6] is None
+
+
+def test_find_matching_course_by_canonical_identity_even_when_the_stored_code_is_the_long_form():
+    # Real bug found live: a pre-existing Canvas course row stored as
+    # "BMEG_V 230 101 2026W1" (predates canonical course codes - see the
+    # ponytail note above SCHEMA - db.save() itself always canonicalizes on
+    # write now, so this can only happen for a row a pre-canonicalization
+    # hub.db already had) didn't join with a fresh "BMEG 230" WeBWorK
+    # course, even though both name the same real course - exact string
+    # lookup (_course_id's WHERE code=?) can't find it since the *stored*
+    # code was never rewritten to canonical form. Inserted directly (not via
+    # db.save(), which would canonicalize it away) to reproduce that stale
+    # row for real.
+    conn = db.connect(":memory:")
+    conn.execute("INSERT INTO courses (code, term, title) VALUES ('BMEG_V 230 101 2026W1', '2026W1_V', 'Biomechanics I')")
+    cid, code, term = db.find_matching_course(conn, "BMEG 230")
+    assert (code, term) == ("BMEG_V 230 101 2026W1", "2026W1_V")
+
+
+def test_find_matching_course_falls_back_to_a_fuzzy_title_match():
+    conn = db.connect(":memory:")
+    db.save(conn, [Course(code="XYZ 000", section="", term="2026W1", title="Biomechanics I")])
+    # "Biomechanic" (typo/partial) doesn't parse as a course code at all, so
+    # only the fuzzy pass can find this.
+    cid, code, term = db.find_matching_course(conn, "Biomechanic")
+    assert (code, term) == ("XYZ 000", "2026W1")
+
+
+def test_find_matching_course_returns_none_for_a_genuinely_new_course():
+    conn = db.connect(":memory:")
+    db.save(conn, [COURSE])  # CPSC 121
+    assert db.find_matching_course(conn, "MATH 200") is None
+
+
+def test_find_matching_course_with_no_courses_at_all_returns_none():
+    conn = db.connect(":memory:")
+    assert db.find_matching_course(conn, "BMEG 230") is None
+
+
+def test_merge_course_into_moves_items_and_deletes_the_absorbed_row():
+    conn = db.connect(":memory:")
+    conn.execute("INSERT INTO courses (id, code, term, title) VALUES (1, 'BMEG_V 230 101 2026W1', '2026W1_V', 'Biomechanics I')")
+    conn.execute("INSERT INTO courses (id, code, term, title) VALUES (2, 'BMEG 230', '', 'BMEG 230')")
+    conn.execute("INSERT INTO items (course_id, category, kind, title, url, source) VALUES (2, 'task', 'problemset', 'WW1', 'https://x/1', 'webwork')")
+    conn.commit()
+    db.merge_course_into(conn, "BMEG 230", "", target_id=1)
+    assert conn.execute("SELECT id FROM courses").fetchall() == [(1,)]
+    assert conn.execute("SELECT course_id FROM items WHERE source='webwork'").fetchone() == (1,)
+
+
+def test_merge_course_into_is_a_no_op_when_the_row_doesnt_exist_or_is_already_the_target():
+    conn = db.connect(":memory:")
+    db.save(conn, [COURSE])
+    db.merge_course_into(conn, "NONEXISTENT 999", "", target_id=1)  # no such row
+    db.merge_course_into(conn, "CPSC 121", "2026W1", target_id=1)  # already the target
+    assert len(conn.execute("SELECT id FROM courses").fetchall()) == 1

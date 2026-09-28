@@ -8,8 +8,8 @@ from http.server import ThreadingHTTPServer
 
 from icalendar import Calendar as ICalendar
 
-from hub import db
-from hub.api import ALLOWED_ORIGIN, Handler, _announcements, _upcoming
+from hub import brightspace, db, webwork
+from hub.api import ALLOWED_ORIGIN, Handler, _announcements, _undated_tasks, _upcoming
 from hub.models import Course, Item
 
 NOW = datetime.now(timezone.utc)
@@ -57,6 +57,20 @@ def test_announcements_excludes_undated_items_that_are_not_announcements():
                                due=None, url="https://x/b", source="canvas")
     db.save(conn, [COURSE], [announcement, undated_assignment])
     assert [r["title"] for r in _announcements(conn)] == ["Welcome!"]
+
+
+def test_undated_tasks_is_the_complement_of_announcements():
+    # Verified live: a real WeBWorK account connected successfully, but
+    # every one of its 7 real problem sets came back due=None (its own
+    # module docstring: a due date only exists for a currently-open set) -
+    # before this endpoint existed, they were invisible everywhere.
+    conn = db.connect(":memory:")
+    announcement = Item(course="CPSC 121", category="task", kind="announcement", title="Welcome!",
+                         due=None, url="https://x/a", source="canvas")
+    undated_problemset = Item(course="CPSC 121", category="task", kind="problemset", title="BMEG230-Statics-A2",
+                               due=None, url="https://x/b", source="webwork")
+    db.save(conn, [COURSE], [announcement, undated_problemset])
+    assert [r["title"] for r in _undated_tasks(conn)] == ["BMEG230-Statics-A2"]
 
 
 def _running_server(tmp_path, monkeypatch):
@@ -237,5 +251,115 @@ def test_non_object_json_body_returns_400_not_a_crash(tmp_path, monkeypatch):
             assert False, "expected HTTPError"
         except urllib.error.HTTPError as e:
             assert e.code == 400
+    finally:
+        server.shutdown()
+
+
+def _post_json(port, path, payload, origin=ALLOWED_ORIGIN):
+    req = urllib.request.Request(
+        f"http://127.0.0.1:{port}{path}", method="POST",
+        data=json.dumps(payload).encode(), headers={"Origin": origin, "Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req) as res:
+            return res.status, json.loads(res.read())
+    except urllib.error.HTTPError as e:
+        return e.code, json.loads(e.read())
+
+
+def test_connect_brightspace_rejects_a_non_https_base_without_ever_fetching(tmp_path, monkeypatch):
+    called = []
+    monkeypatch.setattr(brightspace, "fetch", lambda *a, **k: called.append(1))
+    server = _running_server(tmp_path, monkeypatch)
+    try:
+        port = server.server_address[1]
+        status, body = _post_json(port, "/api/connect/brightspace", {"base": "http://ubc.brightspace.com"})
+        assert status == 400
+        assert called == []
+    finally:
+        server.shutdown()
+
+
+def test_connect_brightspace_saves_courses_from_a_valid_base(tmp_path, monkeypatch):
+    fake_course = Course(code="MATH_V 100A ALL SECTIONS 2026W1", section="", term="", title="Calculus")
+    monkeypatch.setattr(brightspace, "fetch", lambda base: ([fake_course], []))
+    server = _running_server(tmp_path, monkeypatch)
+    try:
+        port = server.server_address[1]
+        status, body = _post_json(port, "/api/connect/brightspace", {"base": "https://ubc.brightspace.com"})
+        assert status == 200
+        assert body == {"ok": True, "courses": 1, "items": 0}
+    finally:
+        server.shutdown()
+
+
+def test_connect_webwork_rejects_a_non_https_base_without_ever_fetching(tmp_path, monkeypatch):
+    called = []
+    monkeypatch.setattr(webwork, "fetch", lambda *a, **k: called.append(1))
+    server = _running_server(tmp_path, monkeypatch)
+    try:
+        port = server.server_address[1]
+        status, body = _post_json(port, "/api/connect/webwork", {"base": "http://webwork.example.edu", "course_code": "MATH 100"})
+        assert status == 400
+        assert called == []
+    finally:
+        server.shutdown()
+
+
+def test_connect_webwork_requires_a_course_code(tmp_path, monkeypatch):
+    called = []
+    monkeypatch.setattr(webwork, "fetch", lambda *a, **k: called.append(1))
+    server = _running_server(tmp_path, monkeypatch)
+    try:
+        port = server.server_address[1]
+        status, body = _post_json(port, "/api/connect/webwork", {"base": "https://webwork.example.edu"})
+        assert status == 400
+        assert called == []
+    finally:
+        server.shutdown()
+
+
+def test_connect_webwork_builds_the_course_itself_from_course_code(tmp_path, monkeypatch):
+    # hub/webwork.py's fetch() returns items only - no catalogue join key on
+    # its own page - so the Course record has to come from the caller.
+    fake_item = Item(course="MATH 100", category="deadline", kind="quiz", title="WW1",
+                      due=None, url="https://webwork.example.edu/1", source="webwork")
+    monkeypatch.setattr(webwork, "fetch", lambda base, course_code: [fake_item])
+    server = _running_server(tmp_path, monkeypatch)
+    try:
+        port = server.server_address[1]
+        status, body = _post_json(port, "/api/connect/webwork", {"base": "https://webwork.example.edu", "course_code": "MATH 100"})
+        assert status == 200
+        assert body == {"ok": True, "courses": 1, "items": 1}
+    finally:
+        server.shutdown()
+
+
+def test_connect_webwork_joins_an_existing_course_instead_of_making_a_new_one(tmp_path, monkeypatch):
+    # Real bug found live: a pre-existing Canvas course row stored as
+    # "BMEG_V 230 101 2026W1" (predates canonical course codes) didn't join
+    # with a fresh "BMEG 230" WeBWorK course, even though both name the
+    # same real course - two separate cards, WeBWorK's items invisible on
+    # the real one. _connect_webwork should find and reuse the existing
+    # course's own stored identity instead of making a new "BMEG 230" row.
+    db_path = tmp_path / "hub.db"
+    conn = db.connect(db_path)
+    conn.execute("INSERT INTO courses (code, term, title) VALUES ('BMEG_V 230 101 2026W1', '2026W1_V', 'Biomechanics I')")
+    conn.commit()
+    fake_item = Item(course="BMEG 230", category="task", kind="problemset", title="WW1",
+                      due=None, url="https://webwork.elearning.ubc.ca/1", source="webwork")
+    monkeypatch.setattr(webwork, "fetch", lambda base, course_code: [fake_item])
+    server = _running_server(tmp_path, monkeypatch)
+    try:
+        port = server.server_address[1]
+        status, body = _post_json(port, "/api/connect/webwork", {"base": "https://webwork.elearning.ubc.ca", "course_code": "BMEG 230"})
+        assert status == 200
+        assert body == {"ok": True, "courses": 1, "items": 1}
+        rows = conn.execute("SELECT code FROM courses").fetchall()
+        assert rows == [("BMEG_V 230 101 2026W1",)]  # one course, not two
+        item_course = conn.execute(
+            "SELECT courses.code FROM items JOIN courses ON courses.id = items.course_id WHERE items.source='webwork'"
+        ).fetchone()
+        assert item_course == ("BMEG_V 230 101 2026W1",)
     finally:
         server.shutdown()
