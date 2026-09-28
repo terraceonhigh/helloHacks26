@@ -4,19 +4,16 @@ tests/oracle/captures/*.json golden ("hub.captures.normalize" - the
 
 Each golden's capture names its own provider ("canvas", "prairielearn").
 captures.py is a pure dispatcher: it only ever succeeds for a source that's
-actually registered under lauds/adapters/. Piazza (this task's own) is
-always registered, so a Piazza-sourced golden always runs for real; a
-golden naming a provider ported by a *different* swarm agent is skipped
-with a clear, named reason instead of silently "passing" - that's a missing
-sibling module, not a captures.py bug, and re-checking after a `git pull`
-picks it up the moment that adapter lands.
+actually registered under lauds/adapters/ - every in-scope adapter is
+registered by the end of this branch (BRIEF.md's scope list), so every
+golden here must actually exercise the real dispatch, never skip past it.
 """
 import json
 
 import pytest
 
 from lauds import adapters
-from lauds.adapters import captures
+from lauds.adapters import _captures as captures
 from tests.parity.superset import assert_superset, golden_paths, load_golden, load_inputs
 
 GOLDENS = golden_paths("captures")
@@ -30,9 +27,14 @@ def test_captures_normalize_is_a_superset(path):
     (capture_text,) = inputs.values()
     capture = json.loads(capture_text)
     source = capture.get("source")
-    if source not in adapters.names():
-        pytest.skip(f"{path.name}: needs the {source!r} adapter (another swarm agent's porting task), "
-                    f"not registered under lauds/adapters/ in this checkout yet")
+    # BRIEF major finding: a conditional pytest.skip here would turn a
+    # source whose adapter module fails to import (adapters._discover puts
+    # it in load_errors instead of the registry) into a silent skip instead
+    # of a failure - it doesn't trigger today (every in-scope adapter loads
+    # clean), but the hole stays latent as long as this can skip at all.
+    assert source in adapters.names(), (
+        f"{path.name}: {source!r} adapter not registered "
+        f"(load error: {adapters.load_errors.get(source)})")
     assert_superset(golden, captures.normalize(capture))
 
 

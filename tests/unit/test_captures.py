@@ -9,7 +9,7 @@ lauds.adapters.piazza (this task's own, always available)."""
 import pytest
 
 from lauds import adapters
-from lauds.adapters import captures
+from lauds.adapters import _captures as captures
 from lauds.models import Bundle, Course, Item
 
 DUE = "2026-09-30T06:59:00+00:00"

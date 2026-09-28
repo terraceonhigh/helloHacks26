@@ -9,10 +9,13 @@ every adapter by its `NAME`, so reusing it here means a provider only ever
 has to define `parse_capture` once, not register it twice.
 
 Not a provider adapter itself: it has no `NAME`/`fetch` of its own (nothing
-"captures" from the network), so `lauds.adapters`' discovery correctly logs
-it under `load_errors` as "not an adapter" - that message is accurate, not
-a bug, and harmless (only shown on `lauds status` for genuinely broken
-plugins).
+"captures" from the network). Named with a leading underscore (BRIEF minor
+finding: it used to sit in the plugin package as plain `captures.py`, so
+`lauds.adapters`' discovery tried to register it as one and logged a
+spurious `load_errors["captures"] = "not an adapter"` on every single CLI
+run) - `_discover()` skips any module starting with `_`, same as
+`lauds/adapters/__init__.py`'s own docstring already says private helpers
+do.
 
 `normalize()`'s output only ever depends on whichever adapter the capture
 names actually being registered under `lauds/adapters/` - e.g. a Piazza
