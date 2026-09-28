@@ -44,6 +44,7 @@ def login(site, base, headless=False, timeout_ms=300_000, logged_in=None):
 
     path = state_path(site)
     paths.ensure_dir(path.parent)
+    paths.touch_secure(path)  # 0600 before Playwright's own driver ever writes it
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=headless)
         try:
@@ -102,24 +103,40 @@ def get_all(req, url, params=None, unwrap=json.loads, sleep=time.sleep, max_page
 
 
 def fetch_with_session(site, base, run, logged_in=None, _playwright=None):
-    """Ensure a saved session exists, run `run(request_context)`, and log in
-    again (once) if the session turns out to be expired."""
+    """Run `run(request_context)` against the saved session for `site`.
+
+    Never opens a browser and never calls `login()` itself - two real bugs,
+    fixed together by removing the retry-login path entirely (BRIEF findings):
+
+    1. **No saved session** used to mean "open a visible browser and log in
+       right here", so a plain `lauds sync` on a fresh machine could pop up
+       to three interactive Chromium windows and block on each for up to
+       5 minutes - `sync`'s own per-source timeout (60s default) would then
+       abandon the thread while the browser stayed open, breaking the
+       never-hang / no-interactive-prompt rules. Now it raises `NotLoggedIn`
+       immediately instead: `lauds.sync` records that as **stale**, and only
+       an explicit `lauds login <source>` may open a browser.
+    2. **A session that expired mid-run** used to call `login()` to
+       re-authenticate *from inside* the `with _playwright() as pw:` block
+       above - `login()` opens its own `with sync_playwright() as pw:`,
+       and nesting two `sync_playwright()` contexts on the same thread
+       crashes ("looks like you are using Playwright Sync API inside the
+       asyncio loop"), live-verified in the lauds venv. `NotLoggedIn` now
+       simply propagates (the `finally` below still closes the browser
+       first) - same "stale, re-login needed" outcome as never having had a
+       session at all, and no login happens while a Playwright context is
+       open.
+    """
     if _playwright is None:
         from playwright.sync_api import sync_playwright as _playwright
 
     path = state_path(site)
     if not path.exists():
-        login(site, base, logged_in=logged_in)
+        raise NotLoggedIn(site)
     with _playwright() as pw:
         browser = pw.chromium.launch()
         try:
-            try:
-                return run(browser.new_context(storage_state=str(path)).request)
-            except NotLoggedIn:
-                browser.close()
-                login(site, base, logged_in=logged_in)
-                browser = pw.chromium.launch()
-                return run(browser.new_context(storage_state=str(path)).request)
+            return run(browser.new_context(storage_state=str(path)).request)
         finally:
             browser.close()
 

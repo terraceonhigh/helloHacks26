@@ -73,38 +73,93 @@ def test_state_path_under_lauds_home(tmp_path, monkeypatch):
     assert session.state_path("canvas") == tmp_path / "canvas-state.json"
 
 
-def test_fetch_with_session_relogs_once_on_expiry(tmp_path, monkeypatch):
+class _FakeCtx:
+    request = "REQ"
+
+
+class _FakeBrowser:
+    def __init__(self):
+        self.closed = False
+
+    def new_context(self, storage_state):
+        return _FakeCtx()
+
+    def close(self):
+        self.closed = True
+
+
+class _FakePW:
+    def __init__(self):
+        self.browsers = []
+
+    def __call__(self):
+        return self
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+    @property
+    def chromium(self):
+        outer = self
+
+        class C:
+            @staticmethod
+            def launch(**kw):
+                b = _FakeBrowser()
+                outer.browsers.append(b)
+                return b
+        return C
+
+
+def test_fetch_with_session_raises_not_logged_in_with_no_saved_session_and_never_opens_a_browser(
+        tmp_path, monkeypatch):
+    """BRIEF major finding: no saved session must never mean "open an
+    interactive browser and block `sync` on it" - it must come back as
+    NotLoggedIn (stale), same as an expired one, so only `lauds login
+    <source>` drives an interactive login."""
+    monkeypatch.setenv("LAUDS_HOME", str(tmp_path))
+
+    def boom(*a, **kw):
+        raise AssertionError("fetch_with_session must never call session.login() itself")
+
+    monkeypatch.setattr(session, "login", boom)
+    pw = _FakePW()
+    with pytest.raises(NotLoggedIn):
+        session.fetch_with_session("s", "https://b", lambda req: "unreachable", _playwright=pw)
+    assert pw.browsers == []  # never even launched a browser
+
+
+def test_fetch_with_session_lets_an_expired_session_propagate_without_relogging(tmp_path, monkeypatch):
+    """BRIEF blocker finding: re-logging in from inside fetch_with_session's
+    own `with _playwright()` block nests two sync_playwright() calls and
+    crashes for real (live-verified in the lauds venv). NotLoggedIn must
+    propagate untouched instead, and login() must never be called while a
+    Playwright context is open - the caller (`lauds.sync`) is what turns
+    this into "stale, re-login needed"."""
     monkeypatch.setenv("LAUDS_HOME", str(tmp_path))
     (tmp_path / "s-state.json").write_text("{}")
-    logins = []
-    monkeypatch.setattr(session, "login", lambda site, base, **kw: logins.append(site))
+    monkeypatch.setattr(session, "login", lambda *a, **kw: (_ for _ in ()).throw(
+        AssertionError("fetch_with_session must never call session.login() itself")))
 
-    class Ctx:
-        request = "REQ"
+    pw = _FakePW()
+    with pytest.raises(NotLoggedIn):
+        session.fetch_with_session("s", "https://b", lambda req: (_ for _ in ()).throw(NotLoggedIn), _playwright=pw)
+    assert len(pw.browsers) == 1 and pw.browsers[0].closed  # opened once, closed on the way out
 
-    class Browser:
-        def new_context(self, storage_state):
-            return Ctx()
 
-        def close(self):
-            pass
-
-    class PW:
-        chromium = type("C", (), {"launch": staticmethod(lambda **kw: Browser())})
-
-        def __enter__(self):
-            return self
-
-        def __exit__(self, *a):
-            return False
-
+def test_fetch_with_session_runs_against_the_saved_session(tmp_path, monkeypatch):
+    monkeypatch.setenv("LAUDS_HOME", str(tmp_path))
+    (tmp_path / "s-state.json").write_text("{}")
+    pw = _FakePW()
     calls = []
 
     def run(req):
         calls.append(req)
-        if len(calls) == 1:
-            raise NotLoggedIn
         return "ok"
 
-    assert session.fetch_with_session("s", "https://b", run, _playwright=PW) == "ok"
-    assert logins == ["s"] and calls == ["REQ", "REQ"]
+    assert session.fetch_with_session("s", "https://b", run, _playwright=pw) == "ok"
+    assert calls == ["REQ"]
+    assert len(pw.browsers) == 1 and pw.browsers[0].closed
