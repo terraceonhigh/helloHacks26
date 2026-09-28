@@ -104,12 +104,31 @@ def _counts(bundle) -> dict[str, int]:
     return {k: len(getattr(bundle, k)) for k in ("courses", "items", "textbooks", "meetings")}
 
 
-def sync_one(name: str, mod, conn, timeout: float, **opts) -> SyncResult:
+def sync_one(name: str, mod, conn, timeout: float, cfg: dict | None = None, **opts) -> SyncResult:
     """Fetch and save one source. Never raises - every failure becomes a
     `SyncResult(ok=False, ...)` so the caller's loop never needs its own
-    try/except."""
+    try/except.
+
+    `cfg` is this source's saved `lauds config set`/`lauds login --opt`
+    values (`{}` if none); `adapters.fill_kwargs` matches them against
+    `mod.fetch`'s own parameter names so a real per-adapter signature -
+    `webwork.fetch(base, course_code)`, `bookstore.fetch(program, term)`,
+    ... - actually gets driven instead of always being called as a bare
+    `fetch()` (BRIEF blocker finding). A required kwarg with nothing
+    configured for it is reported as a clear "needs config: ..." failure,
+    not a bare `TypeError`. Anything in `opts` overrides `cfg` (a caller -
+    e.g. a future scripted use of `sync_one` - can still pass exact kwargs
+    through directly)."""
+    kwargs, missing = adapters.fill_kwargs(mod.fetch, cfg or {})
+    kwargs.update(opts)
+    missing = [m for m in missing if m not in opts]
+    if missing:
+        err = ("needs config: " + ", ".join(f"{name}.{m}" for m in missing)
+               + f" (run `lauds config set {name}.{missing[0]} <value>`)")
+        store.record_sync(conn, name, False, error=err)
+        return SyncResult(name, False, error=err)
     try:
-        bundle = _call_with_timeout(lambda: mod.fetch(**opts), timeout)
+        bundle = _call_with_timeout(lambda: mod.fetch(**kwargs), timeout)
     except NotLoggedIn:
         store.record_sync(conn, name, False, error=STALE_ERROR)
         return SyncResult(name, False, error=STALE_ERROR, stale=True)
@@ -145,7 +164,7 @@ def sync(names: list[str] | None = None, timeout: float = DEFAULT_TIMEOUT, conn=
                     store.record_sync(conn, name, False, error=msg)
                     report.results.append(SyncResult(name, False, error=msg))
                     continue
-                report.results.append(sync_one(name, reg[name], conn, timeout))
+                report.results.append(sync_one(name, reg[name], conn, timeout, cfg=paths.adapter_config(name)))
     finally:
         if own_conn:
             conn.close()

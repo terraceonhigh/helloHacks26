@@ -18,6 +18,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from lauds import adapters, export_ics, paths, store
+from lauds.adapters import fill_kwargs
 from lauds.models import SOON_WINDOW, canonical_code
 from lauds.sync import STALE_ERROR, SyncLocked, sync as run_sync
 
@@ -103,6 +104,21 @@ ITEM_COLUMNS = (
 
 # --- commands ----------------------------------------------------------------
 
+def _parse_opts(pairs) -> dict:
+    """`--opt base=https://x --opt course_code=math100` -> {"base": ...,
+    "course_code": ...}. Same shape `lauds config set <source>.<key>
+    <value>` writes, so an adapter's `login()`/`fetch()` can be driven by
+    either one (BRIEF blocker finding: neither `login` nor `sync` used to
+    be able to pass an adapter any argument at all)."""
+    opts = {}
+    for raw in pairs or ():
+        key, sep, value = raw.partition("=")
+        if not sep or not key:
+            raise ValueError(f"--opt must be key=value, got {raw!r}")
+        opts[key] = value
+    return opts
+
+
 def cmd_login(args) -> int:
     name = args.source
     try:
@@ -114,7 +130,24 @@ def cmd_login(args) -> int:
     if not callable(login):
         print(f"{name}: no login step needed (it isn't a session-based adapter)")
         return 0
-    login()
+    try:
+        explicit = _parse_opts(args.opt)
+    except ValueError as e:
+        print(f"lauds login: {e}", file=sys.stderr)
+        return 1
+    cfg = {**paths.adapter_config(name), **explicit}
+    kwargs, missing = fill_kwargs(login, cfg)
+    if missing:
+        print(f"lauds login {name}: needs " +
+              ", ".join(f"--opt {m}=<value>" for m in missing), file=sys.stderr)
+        return 1
+    try:
+        login(**kwargs)
+    except Exception as e:  # noqa: BLE001 - report it, don't crash the CLI
+        print(f"lauds login {name}: {type(e).__name__}: {e}", file=sys.stderr)
+        return 1
+    if explicit:
+        paths.save_adapter_config(name, explicit)  # so a later `sync`/`login` doesn't need --opt again
     print(f"{name}: session saved")
     return 0
 
@@ -125,14 +158,21 @@ def cmd_sync(args) -> int:
     except SyncLocked as e:
         print(f"lauds sync: {e}", file=sys.stderr)
         return 3
+    as_json = getattr(args, "json", False)
     for r in report.results:
+        # With --json, stdout carries only the JSON array below (BRIEF minor
+        # finding: these human lines used to print to stdout first, so
+        # `lauds sync --json | python3 -c "json.load(sys.stdin)"` failed at
+        # char 0) - still shown, just on stderr, so `--json` doesn't also
+        # mean "silent".
+        out = sys.stderr if as_json else sys.stdout
         if r.ok:
             n = ", ".join(f"{k} {v}" for k, v in sorted(r.counts.items())) if r.counts else "nothing"
-            print(f"{r.source}: ok ({n})")
+            print(f"{r.source}: ok ({n})", file=out)
         else:
             tag = "re-login needed" if r.stale else "FAILED"
             print(f"{r.source}: {tag} - {r.error}", file=sys.stderr)
-    if getattr(args, "json", False):
+    if as_json:
         print(json.dumps([r.__dict__ for r in report.results], indent=2, sort_keys=True))
     return 1 if report.any_failed else 0
 
@@ -318,16 +358,26 @@ def cmd_export_ics(args) -> int:
     return 0
 
 
+_CONFIG_SEGMENT = r"[a-z][a-z0-9_-]*"  # allows e.g. "course_code", a real fetch() parameter name
+
+
 def cmd_config_set(args) -> int:
-    if not re.match(r"^[a-z][a-z0-9-]*$", args.key):
+    """`config set <key> <value>`. `<key>` is either a bare flat key (the
+    original `config set canvas-feed-url <url>` shape) or `<source>.<key>`
+    (BRIEF blocker fix: this is what `lauds.sync`/`lauds login --opt` read
+    per adapter - `lauds config set webwork.base https://...`)."""
+    dotted = re.match(rf"^({_CONFIG_SEGMENT})\.({_CONFIG_SEGMENT})$", args.key)
+    if dotted:
+        paths.save_adapter_config(dotted.group(1), {dotted.group(2): args.value})
+    elif re.match(rf"^{_CONFIG_SEGMENT}$", args.key):
+        path = paths.config_path()
+        paths.ensure_dir(path.parent)
+        data = paths.load_config()
+        data[args.key] = args.value
+        paths.secure_write_text(path, json.dumps(data, indent=2, sort_keys=True))
+    else:
         print(f"lauds config set: bad key {args.key!r}", file=sys.stderr)
         return 1
-    cfg_dir = paths.ensure_dir(paths.config_dir())
-    path = cfg_dir / "config.json"
-    data = json.loads(path.read_text()) if path.exists() else {}
-    data[args.key] = args.value
-    path.write_text(json.dumps(data, indent=2, sort_keys=True))
-    paths.secure_file(path)
     masked = args.value if len(args.value) <= 8 else args.value[:4] + "…" + args.value[-2:]
     print(f"{args.key} set ({masked})")
     return 0
@@ -341,6 +391,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser("login", help="interactive login for one source")
     sp.add_argument("source")
+    sp.add_argument("--opt", action="append", metavar="KEY=VALUE",
+                     help="a config value this source's login/fetch needs (repeatable); "
+                          "saved for later syncs too, same as `config set <source>.<key> <value>`")
     sp.set_defaults(func=cmd_login)
 
     sp = sub.add_parser("sync", help="fetch and save one or more sources (default: all)")

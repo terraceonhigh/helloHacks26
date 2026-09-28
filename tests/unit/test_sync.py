@@ -100,6 +100,49 @@ def test_exit_code_nonzero_iff_any_failed(conn):
     assert sync.sync(conn=store.connect(":memory:"), adapters_map=bad_reg, timeout=5).any_failed
 
 
+def test_sync_one_drives_a_real_adapter_signature_from_cfg(conn):
+    # BRIEF blocker finding: sync_one used to always call `mod.fetch()` with
+    # no arguments at all, so any adapter whose fetch() takes a required
+    # positional (webwork's base/course_code, bookstore's program/term, ...)
+    # always failed with a bare TypeError. cfg (this source's saved config)
+    # must now actually reach fetch() as kwargs.
+    seen = {}
+
+    def fetch(base, course_code, campus="UBCV"):
+        seen["kwargs"] = {"base": base, "course_code": course_code, "campus": campus}
+        return Bundle()
+
+    result = sync.sync_one("webwork", _mod("webwork", fetch=fetch), conn, timeout=5,
+                            cfg={"base": "https://ww.example.edu", "course_code": "math100"})
+    assert result.ok
+    assert seen["kwargs"] == {"base": "https://ww.example.edu", "course_code": "math100", "campus": "UBCV"}
+
+
+def test_sync_one_reports_missing_required_config_clearly_instead_of_a_typeerror(conn):
+    def fetch(base, course_code):
+        raise AssertionError("must not be called with missing required config")
+
+    result = sync.sync_one("webwork", _mod("webwork", fetch=fetch), conn, timeout=5, cfg={"base": "https://x"})
+    assert not result.ok and not result.stale
+    assert "needs config" in result.error and "webwork.course_code" in result.error
+
+
+def test_sync_one_passes_a_keyword_only_config_value_like_canvas_access_token(conn):
+    # BRIEF blocker finding: access_token was unreachable from the CLI even
+    # though canvas.fetch(start=None, end=None, *, access_token=None) has
+    # always accepted one - a keyword-only parameter must be filled from
+    # cfg exactly like an ordinary one.
+    seen = {}
+
+    def fetch(start=None, end=None, *, access_token=None):
+        seen["access_token"] = access_token
+        return Bundle()
+
+    result = sync.sync_one("canvas", _mod("canvas", fetch=fetch), conn, timeout=5,
+                            cfg={"access_token": "tok123"})
+    assert result.ok and seen["access_token"] == "tok123"
+
+
 def test_two_syncs_cannot_overlap(tmp_path):
     lock_path = tmp_path / "sync.lock"
     slow_started = []

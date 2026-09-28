@@ -5,7 +5,7 @@ command reads/writes the store at `paths.db_path()` (default
 `~/.local/share/lauds/lauds.db`, or everything under `$LAUDS_HOME` when set).
 
 ```
-lauds login <source>
+lauds login <source> [--opt KEY=VALUE ...]
 lauds sync [source...] [--timeout SECONDS]
 lauds status [--json]
 lauds today [--json]
@@ -21,19 +21,35 @@ lauds config set <key> <value>
 
 ## Commands
 
-- **`login <source>`** — runs that adapter's interactive login (a real,
-  visible browser; only the session is kept, never a password), or says
-  "no login step needed" for a token/no-auth adapter that has none.
+- **`login <source> [--opt KEY=VALUE ...]`** — runs that adapter's
+  interactive login (a real, visible browser; only the session is kept,
+  never a password), or says "no login step needed" for a token/no-auth
+  adapter that has none. Some adapters' `login()`/`fetch()` need more than
+  a saved session — WeBWorK needs `base`; Bookstore needs `program`/`term`;
+  Canvas's optional token path needs `access_token`; and so on. `--opt` (
+  repeatable) supplies those by parameter name for this one call, and — if
+  `login()` succeeds — saves them for later, same as `config set
+  <source>.<key> <value>` (below): a later `sync` needs no `--opt` at all.
+  A missing required value is reported by name (`needs --opt base=<value>`),
+  never a bare `TypeError`.
 - **`sync [source...]`** — fetches and saves sources (default: every
-  adapter `lauds.adapters` discovers). Each source gets its own try/except
-  and a hard per-source `--timeout` (default 60s, via `lauds.sync`'s
-  daemon-thread runner — a hung adapter is abandoned and reported as a
-  timeout, never left to block the others). `NotLoggedIn` is recorded as
-  **stale** (`status`'s `stale` column, error `"re-login needed"`), never
-  silently partial — sources that *did* succeed are still saved. Exit code
-  is non-zero iff any source failed. A lockfile
-  (`$LAUDS_HOME_or_data_dir/sync.lock`) keeps two `sync` runs from
-  overlapping; a second one exits immediately (code 3) instead of waiting.
+  adapter `lauds.adapters` discovers). Each source's saved config
+  (`config set <source>.<key> <value>` / a prior `login --opt`) is matched
+  against its `fetch()`'s own parameter names and passed through as kwargs
+  — a required one with nothing configured fails clearly ("needs config:
+  `<source>.<key>`"), never a bare `TypeError`. Each source gets its own
+  try/except and a hard per-source `--timeout` (default 60s, via
+  `lauds.sync`'s daemon-thread runner — a hung adapter is abandoned and
+  reported as a timeout, never left to block the others). `NotLoggedIn` is
+  recorded as **stale** (`status`'s `stale` column, error `"re-login
+  needed"`), never silently partial — sources that *did* succeed are still
+  saved, and a session-based adapter with no saved session at all is
+  reported stale too, never opened as an interactive browser mid-`sync`
+  (only `lauds login` does that). Exit code is non-zero iff any source
+  failed. A lockfile (`$LAUDS_HOME_or_data_dir/sync.lock`) keeps two `sync`
+  runs from overlapping; a second one exits immediately (code 3) instead of
+  waiting. `--json` prints only the JSON array on stdout; the per-source
+  human lines go to stderr instead so the two never mix on one stream.
 - **`status`** — one row per known adapter (whether ever synced or not):
   last attempt/success, ok/never, stale, and the last error.
 - **`today`** — items due today, America/Vancouver.
@@ -58,9 +74,13 @@ lauds config set <key> <value>
   side is how a calendar app gives each its own colour — see that module's
   docstring). Checked against `tests/oracle/export_ics/*.json` byte-for-byte
   by `tests/parity/test_export_ics.py`.
-- **`config set <key> <value>`** — e.g. `config set canvas-feed-url <url>`.
-  Stored at `$LAUDS_HOME_or_config_dir/config.json`, chmod 0600, and never
-  echoed back in full (only a short masked prefix/suffix).
+- **`config set <key> <value>`** — `<key>` is either `<source>.<key>` (an
+  adapter's own config, e.g. `config set webwork.base https://...` or
+  `config set bookstore.term 2026W1` — read by `sync`/`login` as described
+  above) or a bare flat key (e.g. `config set canvas-feed-url <url>`, kept
+  for anything that isn't tied to one adapter's `fetch()`/`login()`
+  parameters). Stored at `$LAUDS_HOME_or_config_dir/config.json`, chmod
+  0600, and never echoed back in full (only a short masked prefix/suffix).
 
 ## `--json` schema
 

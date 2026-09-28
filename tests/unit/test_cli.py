@@ -60,6 +60,14 @@ NAME = "flaky"
 def fetch(**kw):
     raise NotLoggedIn("flaky")
 ''')
+    (pkg / "needsconfig.py").write_text('''
+from lauds.models import Bundle, Course
+NAME = "needsconfig"
+def login(base, course_code):
+    pass
+def fetch(base, course_code):
+    return Bundle(courses=[Course(code="X", section="", term="", title=f"{base}/{course_code}")])
+''')
     monkeypatch.setattr(adapters, "__path__", [str(pkg)])
     monkeypatch.setattr(adapters, "__name__", "clitest_plug")
     mod = types.ModuleType("clitest_plug")
@@ -91,6 +99,36 @@ def test_login_no_login_step(env, capsys):
 def test_login_unknown_source(env, capsys):
     code, _, err = _run(["login", "nope"], capsys)
     assert code == 1 and "unknown adapter" in err
+
+
+def test_login_reports_missing_required_config_instead_of_a_typeerror(env, capsys):
+    code, _, err = _run(["login", "needsconfig"], capsys)
+    assert code == 1
+    assert "base" in err and "course_code" in err
+
+
+def test_login_with_opts_drives_login_and_saves_config_for_later(env, capsys):
+    from lauds import paths
+    code, out, _ = _run(["login", "needsconfig", "--opt", "base=https://ww.example.edu",
+                          "--opt", "course_code=math100"], capsys)
+    assert code == 0 and "session saved" in out
+    assert paths.adapter_config("needsconfig") == {"base": "https://ww.example.edu", "course_code": "math100"}
+    # a later sync needs no --opt at all: the saved config drives fetch()
+    code, out, _ = _run(["sync", "needsconfig"], capsys)
+    assert code == 0 and "needsconfig: ok" in out
+
+
+def test_sync_reports_missing_config_as_a_clear_error(env, capsys):
+    code, out, err = _run(["sync", "needsconfig"], capsys)
+    assert code == 1
+    assert "needsconfig: FAILED - needs config" in err and "base" in err
+
+
+def test_config_set_dotted_key_drives_sync_without_login(env, capsys):
+    _run(["config", "set", "needsconfig.base", "https://ww.example.edu"], capsys)
+    _run(["config", "set", "needsconfig.course_code", "math100"], capsys)
+    code, out, _ = _run(["sync", "needsconfig"], capsys)
+    assert code == 0 and "needsconfig: ok" in out
 
 
 # --- sync / status -------------------------------------------------------------

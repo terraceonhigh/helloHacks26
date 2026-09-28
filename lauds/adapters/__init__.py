@@ -19,6 +19,7 @@ Discovery is by module listing: drop a file here and it's an adapter.
 Nothing outside this package names a provider.
 """
 import importlib
+import inspect
 import pkgutil
 from types import ModuleType
 from typing import Callable, Protocol, runtime_checkable
@@ -86,3 +87,34 @@ def reset() -> None:
     global _cache
     _cache = None
     load_errors.clear()
+
+
+def fill_kwargs(fn: Callable, cfg: dict) -> tuple[dict, list[str]]:
+    """Match a config dict (the CLI's per-source `config set`/`login --opt`
+    store) against `fn`'s own parameter names, so `login`/`fetch` get driven
+    by real config instead of always being called with zero arguments
+    (BRIEF blocker: "9 of its 11 adapters" couldn't be driven at all - every
+    adapter has a different `login`/`fetch` signature, and nothing outside
+    an adapter is allowed to special-case one, so this reads the signature
+    itself rather than a hand-maintained per-adapter key list).
+
+    Returns `(kwargs, missing)`: `kwargs` is `{name: cfg[name]}` for every
+    named parameter `fn` accepts that `cfg` also has a value for (`**opts`/
+    `*args` are never matched by name, so they're left for the caller);
+    `missing` lists parameters with no default and no matching `cfg` entry -
+    the caller turns that into a clear "needs config: ..." error instead of
+    a bare `TypeError: fetch() missing ... argument`."""
+    try:
+        params = inspect.signature(fn).parameters
+    except (TypeError, ValueError):
+        return {}, []
+    kwargs: dict = {}
+    missing: list[str] = []
+    for name, p in params.items():
+        if p.kind in (p.VAR_POSITIONAL, p.VAR_KEYWORD):
+            continue
+        if name in cfg:
+            kwargs[name] = cfg[name]
+        elif p.default is p.empty:
+            missing.append(name)
+    return kwargs, missing

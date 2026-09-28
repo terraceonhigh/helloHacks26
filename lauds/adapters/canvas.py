@@ -1,5 +1,10 @@
 """Canvas adapter: a local browser session (default) or a personal access
-token (`lauds login canvas --token ...`). Clean port of main's hub/canvas.py.
+token (`lauds config set canvas.access_token <token>`, then `lauds sync
+canvas` - no `login` step at all for the token path; BRIEF finding: this
+docstring used to claim a `lauds login canvas --token` flag that never
+existed and left `access_token` unreachable from the CLI. `login()` itself
+never takes a token - it always opens the real browser session - so the
+token path is config-only). Clean port of main's hub/canvas.py.
 
 Not ported, on purpose: the server-side OAuth authorization-code exchange
 (`authorization_url`/`exchange_code`/`refresh_token`, `_BearerRequest`'s
