@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7]><html class="iem7 oldie" lang="en"><![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="ie7 oldie" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="ie8 oldie" lang="en"><![endif]-->
+<!--[if (IE 9)&!(IEMobile)]><html class="ie9" lang="en"><![endif]-->
+<!--[[if (gt IE 9)|(gt IEMobile 7)]><!--><html lang="en"><!--<![endif]-->
+<!--
+ * UBC CLF (Common Look and Feel) v7.0.4
+ * Copyright 2012-2013 The University of British Columbia
+ * UBC Communications and Marketing
+ * http://brand.ubc.ca/clf
+ */
+-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+      <title>Course - UBC Bookstore</title>
+<meta name="viewport" content="width=device-width">
+<meta name="description" content="">
+<meta name="author" content="">
+<meta name="facebook-domain-verification" content="pmqr1bnjd9y328z74gou2x9n54vd9z" />
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-18539368-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-18539368-2');
+</script>
+<!--
+ Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=AW-968132597"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date()); gtag('config', 'AW-968132597'); </script>
+<!--
+ Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-1SYWZSK83R"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date()); gtag('config', 'G-1SYWZSK83R'); </script>
+
+<!-- TikTok Pixel Code Start -->
+<script>
+!function (w, d, t) {
+  w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
+var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
+;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+
+
+  ttq.load('CPGE5BJC77U57258IEC0');
+  ttq.page();
+}(window, document, 'ttq');
+</script>
+<!-- TikTok Pixel Code End -->
+
+<!-- TikTok Pixel Code Start -->
+<script>
+!function (w, d, t) {
+  w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
+var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
+;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+
+
+  ttq.load('CPB3TN3C77UBT003SB20');
+  ttq.page();
+}(window, document, 'ttq');
+</script>
+<!-- TikTok Pixel Code End -->
+
+<!-- Google Analytics Events -->
+<script>
+    
+    // add to cart function for GA4 - Prajna Aug 2024
+    function postAddItemToGA4(item) {
+      gtag("event", "add_to_cart", {
+          currency: "CAD",
+          value: item.price * item.qty,
+          items: [
+              {
+                  item_id: item.item,
+                  item_name: item.desc,
+                  price: item.price,
+                  quantity: item.qty
+              }]
+      })
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        esolution.basket.add_hook('item.added', function(event_name, details) {
+            postAddItemToGA4( details.item );
+        });
+    });
+
+    // view cart event
+    function postItemstoGA4(items) {
+        const totalValue = items.items.reduce((total, item) => total + (item.price * item.qty), 0);
+         // Send the event to GA4
+      gtag('event', 'view_cart', {
+        items: items.items.map(item => ({
+          item_name: item.desc, // GA4 uses `item_name` instead of `name`
+          item_id: item.item,     // GA4 uses `item_id` instead of `id`
+          quantity: item.qty,
+          price: item.price
+        })),
+        value: totalValue,
+        currency: 'CAD' // Adjust the currency code as needed
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        if (window.location.pathname === '/Basket') {
+            postItemstoGA4(esolution.basket.cart_data);
+        };
+    });
+
+</script>
+
+ <link href="/theme/css/bootstrap-override.css" rel="stylesheet">
+	
+
+<!-- Stylesheets -->
+<link href="/theme/css/ubc-clf-full-bw.min.css" rel="stylesheet">
+<link href="/theme/css/unit.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<!--[if lte IE 7]>
+<link href="https://cdn.ubc.ca/clf/7.0.4/css/font-awesome-ie7.css" rel="stylesheet">
+<![endif]-->
+<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+<!-- Fav and touch icons -->
+<link rel="shortcut icon" href="//cdn.ubc.ca/clf/7.0.4/img/favicon.ico">
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://cdn.ubc.ca/clf/7.0.4/img/apple-touch-icon-144-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://cdn.ubc.ca/clf/7.0.4/img/apple-touch-icon-114-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://cdn.ubc.ca/clf/7.0.4/img/apple-touch-icon-72-precomposed.png">
+<link rel="apple-touch-icon-precomposed" href="https://cdn.ubc.ca/clf/7.0.4/img/apple-touch-icon-57-precomposed.png">
+      <!-- Bootstrap core CSS -->
+
+      <!-- Custom styles for this template -->
+                  <link rel="stylesheet" href="/eSolution_config/themes/Arrow/css/all.css?v=4.3.409.27" />
+<link rel="stylesheet" href="/eSolution_config/themes/Arrow/css/arrow.css?v=4.3.409.27" />
+<link rel="stylesheet" href="/eSolution_config/themes/Arrow/css/theme.css?v=4.3.409.27" />
+<link rel="stylesheet" href="/eSolution/css/course/all.css?v=4.3.409.27" />
+<link rel="stylesheet" href="/eSolution/css/course/course.css?v=4.3.409.27" />
+<link rel="stylesheet" href="/eSolution_config/themes/theme-arrow-ubc-2022/css/theme.css?v=4.3.409.27" />
+
+<style>
+.breadcrumb {
+  background-color: #fff !important;
+}
+* {
+  box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+}
+.content * {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+.content .form-control {
+    display: block;
+    width: 100%;
+    /*margin-left: 15px;*/
+    margin-left: 0;
+    height: calc(1.5em + .75rem + 6px);
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+ /*   background-color: #fff;*/
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.esolution-view button.form-control, .esolution-view input[type=submit].form-control {
+    height: auto;
+    line-height: normal;
+    padding: 1rem 2rem 1rem 2rem;
+}
+a:hover.btn {
+    text-decoration: none;
+    background-color: #2f5d7c;
+    color: #ffffff;
+}
+button:hover.btn {
+    text-decoration: none;
+    background-color: #2f5d7c;
+    color: #ffffff;
+}
+button.cti_buy_button {
+    min-height: 3.6em;
+}
+#prodImg {
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    border-radius: 0px;
+    padding: 2px;
+}
+</style>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '207170272954721');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=207170272954721&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel Code -->
+
+
+</head>
+<body class="full-width">
+    <!-- UBC Global Utility Menu -->
+    <div class="collapse expand" id="ubc7-global-menu">
+        <div id="ubc7-search" class="expand">
+        	<div class="container">
+	            <div id="ubc7-search-box">
+	                <form class="form-search" method="get" action="https://www.ubc.ca/search/refine/" role="search">
+	                    <input type="text" name="q" placeholder="" class="input-xlarge search-query">
+	                    <input type="hidden" name="label" value="Search UBC" />
+	                    <input type="hidden" name="site" value="*.ubc.ca" />
+	                    <button type="submit" class="btn">Search</button>
+	                </form>
+	            </div>
+			</div>
+        </div>
+        <div class="container">
+	        <div id="ubc7-global-header" class="expand">
+	            <!-- Global Utility Header from CDN -->
+	        </div>
+        </div>
+    </div>
+    <!-- End of UBC Global Utility Menu -->
+    <!-- UBC Header -->
+    <header id="ubc7-header" class="row-fluid expand" role="banner">
+    	<div class="container">
+	        <div class="span1">
+	            <div id="ubc7-logo">
+	                <a href="https://www.ubc.ca" title="The University of British Columbia (UBC)">The University of British Columbia</a>
+	            </div>
+	        </div>
+	        <div class="span11" id="ubc7-wordmark-block">
+	            <div id="ubc7-wordmark">
+	                <a href="https://www.ubc.ca" title="The University of British Columbia (UBC)">The University of British Columbia</a>
+	                
+	            </div>
+	            <div id="ubc7-global-utility">
+	                <button type="button" data-toggle="collapse" data-target="#ubc7-global-menu"><span>UBC Search</span></button>
+	                <noscript><a id="ubc7-global-utility-no-script" href="https://www.ubc.ca/" title="UBC Search">UBC Search</a></noscript>
+	            </div>
+	        </div>
+		</div>
+    </header>
+    <!-- End of UBC Header -->
+    <!-- UBC Unit Identifier -->
+    <div id="ubc7-unit" class="row-fluid expand">
+    	<div class="container">
+	        <div class="span12">
+	            <!-- Mobile Menu Icon -->
+	            <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
+                <div class="navbar">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target="#ubc7-unit-navigation">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                </div>
+	            <!-- Read more about Unit Name Treatment on http://brand.ubc.ca/clf -->
+	            <!-- No Faculty Treatment --><!--<div id="ubc7-unit-name" class="ubc7-single-element"> -->
+	            <div id="ubc7-unit-name"  class="ubc7-single-element">
+	                <a href="/" title="Unit Name"><span id="ubc7-unit-faculty"></span><span id="ubc7-unit-identifier">UBC Bookstore</span></a>
+	            </div>
+	        </div>
+		</div>
+    </div>
+    <!-- End of UBC Unit Identifier -->
+
+    <!-- Navigation -->
+    <div id="ubc7-unit-menu" class="navbar expand" role="navigation">
+        <div class="navbar-inner expand">
+            <div class="container">
+                <div class="nav-collapse collapse" id="ubc7-unit-navigation">
+                    <div id="ubc7-search" class="expand">
+                        <div class="container">
+                            <div class="search-field">
+                                <form action="https://the.bookstore.ubc.ca/Search" method="GET">
+                                    <input type="text" placeholder="SEARCH" name="data" value="">
+                                    <button type="submit"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                                            <ul class="nav">
+                            <li class="nav-title"><a href="/home">Home</a></li>
+                            <li class="nav-title"><a href="/course-search">Course Search</a></li>
+                        </ul>
+
+                                            <ul class="nav">
+                            <li class="nav-title"><a href="/cart">Cart</a></li>
+                            <li class="dropdown">
+                                <div class="btn-group">
+                                    <a class="btn" href="#">My Account</a>
+                                    <button class="btn dropdown-toggle" data-toggle="dropdown"><span class="ubc7-arrow blue down-arrow"></span></button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/my-account/log-in">Log In</a></li>
+                                        <li><a href="/my-account/log-out">Log Out</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="nav-bar-mega" class="row-fluid expand">
+      <div class="container">
+        <div class="nav-bar">
+<a href='/home' target="_self">Home</a><a href='/course-search' target="_self">Course Search</a>
+<!--
+          <a href="/">Home</a>
+        <div class="drop-down">
+          <button class="dropbtn">Books 
+          <i class="fa fa-angle-down"></i>
+          </button>
+        <div class="drop-down-content">
+          <div class="nav-bar-drop" >
+          <div class="row-nav container">  
+        <div class="column-nav col-25">
+          <h3>TEXTBOOKS AND COURSE MATERIALS</h3>
+          <a href="https://bookstore.ubc.ca/students">Students</a>
+          <a href="https://bookstore.ubc.ca/instructors">Instructors</a>
+        </div>
+        <div class="column-nav col-25">
+          <h3>FEATURED BOOK LISTS</h3>
+          <a href="#">Antiracist Reading List</a>
+          <a href="#">Books about UBC</a>
+          <a href="#">Faculty Authors</a>
+          <a href="#">Our Favourites</a>
+          <a href="#">Literary Awards</a>
+          <a href="#">Local Authors</a>
+          <a href="#">Staff Picks</a>    
+        </div>
+        <div class="column-nav col-25">
+          <h3>Categories</h3>
+          <a href="#">Education Workbooks</a>
+          <a href="#">Fiction</a>
+          <a href="#">Indigenous Studies &amp; Authors</a>
+          <a href="#">Law</a>
+          <a href="#">Medicine</a>
+          <a href="#">Non-Fiction</a>
+          <a href="#">Poetry</a>
+          <div class="pad-top"><a href="#">VIEW ALL</a></div>       
+        </div>
+        <div class="column-nav col-25">
+          <h3>Book Search</h3>
+          <p>Type a keyword into the search bar to find a specific or general book.</p>
+          <div class="search-field">
+            <form action="/Search" method="GET">
+            <input type="text" placeholder="KEYWORD OR TITLE" name="data" value="">
+            <button type="submit"></button>
+            </form>
+          </div>
+        </div>
+       </div>
+      </div>
+    </div> 
+  </div> 
+      
+  <div class="drop-down">
+    <button class="dropbtn">Supplies 
+      <i class="fa fa-angle-down"></i>
+    </button>
+    <div class="drop-down-content">
+      <div class="nav-bar-drop" >
+      <div class="row-nav container">  
+        <div class="column-nav col-20">
+          <h3>FACULTY SPECIFIC</h3>
+          <a href="#">Art Supplies</a>
+          <a href="#">Lab Coats &amp; Supplies</a>
+          <a href="#">Medical Supplies</a>
+        </div>
+        <div class="column-nav col-20">
+          <h3>UBC-BRANDED STATIONARY</h3>
+          <a href="#">Binders &amp; Clipboards</a>
+          <a href="#">Notebooks &amp; Calendars</a>
+          <a href="#">Pens</a>  
+        </div>
+        <div class="column-nav col-20">
+          <h3>GENERAL STATIONARY</h3>
+          <a href="#">Binders &amp; Folders</a>
+          <a href="#">Greeting Cards &amp; Gift Wrap</a>
+          <a href="#">Notebooks &amp; Calendars</a>
+          <a href="#">Paper &amp; Cardstock</a>
+          <a href="#">Pens &amp; Writing Supplies</a>      
+        </div>
+        <div class="column-nav col-40">
+          <div class="ad-block">
+            <div class="shop-new-supplies">SHOP NEW<a href="#"><span class="shop-link"></span></a></div> 
+            <div class="shop-sale-supplies">SHOP SALE<a href="#"><span class="shop-link"></span></a></div>
+            <button class="ubc-button button">Departmental Order Forms &amp; Catalogues</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>      
+
+  <div class="drop-down">
+    <button class="dropbtn">Apparel 
+      <i class="fa fa-angle-down"></i>
+    </button>
+    <div class="drop-down-content">
+      <div class="nav-bar-drop" >
+      <div class="row-nav container">  
+        <div class="column-nav col-20">
+          <h3>CLOTHING</h3>
+          <a href="#">Crew Necks</a>
+          <a href="#">Hoodies</a>
+          <a href="#">Shirts</a>
+          <a href="#">Shorts &amp; Pants</a>
+          <h3 class="pad-top">ACCESSORIES</h3>
+          <a href="#">Backpacks &amp; Bags</a>
+          <a href="#">Hats &amp; Scarves</a> 
+        </div>
+        <div class="column-nav col-20">
+          <h3>FACULTY BRANDED</h3>
+          <a href="#">Allard School of Law</a>
+          <a href="#">Alumni UBC</a>
+          <a href="#">Alumni UBCO</a>
+          <a href="#">BC Children's Hospital</a>
+          <a href="#">BC Women's Hospital</a>
+          <a href="#">Faculty of Arts</a>
+          <a href="#">Faculty of Medicine</a>
+          <a href="#">Midwifery</a>
+          <a href="#">Okanagan Nursing</a>
+          <a href="#">Sauder School of Business</a>
+          <a href="#">School of Kinesiology</a>    
+        </div>
+        <div class="column-nav col-20">
+          <h3>Collections</h3>
+          <a href="#">Lululemon</a>
+          <a href="#">Thunderbird</a>
+          <a href="#">Children / Youths</a>
+        </div>
+        <div class="column-nav col-40">
+          <div class="ad-block">
+            <div class="shop-new-apparel">SHOP NEW<a href="#"><span class="shop-link"></span></a></div> 
+            <div class="shop-sale-apparel">SHOP SALE<a href="#"><span class="shop-link"></span></a></div>
+            <button class="ubc-button button">Order Custom Apparel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+      
+  <div class="drop-down">
+    <button class="dropbtn">Technology 
+      <i class="fa fa-angle-down"></i>
+    </button>
+    <div class="drop-down-content">
+      <div class="nav-bar-drop" >
+      <div class="row-nav container">  
+        <div class="column-nav col-20">
+          <h3>DISCOUNT PROGRAMS</h3>
+          <a href="#">Apple</a>
+          <a href="#">Microsoft</a>
+          <h3 class="pad-top">Audio</h3>
+          <a href="#">Ear Buds &amp; Cases</a>
+          <a href="#">Headphones &amp; Headsets</a>
+          <a href="#">Speakers</a>
+          <a href="#">Adapters</a>
+        </div>
+        <div class="column-nav col-20">
+          <h3>ACCESSORIES</h3>
+          <a href="#">Adapters, Chargers &amp; Cables</a>
+          <a href="#">Cases &amp; Sleeves</a>
+          <a href="#">Desktop Accessories</a>
+          <a href="#">Hard Drives &amp; Data Storage</a>
+          <a href="#">Keyboards &amp; Mice</a>
+          <h3 class="pad-top">PHONE ACCESSORIES</h3>
+          <a href="#">Phone Cases &amp; Screen Protectors</a>
+          <a href="#">Adapters &amp; Chargers</a>
+          <a href="#">Holders &amp; Tripods</a>
+        </div>
+        <div class="column-nav col-20">
+          <h3>HOME ELECTRONICS</h3>
+          <a href="#">Alarm Clocks</a>
+          <a href="#">Batteries</a>
+          <a href="#">Lighting</a>
+          <a href="#">Printer Supplies</a>
+          <h3 class="pad-top">CALCULATORS</h3>
+          <a href="#">Shop All Calculators</a>
+        </div>
+        <div class="column-nav col-40">
+          <div class="ad-block">
+            <div class="shop-new-tech">SHOP NEW<a href="#"><span class="shop-link"></span></a></div> 
+            <div class="shop-sale-tech">SHOP SALE<a href="#"><span class="shop-link"></span></a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="drop-down">
+    <button class="dropbtn">Home &amp; Lifestyle 
+      <i class="fa fa-angle-down"></i>
+    </button>
+    <div class="drop-down-content">
+      <div class="nav-bar-drop" >
+      <div class="row-nav container">  
+        <div class="column-nav col-25">
+          <h3>GIFTS</h3>
+          <a href="#">UBC Branded Collection</a>
+          <a href="#">Customized Chairs</a>
+          <a href="#">Customized Gifts</a>
+          <a href="#">Greeting Cards &amp; Gift Wrap</a>
+        </div>
+        <div class="column-nav col-25">
+          <h3>CATEGORIES</h3>
+          <a href="#">Drinkware</a>
+          <a href="#">Health &amp; Body Care</a>
+          <a href="#">Home, Decor &amp; Garden</a>
+          <a href="#">Fitness &amp; Outdoors</a>
+          <a href="#">Frames</a>
+          <a href="#">Games</a>
+          <a href="#">Novelty Items</a>
+        </div>
+        <div class="column-nav col-25">
+          <h3>FEATURED</h3>
+          <a href="#">Canadiana</a>
+          <a href="#">Indigenous Designs</a>     
+        </div>
+        <div class="column-nav col-25">
+        </div>
+      </div>
+    </div>
+    </div>
+  </div> 
+      
+      <div class="drop-down">
+        <button class="dropbtn">Graduation 
+          <i class="fa fa-angle-down"></i>
+        </button>
+        <div class="drop-down-content">
+          <div class="nav-bar-drop" >
+          <div class="row-nav container">  
+            <div class="column-nav col-25">
+              <h3>GIFTS</h3>
+              <a href="#">UBC Signature Collection</a>
+              <a href="#">Customized Chairs</a>
+              <a href="#">Customized Gifts</a>
+              <a href="#">Frames</a>
+              <div class="pad-top"><a href="#">SHOP ALL GIFTS</a></div>
+              <button class="ubc-button button">Gown Rentals</button>
+            </div>
+            <div class="column-nav col-25"></div>
+            <div class="column-nav col-25"></div>
+            <div class="column-nav col-25"></div>
+          </div>
+          </div>
+        </div>
+       </div>
+     --> 
+      </div>
+
+     </div>    
+    </div>
+    <!-- End of UBC Unit Navigation -->
+
+    <!-- Search Bar -->
+    <div id="search-bar" class="row-fluid expand">
+      <div class="container">
+      <div class="row-fluid">
+      <div class="span12">      
+          <div class="navbar-secondary">
+            <div class="search-field span6">
+            <form action="/Search" method="GET">
+            <input type="text" placeholder="" name="data" value="">
+            <button type="submit"></button>
+            </form>
+            </div>
+          <div class="span6">
+<a href='/cart' target="_self">Cart</a><div class="dropdown-secondary">
+	<button class="dropbtn">My Account
+	<i class="fa fa-angle-down"></i>
+	</button>
+<div class="dropdown-secondary-content">
+<a href='/my-account/log-in' target="_self">Log In</a><a href='/my-account/log-out' target="_self">Log Out</a></div></div>
+
+<!--
+          <a href="#">Blog</a>
+          <div class="dropdown-secondary">
+            <button class="dropbtn">About 
+              <i class="fa fa-angle-down"></i>
+            </button>
+          <div class="dropdown-secondary-content">
+              <a href="https://bookstore.ubc.ca/directory">Bookstore Directory</a>
+              <a href="https://bookstore.ubc.ca/contact">Contact</a>
+              <a href="https://bookstore.ubc.ca/community-support">Community Support &amp; Donations</a>
+              <a href="https://bookstore.ubc.ca/jobs">Jobs</a>
+          </div>
+          </div>
+          <a href="#">Cart</a>
+          <div class="dropdown-secondary">
+            <button class="dropbtn">My Account 
+              <i class="fa fa-angle-down"></i>
+            </button>
+            <div class="dropdown-secondary-content">
+              <a href="#">Log In</a>
+              <a href="#">Log Out</a>
+            </div>
+          </div>
+-->
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+    </div>
+    <!-- End Search Bar -->
+
+    <!-- Announcement Bar -->
+    <div class="row-fluid expand" id="announcement">
+        <div class="container">
+            <div class="row-fluid">
+                <div class="span12">
+                    <h1>Course</h1>  
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Announcement Bar -->
+    
+    <div class="full-width-container">    
+        <!-- UBC Unit Breadcrumbs -->
+        <ul class="breadcrumb expand">
+            <li>
+                <a href="/">UBC Bookstore</a> <span class="divider"><i class="fa fa-angle-double-right" style="font-size:14px"></i></span>
+            </li>
+            <li class="active">Course</li>
+        </ul>
+        <!-- End of UBC Unit Breadcrumbs -->
+        <!-- Content Area -->
+        <div class="content expand" role="main">
+          <!-- Content Area -->
+          <div class="row-fluid expand" style="background: #FFF;">
+            <div class="span12 esolution-view">
+                                                                        <h2>Textbook Search</h2>
+				<div id="course_search">
+					<h3 id="campus_heading">Campus: UBCV</h3>
+					<h3 id="term_heading">Term: 2026W1</h3>
+					<form action="/CourseSearch/?source=course">
+					<input type="hidden" name="source" value="course" />
+					<h3 id="course_heading">Select Courses<input type="submit" value="Go &#187;" class="go" /></h3>
+					<div id="course_form"><ul><li class="course" id="UBCV,2026W1,CPSC,CPSC100,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC100,101" id="checkUBCV,2026W1,CPSC,CPSC100,101" /><label for="checkUBCV,2026W1,CPSC,CPSC100,101">CPSC100 101 - Computational Thinking (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC103,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC103,101" id="checkUBCV,2026W1,CPSC,CPSC103,101" /><label for="checkUBCV,2026W1,CPSC,CPSC103,101">CPSC103 101 - Introduction To Systematic Program Design (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC103,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC103,102" id="checkUBCV,2026W1,CPSC,CPSC103,102" /><label for="checkUBCV,2026W1,CPSC,CPSC103,102">CPSC103 102 - Introduction To Systematic Program Design (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC110,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC110,101" id="checkUBCV,2026W1,CPSC,CPSC110,101" /><label for="checkUBCV,2026W1,CPSC,CPSC110,101">CPSC110 101 - Computation, Programs, And Programming (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC110,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC110,102" id="checkUBCV,2026W1,CPSC,CPSC110,102" /><label for="checkUBCV,2026W1,CPSC,CPSC110,102">CPSC110 102 - Computation, Programs, And Programming (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC110,103"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC110,103" id="checkUBCV,2026W1,CPSC,CPSC110,103" /><label for="checkUBCV,2026W1,CPSC,CPSC110,103">CPSC110 103 - Computation, Programs, And Programming (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC110,CH1"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC110,CH1" id="checkUBCV,2026W1,CPSC,CPSC110,CH1" /><label for="checkUBCV,2026W1,CPSC,CPSC110,CH1">CPSC110 CH1 - Computation, Programs, And Programming (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC121,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC121,101" id="checkUBCV,2026W1,CPSC,CPSC121,101" /><label for="checkUBCV,2026W1,CPSC,CPSC121,101">CPSC121 101 - Models Of Computation (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC121,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC121,102" id="checkUBCV,2026W1,CPSC,CPSC121,102" /><label for="checkUBCV,2026W1,CPSC,CPSC121,102">CPSC121 102 - Models Of Computation (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC203,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC203,101" id="checkUBCV,2026W1,CPSC,CPSC203,101" /><label for="checkUBCV,2026W1,CPSC,CPSC203,101">CPSC203 101 - Programming, Problem Solving, And Algorithms (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC210,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC210,101" id="checkUBCV,2026W1,CPSC,CPSC210,101" /><label for="checkUBCV,2026W1,CPSC,CPSC210,101">CPSC210 101 - Software Construction (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC210,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC210,102" id="checkUBCV,2026W1,CPSC,CPSC210,102" /><label for="checkUBCV,2026W1,CPSC,CPSC210,102">CPSC210 102 - Software Construction (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC213,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC213,101" id="checkUBCV,2026W1,CPSC,CPSC213,101" /><label for="checkUBCV,2026W1,CPSC,CPSC213,101">CPSC213 101 - Introduction To Computer Systems (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC213,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC213,102" id="checkUBCV,2026W1,CPSC,CPSC213,102" /><label for="checkUBCV,2026W1,CPSC,CPSC213,102">CPSC213 102 - Introduction To Computer Systems (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC221,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC221,101" id="checkUBCV,2026W1,CPSC,CPSC221,101" /><label for="checkUBCV,2026W1,CPSC,CPSC221,101">CPSC221 101 - Basic Algorithms And Data Structures (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC221,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC221,102" id="checkUBCV,2026W1,CPSC,CPSC221,102" /><label for="checkUBCV,2026W1,CPSC,CPSC221,102">CPSC221 102 - Basic Algorithms And Data Structures (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC259,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC259,101" id="checkUBCV,2026W1,CPSC,CPSC259,101" /><label for="checkUBCV,2026W1,CPSC,CPSC259,101">CPSC259 101 - Data Structures And Algorithms For Electrical Engi (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC302,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC302,101" id="checkUBCV,2026W1,CPSC,CPSC302,101" /><label for="checkUBCV,2026W1,CPSC,CPSC302,101">CPSC302 101 - Numerical Computation For Algebraic Problems (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC304,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC304,101" id="checkUBCV,2026W1,CPSC,CPSC304,101" /><label for="checkUBCV,2026W1,CPSC,CPSC304,101">CPSC304 101 - Introduction To Relational Databases (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC304,103"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC304,103" id="checkUBCV,2026W1,CPSC,CPSC304,103" /><label for="checkUBCV,2026W1,CPSC,CPSC304,103">CPSC304 103 - Introduction To Relational Databases (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC310,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC310,101" id="checkUBCV,2026W1,CPSC,CPSC310,101" /><label for="checkUBCV,2026W1,CPSC,CPSC310,101">CPSC310 101 - Introduction To Software Engineering (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC310,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC310,102" id="checkUBCV,2026W1,CPSC,CPSC310,102" /><label for="checkUBCV,2026W1,CPSC,CPSC310,102">CPSC310 102 - Introduction To Software Engineering (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC310,103"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC310,103" id="checkUBCV,2026W1,CPSC,CPSC310,103" /><label for="checkUBCV,2026W1,CPSC,CPSC310,103">CPSC310 103 - Introduction To Software Engineering (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC311,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC311,101" id="checkUBCV,2026W1,CPSC,CPSC311,101" /><label for="checkUBCV,2026W1,CPSC,CPSC311,101">CPSC311 101 - Definition Of Programming Languages (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC313,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC313,101" id="checkUBCV,2026W1,CPSC,CPSC313,101" /><label for="checkUBCV,2026W1,CPSC,CPSC313,101">CPSC313 101 - Computer Hardware And Operating Systems (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC313,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC313,102" id="checkUBCV,2026W1,CPSC,CPSC313,102" /><label for="checkUBCV,2026W1,CPSC,CPSC313,102">CPSC313 102 - Computer Hardware And Operating Systems (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC314,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC314,101" id="checkUBCV,2026W1,CPSC,CPSC314,101" /><label for="checkUBCV,2026W1,CPSC,CPSC314,101">CPSC314 101 - Computer Graphics (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC317,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC317,101" id="checkUBCV,2026W1,CPSC,CPSC317,101" /><label for="checkUBCV,2026W1,CPSC,CPSC317,101">CPSC317 101 - Introduction To Computer Networking (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC317,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC317,102" id="checkUBCV,2026W1,CPSC,CPSC317,102" /><label for="checkUBCV,2026W1,CPSC,CPSC317,102">CPSC317 102 - Introduction To Computer Networking (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC320,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC320,101" id="checkUBCV,2026W1,CPSC,CPSC320,101" /><label for="checkUBCV,2026W1,CPSC,CPSC320,101">CPSC320 101 - Intermediate Algorithm Design And Analysis (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC320,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC320,102" id="checkUBCV,2026W1,CPSC,CPSC320,102" /><label for="checkUBCV,2026W1,CPSC,CPSC320,102">CPSC320 102 - Intermediate Algorithm Design And Analysis (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC322,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC322,101" id="checkUBCV,2026W1,CPSC,CPSC322,101" /><label for="checkUBCV,2026W1,CPSC,CPSC322,101">CPSC322 101 - Introduction To Artificial Intelligence (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC330,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC330,101" id="checkUBCV,2026W1,CPSC,CPSC330,101" /><label for="checkUBCV,2026W1,CPSC,CPSC330,101">CPSC330 101 - Applied Machine Learning (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC330,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC330,102" id="checkUBCV,2026W1,CPSC,CPSC330,102" /><label for="checkUBCV,2026W1,CPSC,CPSC330,102">CPSC330 102 - Applied Machine Learning (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC330,103"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC330,103" id="checkUBCV,2026W1,CPSC,CPSC330,103" /><label for="checkUBCV,2026W1,CPSC,CPSC330,103">CPSC330 103 - Applied Machine Learning (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC340,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC340,101" id="checkUBCV,2026W1,CPSC,CPSC340,101" /><label for="checkUBCV,2026W1,CPSC,CPSC340,101">CPSC340 101 - Machine Learning And Data Mining (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC340,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC340,102" id="checkUBCV,2026W1,CPSC,CPSC340,102" /><label for="checkUBCV,2026W1,CPSC,CPSC340,102">CPSC340 102 - Machine Learning And Data Mining (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC344,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC344,101" id="checkUBCV,2026W1,CPSC,CPSC344,101" /><label for="checkUBCV,2026W1,CPSC,CPSC344,101">CPSC344 101 - Introduction To Human Computer Interaction Methods (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC344,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC344,102" id="checkUBCV,2026W1,CPSC,CPSC344,102" /><label for="checkUBCV,2026W1,CPSC,CPSC344,102">CPSC344 102 - Introduction To Human Computer Interaction Methods (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC349,001"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC349,001" id="checkUBCV,2026W1,CPSC,CPSC349,001" /><label for="checkUBCV,2026W1,CPSC,CPSC349,001">CPSC349 001 - Honours Research Seminar (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC402,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC402,101" id="checkUBCV,2026W1,CPSC,CPSC402,101" /><label for="checkUBCV,2026W1,CPSC,CPSC402,101">CPSC402 101 - Numerical Linear Algebra (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC404,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC404,101" id="checkUBCV,2026W1,CPSC,CPSC404,101" /><label for="checkUBCV,2026W1,CPSC,CPSC404,101">CPSC404 101 - Advanced Relational Databases (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC410,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC410,101" id="checkUBCV,2026W1,CPSC,CPSC410,101" /><label for="checkUBCV,2026W1,CPSC,CPSC410,101">CPSC410 101 - Advanced Software Engineering (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC415,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC415,101" id="checkUBCV,2026W1,CPSC,CPSC415,101" /><label for="checkUBCV,2026W1,CPSC,CPSC415,101">CPSC415 101 - Operating Systems Design And Implementation (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC416,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC416,101" id="checkUBCV,2026W1,CPSC,CPSC416,101" /><label for="checkUBCV,2026W1,CPSC,CPSC416,101">CPSC416 101 - Distributed Systems (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC418,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC418,101" id="checkUBCV,2026W1,CPSC,CPSC418,101" /><label for="checkUBCV,2026W1,CPSC,CPSC418,101">CPSC418 101 - Parallel Computation (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC418,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC418,102" id="checkUBCV,2026W1,CPSC,CPSC418,102" /><label for="checkUBCV,2026W1,CPSC,CPSC418,102">CPSC418 102 - Parallel Computation (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC421,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC421,101" id="checkUBCV,2026W1,CPSC,CPSC421,101" /><label for="checkUBCV,2026W1,CPSC,CPSC421,101">CPSC421 101 - Introduction To Theory Of Computing (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC423,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC423,101" id="checkUBCV,2026W1,CPSC,CPSC423,101" /><label for="checkUBCV,2026W1,CPSC,CPSC423,101">CPSC423 101 - Natural Language Processing (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC424,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC424,101" id="checkUBCV,2026W1,CPSC,CPSC424,101" /><label for="checkUBCV,2026W1,CPSC,CPSC424,101">CPSC424 101 - Geometric Modelling (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC425,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC425,101" id="checkUBCV,2026W1,CPSC,CPSC425,101" /><label for="checkUBCV,2026W1,CPSC,CPSC425,101">CPSC425 101 - Computer Vision (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC427,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC427,101" id="checkUBCV,2026W1,CPSC,CPSC427,101" /><label for="checkUBCV,2026W1,CPSC,CPSC427,101">CPSC427 101 - Video Game Programming (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC430,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC430,101" id="checkUBCV,2026W1,CPSC,CPSC430,101" /><label for="checkUBCV,2026W1,CPSC,CPSC430,101">CPSC430 101 - Computers And Society (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC436C,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC436C,101" id="checkUBCV,2026W1,CPSC,CPSC436C,101" /><label for="checkUBCV,2026W1,CPSC,CPSC436C,101">CPSC436C 101 - Topics In Computer Science - Cloud Computing (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC436T,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC436T,101" id="checkUBCV,2026W1,CPSC,CPSC436T,101" /><label for="checkUBCV,2026W1,CPSC,CPSC436T,101">CPSC436T 101 - Topics In Computer Science - Submodularity And Opt (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC501,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC501,101" id="checkUBCV,2026W1,CPSC,CPSC501,101" /><label for="checkUBCV,2026W1,CPSC,CPSC501,101">CPSC501 101 - Theory Of Automata, Formal Languages And Computabi (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC507,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC507,101" id="checkUBCV,2026W1,CPSC,CPSC507,101" /><label for="checkUBCV,2026W1,CPSC,CPSC507,101">CPSC507 101 - Software Engineering (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC511,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC511,101" id="checkUBCV,2026W1,CPSC,CPSC511,101" /><label for="checkUBCV,2026W1,CPSC,CPSC511,101">CPSC511 101 - Implementation Of Programming Languages (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC521,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC521,101" id="checkUBCV,2026W1,CPSC,CPSC521,101" /><label for="checkUBCV,2026W1,CPSC,CPSC521,101">CPSC521 101 - Parallel Algorithms And Architectures (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC532A,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC532A,101" id="checkUBCV,2026W1,CPSC,CPSC532A,101" /><label for="checkUBCV,2026W1,CPSC,CPSC532A,101">CPSC532A 101 - Topics In Artificial Intelligence - Cognitive Ai (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC532B,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC532B,101" id="checkUBCV,2026W1,CPSC,CPSC532B,101" /><label for="checkUBCV,2026W1,CPSC,CPSC532B,101">CPSC532B 101 - Topics In Artificial Intelligence - Open Questions (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC532D,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC532D,101" id="checkUBCV,2026W1,CPSC,CPSC532D,101" /><label for="checkUBCV,2026W1,CPSC,CPSC532D,101">CPSC532D 101 - Topics In Artificial Intelligence - Stat Learn Thr (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC532G,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC532G,101" id="checkUBCV,2026W1,CPSC,CPSC532G,101" /><label for="checkUBCV,2026W1,CPSC,CPSC532G,101">CPSC532G 101 - Topics In Artificial Intelligence - Llms Meet Info (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC532H,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC532H,101" id="checkUBCV,2026W1,CPSC,CPSC532H,101" /><label for="checkUBCV,2026W1,CPSC,CPSC532H,101">CPSC532H 101 - Topics In Artificial Intelligence - Interpretation (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC532W,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC532W,101" id="checkUBCV,2026W1,CPSC,CPSC532W,101" /><label for="checkUBCV,2026W1,CPSC,CPSC532W,101">CPSC532W 101 - Topics In Artificial Intelligence - Probabilistic (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC532X,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC532X,101" id="checkUBCV,2026W1,CPSC,CPSC532X,101" /><label for="checkUBCV,2026W1,CPSC,CPSC532X,101">CPSC532X 101 - Topics In Artificial Intelligence - Adaptation & A (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC532Z,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC532Z,101" id="checkUBCV,2026W1,CPSC,CPSC532Z,101" /><label for="checkUBCV,2026W1,CPSC,CPSC532Z,101">CPSC532Z 101 - Topics In Artificial Intelligence - Physics-Inform (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC533A,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC533A,101" id="checkUBCV,2026W1,CPSC,CPSC533A,101" /><label for="checkUBCV,2026W1,CPSC,CPSC533A,101">CPSC533A 101 - Topics In Computer Graphics - Advances In Geometry (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC536C,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC536C,101" id="checkUBCV,2026W1,CPSC,CPSC536C,101" /><label for="checkUBCV,2026W1,CPSC,CPSC536C,101">CPSC536C 101 - Topics In Algorithms And Complexity - Algorithms F (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC536R,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC536R,101" id="checkUBCV,2026W1,CPSC,CPSC536R,101" /><label for="checkUBCV,2026W1,CPSC,CPSC536R,101">CPSC536R 101 - Topics In Algorithms And Complexity - Comp Bio (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC536S,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC536S,101" id="checkUBCV,2026W1,CPSC,CPSC536S,101" /><label for="checkUBCV,2026W1,CPSC,CPSC536S,101">CPSC536S 101 - Topics In Algorithms And Complexity - Submodularit (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC539S,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC539S,101" id="checkUBCV,2026W1,CPSC,CPSC539S,101" /><label for="checkUBCV,2026W1,CPSC,CPSC539S,101">CPSC539S 101 - Topics In Programming Languages - Programverifiers (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC540,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC540,101" id="checkUBCV,2026W1,CPSC,CPSC540,101" /><label for="checkUBCV,2026W1,CPSC,CPSC540,101">CPSC540 101 - Machine Learning (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC540,102"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC540,102" id="checkUBCV,2026W1,CPSC,CPSC540,102" /><label for="checkUBCV,2026W1,CPSC,CPSC540,102">CPSC540 102 - Machine Learning (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC541H,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC541H,101" id="checkUBCV,2026W1,CPSC,CPSC541H,101" /><label for="checkUBCV,2026W1,CPSC,CPSC541H,101">CPSC541H 101 - Topics In Computer Security And Privacy - Network (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC542G,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC542G,101" id="checkUBCV,2026W1,CPSC,CPSC542G,101" /><label for="checkUBCV,2026W1,CPSC,CPSC542G,101">CPSC542G 101 - Topics In Numerical Computation - Topics In Scient (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC545,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC545,101" id="checkUBCV,2026W1,CPSC,CPSC545,101" /><label for="checkUBCV,2026W1,CPSC,CPSC545,101">CPSC545 101 - Algorithms For Bioinformatics (CPSC)</label></a><div class='go'></div></li><li class="course" id="UBCV,2026W1,CPSC,CPSC547,101"><a class="course" href="#"><input type="checkbox" name="course[]" value="UBCV,2026W1,CPSC,CPSC547,101" id="checkUBCV,2026W1,CPSC,CPSC547,101" /><label for="checkUBCV,2026W1,CPSC,CPSC547,101">CPSC547 101 - Information Visualization (CPSC)</label></a><div class='go'></div></li></ul>	</div>
+					</form>
+				</div>
+                                            <!--
+                <h1>Page Heading</h1>
+                <p>Bacon ipsum dolor sit amet magna short ribs salami laborum pariatur fugiat shankle excepteur bresaola in esse tail proident non. Doner velit frankfurter dolore ex pig veniam. Tempor sausage ea doner rump mollit filet mignon sint fatback. Filet mignon nostrud pork loin leberkas, voluptate enim ex commodo.</p>
+                <h2>Subheading</h2>
+	            <p>Salami prosciutto chuck beef ribs sirloin, strip steak capicola ball tip kielbasa. Shankle pork belly tail capicola andouille. Prosciutto turkey andouille, leberkas strip steak pork loin bresaola ribeye shoulder short ribs short loin venison t-bone shankle sirloin. Tongue pig jowl, ham hock turkey pork chop shank ball tip cow short ribs ham leberkas short loin sirloin corned beef. Strip steak chicken beef, shankle swine pork loin pork belly drumstick turducken spare ribs jerky pancetta. Tri-tip jerky capicola shankle t-bone pork belly shank short loin rump strip steak ham hock. Tri-tip ham hock tongue pork chop meatloaf shoulder beef frankfurter sausage drumstick salami tail pork loin.</p>
+-->
+            </div>      
+          </div>
+            
+        </div>
+        <!-- End of Content Area -->
+    </div>        
+
+    <footer id="ubc7-footer" class="expand mt-5" role="contentinfo">
+        <!-- UBC Bookstore Footer -->
+        <div class="row-fluid expand" id="ubc7-bookstore-footer">
+        	<div class="container">
+                <div class="row-fluid">
+                  <div class="span12">
+                    <h1>UBC Bookstore</h1>
+                    <div class="row-fluid">
+                      <div class="span3">
+                          <h3>UBC Vancouver</h3>
+                          <ul class="unstyled">
+                              <li>6200 University Boulevard</li>
+                              <li>Vancouver BC, V6T 1Z4</li>
+                              <li>604-822-2665</li>
+                          </ul>
+                          <div class="spacer1"></div>
+                          <h4>Hours</h4>
+                          <ul class="unstyled">
+                              <li>Monday-Friday: 10am-6pm</li>
+                              <li>Saturday: 11am-5pm</li>
+                              <li>Sunday: CLOSED</li>
+                              <li><a href="https://bookstore.ubc.ca/contact/">Extended/Holiday Hours</a></li>
+                          </ul>
+                      </div>
+                      <div class="span3">
+                          <h3>UBC Okanagan</h3>
+                          <ul class="unstyled">
+                              <li>1138 Alumni Avenue</li>
+                              <li>Kelowna BC, V1V 1V7</li>
+                              <li></li>250-807-9246</li>
+                          </ul>
+                          <div class="spacer1"></div>
+                          <h4>Hours</h4>
+                          <ul class="unstyled">
+                              <li>Monday-Friday: 9:00am-4:30pm</li>
+                              <li>Saturday and Sunday: CLOSED</li>
+                              <li><a href="https://bookstore.ubc.ca/contact/">Extended/Holiday Hours</a></li>
+                          </ul>
+                      </div>
+                      <div class="span3">
+
+<!--
+                          <h4>Customer Service</h4>
+                          <ul class="unstyled">
+                              <li><a href="https://bookstore.ubc.ca/help">Help</a></li>
+                              <li><a href="https://bookstore.ubc.ca/contact">Contact Us</a></li>
+                              <li><a href="https://bookstore.ubc.ca/directory">Bookstore Directory</a></li>
+                              <li><a href="https://bookstore.ubc.ca/shipping-returns">Shipping &amp; Returns</a></li>
+                              <li><a href="https://bookstore.ubc.ca/faq">FAQ</a></li>
+                              <li><a href="https://bookstore.ubc.ca/privacy-policy-2/">Privacy Policy</a></li>
+                          </ul>
+-->
+                          <div class="spacer2"></div>
+                          <h4>Follow Us</h4>
+                          <div id="ubc7-unit-social-icons">
+                          <a href="https://www.facebook.com/UBCBookstore/" title="Facebook icon"><i class="icon-facebook-sign"></i></a>&nbsp;
+                          <a href="https://www.instagram.com/accounts/login/?next=/ubcbookstore/" title="Instagram icon"><i class="icon-instagram-sign"></i></a>&nbsp;    
+                          <a href="https://twitter.com/UBCBookstore" title="Twitter icon"><i class="icon-twitter-sign"></i></a>&nbsp;
+                          <a href="https://www.tiktok.com/@ubcliving" title="TikTok icon"><i class="icon-tiktok-sign"></i></a>
+                          </div>
+                      </div>
+                      <div class="span3">
+
+<!--
+                          <h4>Faculty</h4>
+                          <ul class="unstyled">
+                              <li><a href="#">Order Faculty Materials</a></li>
+                              <li><a href="#">Order Custom Apparel</a></li>
+                          </ul>
+-->
+                          <div class="spacer3"></div>
+
+<!--
+                          <h4>Students</h4>
+                         <ul class="unstyled">
+                              <li><a href="#">Order Course Materials</a></li>
+                             <li><a href="#">Rent Graduation Gowns</a></li>
+                          </ul>
+-->
+                      </div>  
+                    </div>
+
+                  </div>    
+                </div>
+			</div>
+        </div>
+        <div class="row-fluid expand" id="acknowledgement">
+        	<div class="container">
+        	     <p></p>
+               <div class="row-fluid" style="display: flex; justify-content: space-between;">
+                  <div class="span4" style="width: 33.33%; margin-left: 0px; padding-right: 10px; box-sizing: border-box; text-align: left;">
+                    We acknowledge that SHCS and UBC are located on the traditional, ancestral, and unceded territory of the Musqueam people. We thank the Musqueam Nation for its hospitality and support of our work.
+                  </div>
+                  <div class="span4" style="width: 33.33%; padding-right: 10px; box-sizing: border-box; text-align: left;">
+                    We acknowledge the [financial] support of the Government of Canada.<br>
+                    Nous reconnaissons l'appul [financier] du Gouvernement du Canada.
+                  </div>
+                  <div class="span4" style="width: 33.33%; box-sizing: border-box; text-align: right;">
+                <img decoding="async" loading="lazy" class="img-responsive" src="https://the.bookstore.ubc.ca/theme/images/CanGovFund_3li_EnFr.png" alt="">
+                  </div>                  
+                </div>
+            </div>
+        </div>
+        <!-- End of Bookstore -->
+        <div class="row-fluid expand" id="ubc7-global-footer">
+        	<div class="container">
+	            <div class="span5" id="ubc7-signature"><a href="https://www.ubc.ca/" title="The University of British Columbia (UBC)">The University of British Columbia</a></div>
+	            <div class="span7" id="ubc7-footer-menu">
+	            </div>
+			</div>
+        </div>
+        <div class="row-fluid expand" id="ubc7-minimal-footer">
+        	<div class="container">
+	            <div class="span12">
+	                <ul>
+	                    <li><a href="//cdn.ubc.ca/clf/ref/emergency" title="Emergency Procedures">Emergency Procedures</a> <span class="divider">|</span></li>
+	                    <li><a href="//cdn.ubc.ca/clf/ref/terms" title="Terms of Use">Terms of Use</a> <span class="divider">|</span></li>
+	                    <li><a href="//cdn.ubc.ca/clf/ref/copyright" title="UBC Copyright">Copyright</a> <span class="divider">|</span></li>
+	                    <li><a href="//cdn.ubc.ca/clf/ref/accessibility" title="Accessibility">Accessibility</a></li>
+	                </ul>
+	            </div>
+			</div>
+        </div>
+    </footer>
+    
+    <!-- Placed javascript at the end for faster loading -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.ubc.ca/clf/7.0.4/js/ubc-clf.min.js"></script>
+    <script src="/eSolution_config/themes/Arrow/js/bootstrap.min.js"></script>
+    <script>
+    
+    // add to cart event for meta ads
+    function postItemToMetaEventsAPI(item) {
+          fbq('track', 'AddToCart', {
+        content_ids: item.item, // Adjust based on your item's ID
+        content_name: item.desc, // Adjust based on your item's name
+        value: item.price, // Adjust based on your item's price
+        currency: 'CAD' // Change if needed
+    });
+    }
+
+
+
+    function postItemToTikTokEventsAPI(item) {
+  const accessToken = 'b0d4513a8226a340ec6a36b267ac5d5d656bf796';
+  const pixelCode = 'CPGE5BJC77U57258IEC0';
+  const apiUrl = 'https://business-api.tiktok.com/open_api/v1.3/event/track/';
+
+  // Prepare the event data
+  const eventData = {
+    event: 'AddToCart',
+    event_time: Math.floor(Date.now() / 1000), // Convert milliseconds to seconds
+    user: {}, // You can add user data if needed
+    properties: {
+      contents: [{
+        content_id: item.item,
+        content_type: 'product',
+        content_name: item.desc,
+        quantity: item.qty,
+        price: item.price
+      }],
+      currency: 'CAD',
+      value: item.price * item.qty
+    },
+    page: {
+      url: window.location.href
+    }
+  };
+
+  // Prepare the payload as per TikTok Events API structure
+  const payload = {
+    event_source: 'web',
+    event_source_id: pixelCode,
+    data: [eventData] // Wrap eventData in an array as per TikTok's format
+  };
+
+  // Make the API request
+  fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Token': accessToken
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Success:', data);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  });
+}
+
+
+   document.addEventListener("DOMContentLoaded", function() {
+       esolution.basket.add_hook('item.added', function(event_name, details) {
+              postItemToMetaEventsAPI( details.item );
+       });
+   });
+   </script>
+    
+    
+    
+    
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js?v=4.3.409.27" type="text/javascript"></script>
+<script src="/eSolution_config/themes/Arrow/js/equal.js?v=4.3.409.27" type="text/javascript"></script>
+<script src="/eSolution_config/themes/Arrow/js/basket/all.js?v=4.3.409.27" type="text/javascript"></script>
+<script src="/eSolution/js/basket/basketitem.js?v=4.3.409.27" type="text/javascript"></script>
+<script src="/eSolution/js/basket/all.js?v=4.3.409.27" type="text/javascript"></script>
+<script src="/eSolution/js/esolution.js?v=4.3.409.27" type="text/javascript"></script>
+<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js?v=4.3.409.27" type="text/javascript"></script>
+<script src="/eSolution/js/course/all.js?v=4.3.409.27" type="text/javascript"></script>
+
+	<script type="module" src="/eSolution_config/themes/Arrow/js/lit/components.js"></script>
+	<script type="module" src="/theme/js/lit/components.js"></script>
+	<script type="module" src="/eSolution_config/themes/Arrow/js/lit/elements.js"></script>
+<script>
+			$(function(){
+				if (typeof esolution === 'undefined')
+				{
+					esolution = {};
+	}
+	if (typeof esolution.basket === 'undefined')
+	{
+		esolution.basket = {};
+	}
+	esolution.basket.cart_data = new Array({"items":[],"addedItem":null,"suggestions":[],"events":[],"errors":[[]],"form":null});
+	esolution.basket.old_cart_data = esolution.basket.cart_data[0];
+	esolution.basket.update = function(){
+		$("body").trigger("cti.basket",esolution.basket.cart_data);
+	};
+	});
+				</script><script>
+$(function(){
+        esolution.basket.update();
+    });
+    </script><script src="/eSolution_config/themes/Arrow/js/lazysizes.min.js" async=""></script>
+		<script>
+		$(function(){
+			$("#course_form").on("course_selection_changed", function(){
+				setTimeout(function(){
+					$("a.go, a#go").each(function(){
+						var href = $(this).attr("href");
+						if(href && href.indexOf("source=") === -1)
+						{
+							$(this).attr("href", href + (href.indexOf("?") === -1 ? "?source=course" : "&source=course"));
+						}
+					});
+				}, 0);
+			});
+		});
+		</script><script>if (typeof esolution === 'undefined') { esolution = {}; };;esolution.tr_={}</script><script>
+		$(document).ready(function() {
+            $("body").on("arrow_item_view_item", function (e, json) {
+                $("#announcement h1").html(json.item_number + " - " + json.title);
+            });
+        });
+    </script>
+    
+</body>
+</html>
