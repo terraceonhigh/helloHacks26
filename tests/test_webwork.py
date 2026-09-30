@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 
-from hub.webwork import due_from_text, to_item
+from hub import site
+from hub.webwork import _get_soup, due_from_text, to_item
 
 # Anonymised, but structurally identical to a real UBC course's WeBWorK page
 # (webwork.elearning.ubc.ca, checked live 2026-09-26): the <li data-set-status
@@ -154,3 +155,65 @@ def test_due_from_text_none_for_blank_or_no_date():
     assert due_from_text("") is None
     assert due_from_text("Answers available for review.") is None
     assert due_from_text(None) is None
+
+
+class FakeResponse:
+    """Just the bits hub.webwork._get_soup reads off a Playwright response."""
+
+    def __init__(self, status, url, body=""):
+        self.status, self.url, self._body = status, url, body
+
+    @property
+    def ok(self):
+        return 200 <= self.status < 300
+
+    def text(self):
+        return self._body
+
+
+class FakeRequest:
+    def __init__(self, response):
+        self._response = response
+
+    def get(self, _url):
+        return self._response
+
+
+COURSE_URL = "https://webwork.example.edu/webwork2/MATH_101"
+
+
+def test_sso_login_page_is_detected_as_logged_out_even_though_it_answers_200():
+    # Real bug, verified live against UBC's WeBWorK (2026-09-27): a logged-out
+    # request is redirected to the school's identity provider and comes back
+    # 200 with that login page's HTML, NOT 401. The old status-only check
+    # never fired, so the login page parsed to zero sets, fetch() returned []
+    # ("connected, nothing due") and the student was never asked to sign in
+    # again. Leaving the WeBWorK host is the signal.
+    req = FakeRequest(FakeResponse(200, "https://authentication.example.edu/idp/profile/SAML2/Redirect/SSO", "<html>Sign in</html>"))
+    try:
+        _get_soup(req, COURSE_URL)
+    except site.NotLoggedIn:
+        return
+    raise AssertionError("a 200 SSO login page should raise NotLoggedIn, not parse as an empty course")
+
+
+def test_a_normal_logged_in_response_on_the_same_host_still_parses():
+    req = FakeRequest(FakeResponse(200, COURSE_URL, f"<ul>{OPEN_ROW}</ul>"))
+    soup = _get_soup(req, COURSE_URL)
+    assert len(soup.select("li[data-set-status]")) == 1
+
+
+def test_a_redirect_within_the_same_host_is_not_treated_as_logged_out():
+    # WeBWorK's own in-site redirects (trailing slash, effectiveUser query)
+    # stay on the host and must NOT be mistaken for an SSO bounce.
+    req = FakeRequest(FakeResponse(200, COURSE_URL + "/?effectiveUser=abc123", f"<ul>{OPEN_ROW}</ul>"))
+    assert len(_get_soup(req, COURSE_URL).select("li[data-set-status]")) == 1
+
+
+def test_401_still_raises_not_logged_in():
+    req = FakeRequest(FakeResponse(401, COURSE_URL))
+    try:
+        _get_soup(req, COURSE_URL)
+    except site.NotLoggedIn:
+        return
+    raise AssertionError("401 should still raise NotLoggedIn")

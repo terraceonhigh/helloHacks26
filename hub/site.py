@@ -66,20 +66,26 @@ def get_all(req, url, params, unwrap=json.loads):
 def fetch_with_session(site, base, run):
     """Ensure a saved session exists, run `run(request_context)`, and log in
     again (once) if the session turns out to be expired."""
-    from playwright.sync_api import sync_playwright
-
     path = state_path(site)
     if not path.exists():
         login(site, base)
+    try:
+        return _run_with_saved_session(path, run)
+    except NotLoggedIn:
+        # login() opens its own sync_playwright(); the first one above must
+        # already be closed by now (its `with` block has exited), or this
+        # nests two sync Playwright instances in one thread and Playwright
+        # raises "Sync API inside the asyncio loop" instead of logging in.
+        login(site, base)
+        return _run_with_saved_session(path, run)
+
+
+def _run_with_saved_session(path, run):
+    from playwright.sync_api import sync_playwright
+
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
-        ctx = browser.new_context(storage_state=path)
         try:
-            return run(ctx.request)
-        except NotLoggedIn:
-            browser.close()
-            login(site, base)
-            browser = pw.chromium.launch()
             ctx = browser.new_context(storage_state=path)
             return run(ctx.request)
         finally:

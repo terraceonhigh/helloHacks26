@@ -16,9 +16,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 
-from hub import canvas, db, export_ics, ics, prairielearn
+from hub import brightspace, canvas, db, export_ics, ics, prairielearn, webwork
 from hub.logic import sort_items
-from hub.models import Item, classify_urgency, status_of
+from hub.models import Course, Item, classify_urgency, status_of
 
 UI_DIR = Path(__file__).parent.parent / "ui"
 
@@ -75,13 +75,22 @@ def _announcements(conn):
     unopened PrairieLearn assessment has no due date either, and used to leak
     into this feed looking like an announcement. Filter to kind="announcement"
     here rather than in db.undated() itself, which other undated items may
-    still want to read from later.
-    # ponytail: an undated task/deadline has nowhere to surface at all right
-    # now (it's excluded here, and _upcoming() requires a due date) - fine
-    # until something asks for an "undated tasks" list of its own.
-    """
+    still want to read from later - see _undated_tasks() below."""
     now = datetime.now(timezone.utc)
     return [_row_to_dict(r, now) for r in db.undated(conn) if r[2] == "announcement"]
+
+
+def _undated_tasks(conn):
+    """Everything else db.undated() has - real work with no due date to rank
+    by, not an announcement. hub/webwork.py is the clearest real case: its
+    problem-set page only ever shows a due date for a *currently open* set
+    (its own module docstring), so a real, successfully-connected account's
+    items can legitimately ALL come back due=None - before this existed they
+    had nowhere to surface at all (confirmed live: 7 real WeBWorK items,
+    connected correctly, invisible everywhere - _upcoming() requires a due
+    date, and _announcements() above only shows kind="announcement")."""
+    now = datetime.now(timezone.utc)
+    return [_row_to_dict(r, now) for r in db.undated(conn) if r[2] != "announcement"]
 
 
 def _schedule(conn):
@@ -145,6 +154,8 @@ class Handler(BaseHTTPRequestHandler):
             self._json(_upcoming(db.connect()))
         elif path == "/api/announcements":
             self._json(_announcements(db.connect()))
+        elif path == "/api/undated-tasks":
+            self._json(_undated_tasks(db.connect()))
         elif path == "/api/courses":
             conn = db.connect()
             self._json([{"code": c, "term": t, "title": ti, "grade": g} for c, t, ti, g in db.courses(conn)])
@@ -190,6 +201,10 @@ class Handler(BaseHTTPRequestHandler):
             self._connect(lambda: prairielearn.fetch("prairielearn_ok"))
         elif path == "/api/connect/prairielearn_custom":
             self._connect_prairielearn_custom()
+        elif path == "/api/connect/brightspace":
+            self._connect_brightspace()
+        elif path == "/api/connect/webwork":
+            self._connect_webwork()
         elif path == "/api/feed":
             self._feed()
         else:
@@ -250,6 +265,66 @@ class Handler(BaseHTTPRequestHandler):
         except ValueError as e:
             return self._json({"error": str(e)}, status=400, no_store=True)
         self._feed_reply("POST", None, body)
+
+    def _require_https_base(self, base):
+        """Brightspace and WeBWorK are both multi-tenant - the student pastes
+        their own institution's URL, and this opens a real login browser
+        window at whatever comes back. Same trust model as
+        hub/prairielearn.py's resolve_campus(): reject anything that isn't a
+        real https:// URL outright, rather than let a typo or a non-URL
+        string reach Playwright.
+        # ponytail: this is the minimal check (https + non-empty host), not
+        # resolve_campus()'s full userinfo/IP-literal/localhost hardening -
+        # worth porting here too before this leaves local-only demo use."""
+        parsed = urlparse(base)
+        if parsed.scheme != "https" or not parsed.hostname:
+            raise ValueError(f"not a valid https:// URL: {base!r}")
+
+    def _connect_brightspace(self):
+        try:
+            base = self._read_json_body().get("base", "")
+            self._require_https_base(base)
+        except ValueError as e:
+            return self._json({"ok": False, "error": str(e)}, status=400)
+        self._connect(lambda: brightspace.fetch(base))
+
+    def _connect_webwork(self):
+        try:
+            body = self._read_json_body()
+            base, course_code = body.get("base", ""), body.get("course_code", "")
+            self._require_https_base(base)
+        except ValueError as e:
+            return self._json({"ok": False, "error": str(e)}, status=400)
+        if not course_code:
+            return self._json({"ok": False, "error": "a course code is required"}, status=400)
+        # hub/webwork.py's fetch() returns items only (no catalogue join key
+        # on its own page) - build the Course record here ourselves, same as
+        # its own __main__ block does.
+        #
+        # Not routed through self._connect(): course_code is matched against
+        # existing courses (db.find_matching_course) *before* saving, since
+        # a real bug found live showed a plain save() alone isn't enough -
+        # _course_id() always re-canonicalizes course_code, so even reusing
+        # a match's own (code, term) through the normal save() path just
+        # creates a second canonical-form row instead of finding a stale,
+        # pre-canonicalization one (a real "BMEG 230" left a stale
+        # "BMEG_V 230 101 2026W1" row untouched). db.merge_course_into(),
+        # run right after save(), is what actually folds the two together -
+        # self._connect()'s fixed save-then-respond shape has nowhere to
+        # fit that extra step in.
+        conn = db.connect()
+        matched = db.find_matching_course(conn, course_code)
+        try:
+            items = webwork.fetch(base, course_code)
+        except Exception as e:  # ponytail: same broad catch as _connect() - a bad/expired/
+            # slow scrape shouldn't take the server down.
+            return self._json({"ok": False, "error": str(e)}, status=502)
+        courses = [Course(code=course_code, section="", term="", title=course_code)]
+        db.save(conn, courses, items)
+        if matched:
+            _matched_id, _matched_code, _matched_term = matched
+            db.merge_course_into(conn, course_code, "", target_id=_matched_id)
+        self._json({"ok": True, "courses": len(courses), "items": len(items)})
 
     def _connect(self, fetch_fn):
         """Opens a browser window for the student to sign in themselves
