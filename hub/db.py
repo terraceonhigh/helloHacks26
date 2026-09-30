@@ -41,12 +41,10 @@ def _canonical_term(term):
     return f"{m[1]}{m[2][0].upper()}{m[3]}" if m else term
 
 
-# ponytail: no migration for a hub.db that predates canonical course codes -
-# it's a hackathon demo, not a production rollout with real users' existing
-# data at stake. A pre-existing course row keeps its old raw code (e.g.
-# "CPSC 121 101 2026W1") until it's re-saved, so it can sit alongside a new
-# canonical row for the same real course. Delete ~/.ubc-hub/hub.db after
-# pulling this change; upgrade to a real migration if that ever isn't fine.
+# A course row saved before canonical course codes existed keeps its old raw
+# code (e.g. "CPSC 121 101 2026W1") until connect()'s _recanonicalize_courses
+# folds it into the canonical row for the same real course - see that
+# function, below.
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS courses (
@@ -116,7 +114,37 @@ def connect(path=PATH):
     cols = {row[1] for row in conn.execute("PRAGMA table_info(items)")}
     if "done" not in cols:
         conn.execute("ALTER TABLE items ADD COLUMN done INTEGER")
+    _recanonicalize_courses(conn)
     return conn
+
+
+def _recanonicalize_courses(conn):
+    """Fold every course row saved before canonical course codes existed
+    (see the ponytail note above SCHEMA) into the canonical row for the same
+    real course, moving its items/textbooks/meetings across. Runs on every
+    connect(): idempotent, since a row already in canonical (code, term)
+    form is skipped, so this is a no-op once a hub.db has caught up.
+
+    Reuses _course_id()'s own upsert (same shorter-title-wins/COALESCE-grade
+    rules as a fresh save()), so two stale rows for one real course - e.g.
+    two Canvas shells that predate this logic - land on the same canonical
+    row as each other, in the same way two shells saved today already do.
+    """
+    from hub.models import Course
+
+    rows = conn.execute("SELECT id, code, term, title, grade FROM courses").fetchall()
+    for cid, code, term, title, grade in rows:
+        canon_code, canon_term = _canonical_code(code), _canonical_term(term)
+        if (canon_code, canon_term) == (code, term):
+            continue  # already canonical
+        target_id = _course_id(conn, Course(code=canon_code, section="", term=canon_term, title=title, grade=grade))
+        if target_id == cid:
+            continue
+        conn.execute("UPDATE items SET course_id=? WHERE course_id=?", (target_id, cid))
+        conn.execute("UPDATE textbooks SET course_id=? WHERE course_id=?", (target_id, cid))
+        conn.execute("UPDATE meetings SET course_id=? WHERE course_id=?", (target_id, cid))
+        conn.execute("DELETE FROM courses WHERE id=?", (cid,))
+    conn.commit()
 
 
 def _course_id(conn, course):

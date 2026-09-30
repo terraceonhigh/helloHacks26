@@ -153,15 +153,36 @@ const THEMES = [
   { id: "catppuccin", label: "Catppuccin" },
 ];
 
+function hexToRgb(hex) {
+  const n = parseInt(hex.replace("#", ""), 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+
+// Halfway between two hex colors - every built-in theme's own --surface-soft
+// sits between its --page and --surface (a "recessed" look, distinct from
+// both), so a custom scheme's --surface-soft is derived the same way rather
+// than asking for an eighth swatch just for it.
+function mixHex(hexA, hexB, t) {
+  const a = hexToRgb(hexA), b = hexToRgb(hexB);
+  const chan = (x, y) => Math.round(x + (y - x) * t).toString(16).padStart(2, "0");
+  return `#${chan(a.r, b.r)}${chan(a.g, b.g)}${chan(a.b, b.b)}`;
+}
+
 // Everforest's own values - what a freshly-picked "Custom" scheme starts
 // from, so switching to it doesn't jump to something jarring before the
 // student has changed anything.
-const DEFAULT_CUSTOM_COLORS = { page: "#f3ead3", surface: "#fdf6e3", ink: "#2d353b", accent: "#3a6b52" };
+const DEFAULT_CUSTOM_COLORS = {
+  page: "#f3ead3", surface: "#fdf6e3", ink: "#2d353b", accent: "#3a6b52",
+  line: "#ddd4bb", danger: "#c85546", muted: "#6f766b",
+};
 const CUSTOM_COLOR_FIELDS = [
   { key: "page", label: "Background" },
   { key: "surface", label: "Cards" },
   { key: "ink", label: "Text" },
   { key: "accent", label: "Accent" },
+  { key: "line", label: "Card borders" },
+  { key: "danger", label: "Overdue" },
+  { key: "muted", label: "Muted text" },
 ];
 
 const WEEKDAY_LETTERS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -944,12 +965,15 @@ export default function App() {
   const [storeCourses, setStoreCourses] = useState([]);
   const loadRequestId = useRef(0);
   const feedRequestId = useRef(0);
-
   useEffect(() => {
     setTheme(localStorage.getItem("gather-theme") || "everforest");
     try {
       const saved = JSON.parse(localStorage.getItem("gather-custom-colors"));
-      if (saved) setCustomColors(saved);
+      // Merge over the defaults, not a bare overwrite: a scheme saved before
+      // `line`/`danger` existed here is missing those two keys, and an
+      // outright `setCustomColors(saved)` would leave them undefined -
+      // an uncustomized swatch that looks unset rather than a real color.
+      if (saved) setCustomColors({ ...DEFAULT_CUSTOM_COLORS, ...saved });
     } catch {
       // ignore malformed/missing storage - keep the default
     }
@@ -981,6 +1005,12 @@ export default function App() {
       if (Array.isArray(saved)) setWebworkConnections(saved);
     } catch {
       // ignore malformed/missing storage - keep the default (no connections yet)
+    }
+    try {
+      const saved = JSON.parse(localStorage.getItem("gather-workday-meetings"));
+      if (Array.isArray(saved)) setMeetings(saved);
+    } catch {
+      // ignore malformed/missing storage - keep the default (no import yet)
     }
     setPreferredKinds(readPreferredKindsCookie());
     // The feed URL is a secret (works like a password): it lives only in an
@@ -1027,29 +1057,66 @@ export default function App() {
     });
   }
 
+  // Each `skip*` ref below guards the localStorage write effect right after
+  // it against a real bug (verified live, 2026-09-29): a first-mount effect
+  // runs once no matter its dependency array, and on that run it still
+  // closes over its state's plain useState *default* ([], "everforest",
+  // ...) - the matching restore a few lines up (setTheme(saved), etc.) only
+  // takes effect on the *next* render. Unguarded, the write effect fires
+  // during that same first flush and immediately overwrites the
+  // just-restored value with the default - so WeBWorK connections, the
+  // Workday import, hidden courses, done-checks, theme, colours and sample
+  // mode all silently reset on every single reload. Skipping each write
+  // effect's own first run (not "has restore run yet" - each effect must
+  // skip itself) fixes it: the second run only ever happens after a real
+  // state change, by which point restore has already landed.
+  const skipThemeWrite = useRef(true);
+  const skipColorsWrite = useRef(true);
+  const skipSampleModeWrite = useRef(true);
+  const skipHiddenCoursesWrite = useRef(true);
+  const skipManuallyDoneWrite = useRef(true);
+  const skipBrightspaceWrite = useRef(true);
+  const skipWebworkWrite = useRef(true);
+  const skipMeetingsWrite = useRef(true);
+
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
+    if (skipThemeWrite.current) { skipThemeWrite.current = false; return; }
     localStorage.setItem("gather-theme", theme);
   }, [theme]);
   useEffect(() => {
+    if (skipColorsWrite.current) { skipColorsWrite.current = false; return; }
     localStorage.setItem("gather-custom-colors", JSON.stringify(customColors));
   }, [customColors]);
   useEffect(() => {
+    if (skipSampleModeWrite.current) { skipSampleModeWrite.current = false; return; }
     localStorage.setItem("gather-sample-mode", String(sampleMode));
   }, [sampleMode]);
   useEffect(() => {
+    if (skipHiddenCoursesWrite.current) { skipHiddenCoursesWrite.current = false; return; }
     localStorage.setItem("gather-hidden-courses", JSON.stringify(hiddenCourses));
   }, [hiddenCourses]);
   useEffect(() => {
+    if (skipManuallyDoneWrite.current) { skipManuallyDoneWrite.current = false; return; }
     localStorage.setItem("gather-manually-done", JSON.stringify(manuallyDoneKeys));
   }, [manuallyDoneKeys]);
   useEffect(() => {
+    if (skipBrightspaceWrite.current) { skipBrightspaceWrite.current = false; return; }
     if (brightspaceCourseCount === null) return;
     localStorage.setItem("gather-brightspace-course-count", String(brightspaceCourseCount));
   }, [brightspaceCourseCount]);
   useEffect(() => {
+    if (skipWebworkWrite.current) { skipWebworkWrite.current = false; return; }
     localStorage.setItem("gather-webwork-connections", JSON.stringify(webworkConnections));
   }, [webworkConnections]);
+  useEffect(() => {
+    // Workday isn't a login (no saved session, no hub.db row) - the parsed
+    // schedule only ever lived in this one tab's React state, so it was
+    // gone on the next reload (known gap, PM handover 2026-09-27 #5). Persist
+    // it the same way as every other Connections-tab fact above.
+    if (skipMeetingsWrite.current) { skipMeetingsWrite.current = false; return; }
+    localStorage.setItem("gather-workday-meetings", JSON.stringify(meetings));
+  }, [meetings]);
 
   function upsertWebworkConnection(url, courseCode, itemCount) {
     setWebworkConnections((prev) => [...prev.filter((c) => c.courseCode !== courseCode), { url, courseCode, itemCount }]);
@@ -1200,7 +1267,16 @@ export default function App() {
   const shownMeetings = mergeMeetings(demoMeetings, meetings);
 
   const customStyle = theme === "custom"
-    ? { "--page": customColors.page, "--surface": customColors.surface, "--ink": customColors.ink, "--accent": customColors.accent }
+    ? {
+        "--page": customColors.page, "--surface": customColors.surface, "--ink": customColors.ink, "--accent": customColors.accent,
+        "--line": customColors.line, "--danger": customColors.danger, "--muted": customColors.muted,
+        // Neither is one of the 7 swatches - both were left at Gather's own
+        // near-white value regardless of theme, which is exactly the "white
+        // background on some things" bug (search bar, hover states, nested
+        // panels all use --surface-soft; the sticky header uses --page-glass).
+        "--surface-soft": mixHex(customColors.surface, customColors.page, 0.5),
+        "--page-glass": (({ r, g, b }) => `rgba(${r}, ${g}, ${b}, 0.88)`)(hexToRgb(customColors.page)),
+      }
     : undefined;
 
   return (

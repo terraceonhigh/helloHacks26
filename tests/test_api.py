@@ -341,7 +341,13 @@ def test_connect_webwork_joins_an_existing_course_instead_of_making_a_new_one(tm
     # with a fresh "BMEG 230" WeBWorK course, even though both name the
     # same real course - two separate cards, WeBWorK's items invisible on
     # the real one. _connect_webwork should find and reuse the existing
-    # course's own stored identity instead of making a new "BMEG 230" row.
+    # course's own row instead of making a new "BMEG 230" row of its own.
+    #
+    # db.connect()'s own self-heal (_recanonicalize_courses) already renames
+    # the seeded row to canonical "BMEG 230" the moment _connect_webwork
+    # opens its connection, before find_matching_course ever runs - so this
+    # now exercises that heal as much as find_matching_course/merge_course_into,
+    # and the surviving code is the canonical form, not the old raw one.
     db_path = tmp_path / "hub.db"
     conn = db.connect(db_path)
     conn.execute("INSERT INTO courses (code, term, title) VALUES ('BMEG_V 230 101 2026W1', '2026W1_V', 'Biomechanics I')")
@@ -356,10 +362,10 @@ def test_connect_webwork_joins_an_existing_course_instead_of_making_a_new_one(tm
         assert status == 200
         assert body == {"ok": True, "courses": 1, "items": 1}
         rows = conn.execute("SELECT code FROM courses").fetchall()
-        assert rows == [("BMEG_V 230 101 2026W1",)]  # one course, not two
+        assert rows == [("BMEG 230",)]  # one course, not two
         item_course = conn.execute(
             "SELECT courses.code FROM items JOIN courses ON courses.id = items.course_id WHERE items.source='webwork'"
         ).fetchone()
-        assert item_course == ("BMEG_V 230 101 2026W1",)
+        assert item_course == ("BMEG 230",)
     finally:
         server.shutdown()

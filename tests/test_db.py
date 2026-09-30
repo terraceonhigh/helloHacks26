@@ -197,3 +197,61 @@ def test_merge_course_into_is_a_no_op_when_the_row_doesnt_exist_or_is_already_th
     db.merge_course_into(conn, "NONEXISTENT 999", "", target_id=1)  # no such row
     db.merge_course_into(conn, "CPSC 121", "2026W1", target_id=1)  # already the target
     assert len(conn.execute("SELECT id FROM courses").fetchall()) == 1
+
+
+def test_recanonicalize_merges_two_pre_canonical_shells_for_the_same_real_course():
+    """Two Canvas shells for the same real course (a lecture and a lab, or
+    just two course pages a professor made), saved back when hub.db stored
+    whatever raw code/term text a source gave it. A fresh save() of either
+    shell today would canonicalise both to the same ("APSC 160", "2026W1")
+    row (see _canonical_code) - _recanonicalize_courses folds the existing
+    stale rows together the same way, without needing either to be re-saved.
+    _canonical_term only rewrites UBC's "<year> Winter|Summer Term <n>"
+    spelling, so "2026W1_V" (already short-form, with a campus suffix
+    _canonical_term doesn't strip) passes through unchanged - that's the
+    term the merged row keeps."""
+    conn = db.connect(":memory:")
+    conn.execute("INSERT INTO courses (id, code, term, title, grade) VALUES "
+                 "(1, 'APSC_V 160 101/102 2026W1', '2026W1_V', 'APSC_V 160 101/102 2026W1 Intro to Computation', 73.81)")
+    conn.execute("INSERT INTO courses (id, code, term, title) VALUES "
+                 "(2, 'APSC 160:Introduction to Computation,2026-27 Winter Term 1', '', "
+                 "'APSC 160:Introduction to Computation,2026-27 Winter Term 1')")
+    conn.execute("INSERT INTO items (course_id, category, kind, title, url, source) "
+                 "VALUES (2, 'task', 'assignment', 'PS1', 'https://canvas/1', 'canvas')")
+    conn.commit()
+
+    db._recanonicalize_courses(conn)
+
+    rows = conn.execute("SELECT code, term, title, grade FROM courses").fetchall()
+    assert rows == [("APSC 160", "2026W1_V", "APSC_V 160 101/102 2026W1 Intro to Computation", 73.81)]
+    (course_id,) = conn.execute("SELECT id FROM courses").fetchone()
+    assert conn.execute("SELECT course_id FROM items WHERE source='canvas'").fetchone() == (course_id,)
+
+
+def test_recanonicalize_leaves_already_canonical_rows_alone():
+    conn = db.connect(":memory:")
+    db.save(conn, [Course(code="APSC 160", section="", term="2026W1", title="Intro to Computation"),
+                   Course(code="CPSC 160", section="", term="2026W1", title="A different course entirely")])
+    db._recanonicalize_courses(conn)
+    assert sorted(c[0] for c in db.courses(conn)) == ["APSC 160", "CPSC 160"]
+
+
+def test_connect_self_heals_a_hub_db_from_before_canonical_course_codes(tmp_path):
+    """End-to-end version of the two tests above: opening a real hub.db file
+    saved before canonical course codes existed must fold its duplicate
+    course rows together on its own, with no wipe-and-resync needed."""
+    import sqlite3
+
+    path = tmp_path / "old.db"
+    legacy = sqlite3.connect(path)
+    legacy.executescript(db.SCHEMA)
+    legacy.execute("INSERT INTO courses (code, term, title) VALUES "
+                   "('MECH_V 260 102 2026W1', '2026W1_V', 'MECH_V 260 102 2026W1 Mechanics of Materials')")
+    legacy.execute("INSERT INTO courses (code, term, title) VALUES "
+                   "('MECH 260: Intro to Mechanics of Materials,2026W1-102 (with Dr. Amer)', '', "
+                   "'MECH 260: Intro to Mechanics of Materials,2026W1-102 (with Dr. Amer)')")
+    legacy.commit()
+    legacy.close()
+
+    conn = db.connect(path)
+    assert [c[0] for c in db.courses(conn)] == ["MECH 260"]
