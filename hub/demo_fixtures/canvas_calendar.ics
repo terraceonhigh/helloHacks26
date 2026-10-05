@@ -1,0 +1,541 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Demo Canvas//Stu Dent calendar feed//EN
+X-WR-CALNAME:Stu Dent Calendar (Canvas)
+BEGIN:VEVENT
+UID:event-assignment-5001
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w2.Wed@21:00}}
+DTEND:{{due:w2.Wed@21:00}}
+SUMMARY:Problem Set 1 [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5002
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w3.Wed@21:00}}
+DTEND:{{due:w3.Wed@21:00}}
+SUMMARY:Problem Set 2 [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5003
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w4.Wed@21:00}}
+DTEND:{{due:w4.Wed@21:00}}
+SUMMARY:Problem Set 3 [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5004
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:+1d@23:59}}
+DTEND:{{due:+1d@23:59}}
+SUMMARY:Problem Set 4 [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5005
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w7.Wed@21:00}}
+DTEND:{{due:w7.Wed@21:00}}
+SUMMARY:Problem Set 5 [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5006
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w8.Wed@21:00}}
+DTEND:{{due:w8.Wed@21:00}}
+SUMMARY:Problem Set 6 [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5007
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w9.Wed@21:00}}
+DTEND:{{due:w9.Wed@21:00}}
+SUMMARY:Problem Set 7 [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5008
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w10.Wed@21:00}}
+DTEND:{{due:w10.Wed@21:00}}
+SUMMARY:Problem Set 8 [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5009
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w11.Wed@21:00}}
+DTEND:{{due:w11.Wed@21:00}}
+SUMMARY:Problem Set 9 [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5010
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w12.Wed@21:00}}
+DTEND:{{due:w12.Wed@21:00}}
+SUMMARY:Problem Set 10 [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5011
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:+1d@23:59}}
+DTEND:{{due:+1d@23:59}}
+SUMMARY:Final project milestone 0: team formation [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5012
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w8.Fri@23:59}}
+DTEND:{{due:w8.Fri@23:59}}
+SUMMARY:Final project milestone 1: proposal [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5013
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w10.Fri@23:59}}
+DTEND:{{due:w10.Fri@23:59}}
+SUMMARY:Final project milestone 2: prototype [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5014
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w13.Fri@17:00}}
+DTEND:{{due:w13.Fri@17:00}}
+SUMMARY:Final project milestone 3: final submission [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-calendar-event-7001
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:+4d@18:00}}
+DTEND:{{due:+4d@19:00}}
+SUMMARY:Midterm 1 review session [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-calendar-event-7002
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w14.Wed@12:00}}
+DTEND:{{due:w14.Wed@13:00}}
+SUMMARY:CPSC 110 Final Exam [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5015
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w2.Mon@16:00}}
+DTEND:{{due:w2.Mon@16:00}}
+SUMMARY:Lab 1 [CPSC_V 110-L1A 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1006
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5016
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w3.Mon@16:00}}
+DTEND:{{due:w3.Mon@16:00}}
+SUMMARY:Lab 2 [CPSC_V 110-L1A 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1006
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5017
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w4.Mon@16:00}}
+DTEND:{{due:w4.Mon@16:00}}
+SUMMARY:Lab 3 [CPSC_V 110-L1A 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1006
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5018
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w5.Mon@16:00}}
+DTEND:{{due:w5.Mon@16:00}}
+SUMMARY:Lab 4 [CPSC_V 110-L1A 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1006
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5019
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w6.Mon@16:00}}
+DTEND:{{due:w6.Mon@16:00}}
+SUMMARY:Lab 5 [CPSC_V 110-L1A 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1006
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5020
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w7.Mon@16:00}}
+DTEND:{{due:w7.Mon@16:00}}
+SUMMARY:Lab 6 [CPSC_V 110-L1A 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1006
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5021
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w8.Mon@16:00}}
+DTEND:{{due:w8.Mon@16:00}}
+SUMMARY:Lab 7 [CPSC_V 110-L1A 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1006
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5022
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w9.Mon@16:00}}
+DTEND:{{due:w9.Mon@16:00}}
+SUMMARY:Lab 8 [CPSC_V 110-L1A 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1006
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5023
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w10.Mon@16:00}}
+DTEND:{{due:w10.Mon@16:00}}
+SUMMARY:Lab 9 [CPSC_V 110-L1A 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1006
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5024
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w11.Mon@16:00}}
+DTEND:{{due:w11.Mon@16:00}}
+SUMMARY:Lab 10 [CPSC_V 110-L1A 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1006
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5025
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w2.Thu@23:59}}
+DTEND:{{due:w2.Thu@23:59}}
+SUMMARY:WeBWorK 1 [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5026
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w3.Thu@23:59}}
+DTEND:{{due:w3.Thu@23:59}}
+SUMMARY:WeBWorK 2 [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5027
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w4.Thu@23:59}}
+DTEND:{{due:w4.Thu@23:59}}
+SUMMARY:WeBWorK 3 [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5028
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:-1d@23:59}}
+DTEND:{{due:-1d@23:59}}
+SUMMARY:WeBWorK 4 [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5029
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:+1d@23:59}}
+DTEND:{{due:+1d@23:59}}
+SUMMARY:WeBWorK 5 [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5030
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w7.Thu@23:59}}
+DTEND:{{due:w7.Thu@23:59}}
+SUMMARY:WeBWorK 6 [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5031
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w8.Thu@23:59}}
+DTEND:{{due:w8.Thu@23:59}}
+SUMMARY:WeBWorK 7 [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5032
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w9.Thu@23:59}}
+DTEND:{{due:w9.Thu@23:59}}
+SUMMARY:WeBWorK 8 [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5033
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w10.Thu@23:59}}
+DTEND:{{due:w10.Thu@23:59}}
+SUMMARY:WeBWorK 9 [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5034
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w11.Thu@23:59}}
+DTEND:{{due:w11.Thu@23:59}}
+SUMMARY:WeBWorK 10 [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5035
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w12.Thu@23:59}}
+DTEND:{{due:w12.Thu@23:59}}
+SUMMARY:WeBWorK 11 [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5036
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w13.Thu@23:59}}
+DTEND:{{due:w13.Thu@23:59}}
+SUMMARY:WeBWorK 12 [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-calendar-event-7003
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w6.Tue@18:00}}
+DTEND:{{due:w6.Tue@19:00}}
+SUMMARY:MATH 100 Midterm 1 [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-calendar-event-7004
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w10.Tue@18:00}}
+DTEND:{{due:w10.Tue@19:00}}
+SUMMARY:MATH 100 Midterm 2 [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-calendar-event-7005
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w14.Mon@08:30}}
+DTEND:{{due:w14.Mon@09:30}}
+SUMMARY:MATH 100 Final Exam [MATH_V 100-104 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1002
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5037
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w3.Fri@23:59}}
+DTEND:{{due:w3.Fri@23:59}}
+SUMMARY:Lab 1 report: Measurement and uncertainty [PHYS_V 117-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1003
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5038
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:-3d@23:59}}
+DTEND:{{due:-3d@23:59}}
+SUMMARY:Lab 2 report: Projectile motion [PHYS_V 117-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1003
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5039
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w8.Fri@23:59}}
+DTEND:{{due:w8.Fri@23:59}}
+SUMMARY:Lab 3 report: Springs and oscillation [PHYS_V 117-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1003
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5040
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w11.Fri@23:59}}
+DTEND:{{due:w11.Fri@23:59}}
+SUMMARY:Lab 4 report: Standing waves [PHYS_V 117-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1003
+END:VEVENT
+BEGIN:VEVENT
+UID:event-calendar-event-7006
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w6.Wed@19:00}}
+DTEND:{{due:w6.Wed@20:00}}
+SUMMARY:PHYS 117 Midterm 1 [PHYS_V 117-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1003
+END:VEVENT
+BEGIN:VEVENT
+UID:event-calendar-event-7007
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w10.Wed@19:00}}
+DTEND:{{due:w10.Wed@20:00}}
+SUMMARY:PHYS 117 Midterm 2 [PHYS_V 117-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1003
+END:VEVENT
+BEGIN:VEVENT
+UID:event-calendar-event-7008
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w15.Tue@15:30}}
+DTEND:{{due:w15.Tue@16:30}}
+SUMMARY:PHYS 117 Final Exam [PHYS_V 117-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1003
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-8501
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w2.Sun@23:59}}
+DTEND:{{due:w2.Sun@23:59}}
+SUMMARY:Discussion post 1 [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-8502
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w3.Sun@23:59}}
+DTEND:{{due:w3.Sun@23:59}}
+SUMMARY:Discussion post 2 [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-8503
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w4.Sun@23:59}}
+DTEND:{{due:w4.Sun@23:59}}
+SUMMARY:Discussion post 3 [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-8504
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:-2d@23:59}}
+DTEND:{{due:-2d@23:59}}
+SUMMARY:Discussion post 4: Unreliable narrators [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-8505
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:+1d@23:59}}
+DTEND:{{due:+1d@23:59}}
+SUMMARY:Discussion post 5: Setting as character [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-8506
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w7.Sun@23:59}}
+DTEND:{{due:w7.Sun@23:59}}
+SUMMARY:Discussion post 6 [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-8507
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w8.Sun@23:59}}
+DTEND:{{due:w8.Sun@23:59}}
+SUMMARY:Discussion post 7 [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-8508
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w9.Sun@23:59}}
+DTEND:{{due:w9.Sun@23:59}}
+SUMMARY:Discussion post 8 [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-8509
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w10.Sun@23:59}}
+DTEND:{{due:w10.Sun@23:59}}
+SUMMARY:Discussion post 9 [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-8510
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w11.Sun@23:59}}
+DTEND:{{due:w11.Sun@23:59}}
+SUMMARY:Discussion post 10 [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5041
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w6.Fri@12:00}}
+DTEND:{{due:w6.Fri@12:00}}
+SUMMARY:Essay 1 draft [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5042
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w8.Fri@23:59}}
+DTEND:{{due:w8.Fri@23:59}}
+SUMMARY:Essay 1 final [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5043
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w10.Fri@23:59}}
+DTEND:{{due:w10.Fri@23:59}}
+SUMMARY:Essay 2 proposal [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5044
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w12.Fri@23:59}}
+DTEND:{{due:w12.Fri@23:59}}
+SUMMARY:Essay 2 [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-assignment-5045
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w14.Fri@23:59}}
+DTEND:{{due:w14.Fri@23:59}}
+SUMMARY:Final portfolio [ENGL_V 110-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1004
+END:VEVENT
+BEGIN:VEVENT
+UID:event-calendar-event-7009
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w6.Thu@15:30}}
+DTEND:{{due:w6.Thu@16:30}}
+SUMMARY:PSYC 102 Midterm 1 [PSYC_V 102-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1005
+END:VEVENT
+BEGIN:VEVENT
+UID:event-calendar-event-7010
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w10.Thu@15:30}}
+DTEND:{{due:w10.Thu@16:30}}
+SUMMARY:PSYC 102 Midterm 2 [PSYC_V 102-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1005
+END:VEVENT
+BEGIN:VEVENT
+UID:event-calendar-event-7011
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:w15.Thu@19:00}}
+DTEND:{{due:w15.Thu@20:00}}
+SUMMARY:PSYC 102 Final Exam [PSYC_V 102-003 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1005
+END:VEVENT
+BEGIN:VEVENT
+UID:event-calendar-event-7901
+DTSTAMP:20260901T000000Z
+DTSTART:{{due:+2d@15:00}}
+DTEND:{{due:+2d@16:00}}
+SUMMARY:Drop-in office hours [CPSC_V 110-101 2026W1]
+URL;VALUE=URI:https://canvas.example.edu/calendar?include_contexts=course_1001
+END:VEVENT
+END:VCALENDAR
