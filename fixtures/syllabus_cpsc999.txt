@@ -1,0 +1,14 @@
+CPSC 999: Fictional Systems (fake course, for tests only)
+Winter Term 1, 2026
+
+Instructor: Prof. A. Nobody
+
+Grading:
+This course does not use Canvas for due dates. All deadlines are listed here.
+
+- Assignment 1 (Warm-up) is due September 30, 2026, 11:59pm.
+- The midterm exam is on October 22, 2026 at 9:00am, in person.
+- Reading responses are posted weekly on Piazza; the first one is expected by
+  Week 5 Friday, exact date to be confirmed on the course Piazza.
+- Note: your PrairieLearn account will also show "PA2" due November 3, 2026,
+  which does not appear anywhere in Canvas - check PrairieLearn directly.
