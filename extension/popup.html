@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Lauds Sync</title>
+<style>
+  body {font: 14px system-ui; width: 300px; padding: 12px;}
+  label, input, button {display: block; width: 100%; box-sizing: border-box; margin: 8px 0;}
+  input, button {padding: 8px;}
+  #status {min-height: 2em; color: #333;}
+</style>
+<h1>Lauds</h1>
+<label for="hubBase">Sync target (Vercel deployment)</label>
+<input id="hubBase" type="url" placeholder="https://hello-hacks26.vercel.app">
+<label for="provider">Provider</label>
+<select id="provider"></select>
+<label for="origin">Moodle or Blackboard site URL</label>
+<input id="origin" type="url" placeholder="https://lms.example.edu">
+<label for="key">Lauds sync key (auto-generated; keep it to reuse it on another browser)</label>
+<input id="key" type="text" autocomplete="off">
+<button id="save">Save</button>
+<button id="sync">Sync selected provider</button>
+<p id="status" role="status"></p>
+<script src="providers.js"></script>
+<script src="popup.js"></script>
+</html>

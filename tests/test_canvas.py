@@ -1,4 +1,9 @@
-from hub.canvas import done_from_submissions, to_course, to_item, unwrap
+from urllib.parse import parse_qs, urlparse
+
+import pytest
+
+from hub import canvas
+from hub.canvas import done_from_submissions, to_course, to_item, to_undated_item, unwrap
 
 
 def test_unwrap_strips_guard():
@@ -20,6 +25,24 @@ def test_mapping():
     assert (assignment.kind, assignment.category) == ("assignment", "task")
 
 
+def test_calendar_event_url_is_not_double_prefixed():
+    # planner/items' html_url is already absolute for calendar events, unlike
+    # assignments' relative one - BASE + url used to double it (#15).
+    event = to_item({"plannable_type": "calendar_event",
+                     "plannable": {"title": "Office hours"},
+                     "html_url": "https://canvas.ubc.ca/calendar?event_id=9"}, {})
+    assert event.url == "https://canvas.ubc.ca/calendar?event_id=9"
+
+
+def test_to_undated_item():
+    a = {"name": "Reading response", "html_url": "/courses/7/assignments/9",
+         "has_submitted_submissions": True}
+    i = to_undated_item(a, "CPSC 121")
+    assert (i.course, i.kind, i.category, i.title, i.due, i.done) == (
+        "CPSC 121", "assignment", "task", "Reading response", None, True)
+    assert i.url == "https://canvas.ubc.ca/courses/7/assignments/9"
+
+
 def test_announcement_has_no_due_date():
     # plannable_date on an announcement is its post date, not a deadline -
     # verified against a real planner/items response. Using it as `due`
@@ -38,3 +61,150 @@ def test_done_from_submissions():
     assert done_from_submissions({"submissions": {"submitted": False, "excused": False}}) is False
     assert done_from_submissions({"submissions": False}) is None
     assert done_from_submissions({}) is None
+
+
+def test_done_from_submissions_also_honors_the_manual_complete_checkbox():
+    # A student can tick an item off Canvas's own to-do list without
+    # submitting anything (e.g. a reading with no submission at all) - that
+    # used to keep showing up here as not-done forever.
+    assert done_from_submissions({"submissions": False, "planner_override": {"marked_complete": True}}) is True
+    assert done_from_submissions({"planner_override": {"marked_complete": True}}) is True
+    assert done_from_submissions({"submissions": {"submitted": False}, "planner_override": {"marked_complete": False}}) is False
+    assert done_from_submissions({"planner_override": None}) is None
+
+
+def test_oauth_fetch_reuses_the_canvas_mapping_without_local_browser(monkeypatch):
+    class Response:
+        status_code = 200
+        headers = {}
+
+        def __init__(self, body):
+            import json
+            self.text = json.dumps(body)
+
+    class Session:
+        def __init__(self):
+            self.headers = {}
+            self.paths = []
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            pass
+
+        def get(self, url, *, timeout, allow_redirects):
+            assert self.headers == {"Authorization": "Bearer fake-access-token"}
+            assert timeout == 15 and allow_redirects is False
+            path = urlparse(url).path
+            self.paths.append(path)
+            if path == "/api/v1/courses":
+                return Response([{"id": 7, "course_code": "CPSC 121", "name": "Models"}])
+            if path == "/api/v1/planner/items":
+                return Response([{"course_id": 7, "plannable_type": "quiz",
+                                  "plannable_date": "2026-09-30T06:59:00Z",
+                                  "plannable": {"title": "Quiz 2"},
+                                  "html_url": "/courses/7/quizzes/3"}])
+            if path == "/api/v1/courses/7/assignments":
+                return Response([{"name": "Reading response", "due_at": None,
+                                  "html_url": "/courses/7/assignments/9"}])
+            raise AssertionError(url)
+
+    session = Session()
+    monkeypatch.setattr(canvas.requests, "Session", lambda: session)
+    monkeypatch.setattr(canvas.site, "fetch_with_session", lambda *_: pytest.fail("local browser used"))
+    courses, items = canvas.fetch(access_token="fake-access-token")
+    assert [c.code for c in courses] == ["CPSC 121"]
+    assert [(i.kind, i.course, i.title) for i in items] == [
+        ("quiz", "CPSC 121", "Quiz 2"),
+        ("assignment", "CPSC 121", "Reading response"),
+    ]
+    assert session.paths == ["/api/v1/courses", "/api/v1/planner/items",
+                             "/api/v1/courses/7/assignments"]
+
+
+def test_oauth_token_cannot_follow_a_foreign_pagination_link():
+    class Session:
+        def get(self, *_args, **_kwargs):
+            pytest.fail("token sent to foreign origin")
+
+    with pytest.raises(ValueError, match="allowed origin"):
+        canvas._BearerRequest(Session()).get("https://attacker.example/api/v1/courses")
+
+
+def test_canvas_oauth_authorization_and_token_grants(monkeypatch):
+    url = canvas.authorization_url("fake-client", "https://hub.example/api/canvas/callback", "fake-state")
+    parsed = urlparse(url)
+    assert parsed.scheme == "https" and parsed.netloc == "canvas.ubc.ca"
+    assert parsed.path == "/login/oauth2/auth"
+    assert parse_qs(parsed.query) == {
+        "client_id": ["fake-client"], "response_type": ["code"],
+        "redirect_uri": ["https://hub.example/api/canvas/callback"],
+        "state": ["fake-state"],
+    }
+    assert "secret" not in url and "token" not in url
+
+    calls = []
+
+    class Response:
+        status_code = 200
+
+        def json(self):
+            return {"access_token": "fake-access", "refresh_token": "fake-refresh"}
+
+    def post(url, *, data, timeout, allow_redirects):
+        calls.append((url, data))
+        assert timeout == 15 and allow_redirects is False
+        return Response()
+
+    monkeypatch.setattr(canvas.requests, "post", post)
+    assert canvas.exchange_code("fake-client", "fake-secret",
+                                "https://hub.example/api/canvas/callback", "fake-code")["access_token"] == "fake-access"
+    assert canvas.refresh_token("fake-client", "fake-secret", "fake-refresh")["access_token"] == "fake-access"
+    assert calls[0][1] == {
+        "grant_type": "authorization_code", "client_id": "fake-client",
+        "client_secret": "fake-secret", "redirect_uri": "https://hub.example/api/canvas/callback",
+        "code": "fake-code",
+    }
+    assert calls[1][1] == {
+        "grant_type": "refresh_token", "client_id": "fake-client",
+        "client_secret": "fake-secret", "refresh_token": "fake-refresh",
+    }
+
+
+def test_canvas_oauth_error_does_not_echo_upstream_secrets(monkeypatch):
+    class Response:
+        status_code = 400
+        text = "fake-secret fake-code"
+
+    monkeypatch.setattr(canvas.requests, "post", lambda *_args, **_kwargs: Response())
+    with pytest.raises(RuntimeError) as error:
+        canvas.exchange_code("fake-client", "fake-secret", "https://hub.example/callback", "fake-code")
+    assert "fake-secret" not in str(error.value)
+    assert "fake-code" not in str(error.value)
+
+
+def test_extension_capture_uses_the_same_canvas_model_mapping():
+    capture = {
+        "source": "canvas",
+        "courses": [{"id": 7, "course_code": "CPSC 121", "name": "Models"}],
+        "planner": [{"course_id": 7, "plannable_type": "quiz",
+                     "plannable_date": "2026-09-30T06:59:00Z",
+                     "plannable": {"title": "Quiz 2"},
+                     "html_url": "https://canvas.ubc.ca/courses/7/quizzes/3",
+                     "submissions": {"submitted": True}}],
+        "undated": [{"course_id": 7, "name": "Reading", "due_at": None,
+                     "html_url": "https://canvas.ubc.ca/courses/7/assignments/9",
+                     "has_submitted_submissions": False}],
+    }
+    courses, items = canvas.parse_capture(capture)
+    assert [c.code for c in courses] == ["CPSC 121"]
+    assert [(i.course, i.kind, i.done) for i in items] == [
+        ("CPSC 121", "quiz", True), ("CPSC 121", "assignment", False)
+    ]
+    capture["planner"][0]["html_url"] = "https://evil.example/steal"
+    with pytest.raises(ValueError, match="invalid item"):
+        canvas.parse_capture(capture)
+    capture["planner"][0]["html_url"] = "https://canvas.ubc.ca/courses/7/quizzes/3?access_token=fake"
+    with pytest.raises(ValueError, match="invalid item"):
+        canvas.parse_capture(capture)

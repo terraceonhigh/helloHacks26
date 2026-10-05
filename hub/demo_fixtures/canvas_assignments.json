@@ -1,0 +1,39 @@
+{
+ "1001": [
+  {
+   "id": 5901,
+   "name": "Style guide acknowledgement",
+   "due_at": null,
+   "html_url": "https://canvas.example.edu/courses/1001/assignments/5901",
+   "has_submitted_submissions": false
+  },
+  {
+   "id": 5004,
+   "name": "Problem Set 4",
+   "due_at": "{{due:+1d@23:59}}",
+   "html_url": "https://canvas.example.edu/courses/1001/assignments/5004",
+   "has_submitted_submissions": false
+  }
+ ],
+ "1006": [],
+ "1002": [],
+ "1003": [],
+ "1004": [
+  {
+   "id": 5902,
+   "name": "Reading journal (ongoing)",
+   "due_at": null,
+   "html_url": "https://canvas.example.edu/courses/1004/assignments/5902",
+   "has_submitted_submissions": false
+  }
+ ],
+ "1005": [
+  {
+   "id": 5903,
+   "name": "Research participation credits",
+   "due_at": null,
+   "html_url": "https://canvas.example.edu/courses/1005/assignments/5903",
+   "has_submitted_submissions": false
+  }
+ ]
+}
