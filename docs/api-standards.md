@@ -126,6 +126,54 @@ Researched 2026-09-26. **This is a research snapshot, not how we build.** The te
 | WeBWorK | **Verified 2026-09-26 against a real UBC course** (MATH_V 100A ALL SECTIONS 2026W1, `webwork.elearning.ubc.ca`). No student-facing API — it's a legacy Perl-rendered app, no JSON anywhere. At UBC, this deployment isn't reached via a standalone WeBWorK login at all: the session is established by launching the course's "WeBWorK" link from Brightspace (LTI SSO); once that cookie exists, plain GETs to the course URL work fine on their own, no relaunch needed. The Assignments page is `<li data-set-status="open"\|"not-open"\|"past-due">` items (not a table): only an *open* set's status line ("Open. Due October 1, 2026, 11:59:00 PM PDT.") carries a real due date — a not-yet-open set only shows when it opens, and a past-due set's "Answers available for review[ on ...]" date is when *answers* unlock, not the original due date. No score/grade shows anywhere on this page (a separate Grades page exists, not yet explored). Also confirmed separately: WeBWorK sets *are* embedded in this same course's Canvas-equivalent (Brightspace) as an LTI "WeBWorK" tool link, but their due dates are typed in by hand on that side and can drift from WeBWorK's own. `hub/webwork.py` is a small standalone browser-session adapter (`hub/site.py`'s login/session core) that reads WeBWorK's own due dates for that drift-correction case, and for schools that run WeBWorK standalone with no LMS in front of it at all. | Via our own browser-session adapter (`hub/site.py`) — verified |
 | Kaltura | Kaltura Session from a partner secret or appToken [docs](https://developer.kaltura.com/api-docs/VPaaS-API-Getting-Started/Kaltura_API_Authentication_and_Security.html) | No |
 
+## Ed Discussion (edstem.org) detail
+
+Implemented in `hub/ed_discussion.py`. The table row above cites the PyPI
+listing; this section cites the **actual `edapi` source**, cloned and read
+directly (`git clone https://github.com/smartspot2/edapi`, maintainer
+`smartspot2` — this is the real, maintained Ed Discussion client; there is
+also an `edapi-fork` on PyPI, not used here), not just its description.
+
+- **Auth:** a personal API token the student creates themselves at
+  https://edstem.org/us/settings/api-tokens (the exact URL `edapi`'s own
+  `AUTH_MESSAGE` constant points a user to), sent as
+  `Authorization: Bearer <token>` (`edapi/edapi.py`'s `EdAPI._auth_header`).
+  No OAuth, no admin step — same self-serve shape as a Canvas PAT.
+- **API base:** `https://us.edstem.org/api/` (`edapi/edapi.py`'s
+  `API_BASE_URL`). The student-facing web app is a different host,
+  `https://edstem.org/us/...` (confirmed by e.g. Yale's help page:
+  "Ed Discussion site URLs should look similar to:
+  https://edstem.org/us/courses/1234/discussion/" —
+  https://help.canvas.yale.edu/a/1544915).
+- **My courses:** `GET /api/user` (`EdAPI.get_user_info()`) returns
+  `courses: [{course: {id, code, name, year, session, status}, role, lab}]`
+  (`edapi/types/api_types/endpoints/user.py`, `.../course.py`) — real,
+  confirmed by reading the type definitions field-by-field.
+- **Threads:** `GET /api/courses/<course_id>/threads`
+  (`EdAPI.list_threads()`) returns threads shaped per
+  `edapi/types/api_types/thread.py`'s `API_Thread`: `id` (global post
+  number), `course_id`, `number`, `type` (`"post"` / `"question"` /
+  `"announcement"`, per `edapi/constants.py`'s `ThreadType`), `title`,
+  `content`/`document` (free-text body), `category`/`subcategory` (an
+  instructor-defined discussion category, e.g. "Assignment 1" — **not** a
+  date or a deadline classification), `is_pinned`/`pinned_at`,
+  `created_at`/`updated_at` (post timestamps).
+- **No due-date-shaped field exists anywhere on a thread.** The full
+  `API_Thread` type was read top to bottom; there is no `due`, `deadline`,
+  or `date` field. This confirms the TL;DR table's "Ed Discussion:
+  undocumented API" entry in a specific, checkable way: it isn't merely
+  undocumented, its real (if unofficial) type shapes genuinely carry no
+  date. `hub/ed_discussion.py` therefore surfaces pinned/announcement
+  threads as **undated** `Item`s (`due=None`) — real courses, and a real
+  "this is more than an ordinary post" signal, but never an invented date.
+- **Per-thread web URL:** reasoned, not confirmed by `edapi` (it never
+  builds one — it only calls the API). `hub/ed_discussion.py` uses
+  `https://edstem.org/us/courses/<course_id>/discussion/<thread_id>`, by
+  analogy to the one confirmed web URL shape above. Flagged here as the
+  one inferred piece; it doesn't risk a `hub.db` `(source, url)` collision
+  either way, since `thread["id"]` is documented as unique across all of
+  Ed, not just within one course.
+
 ### D2L Brightspace, detail (requested outside the normal issue-tracked roadmap, 2026-09-26)
 
 **Not a tracked target for UBC** in the sense of having its own issue (compare: WeBWorK #23, Macmillan Achieve #24, Moodle #25) -- but it turned out one real course this project has access to runs partly through Brightspace, so the section below is **verified live** (Terrace, 2026-09-26), not a guess from public docs the way the first draft was.
