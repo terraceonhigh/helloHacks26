@@ -1,4 +1,4 @@
-# UBC Hub — web/
+# Lauds — web/
 
 Next.js frontend. Two modes:
 
@@ -14,6 +14,8 @@ Unlike Canvas/PrairieLearn, Workday isn't a login - it's a `.xlsx` file the stud
 ## Run it locally (real data)
 
 From the repo root:
+
+**After pulling #33** (course-code canonicalization), delete `~/.ubc-hub/hub.db` once - it has no migration for existing rows, so an old raw course code (e.g. `CPSC 121 101 2026W1`) can otherwise sit alongside a new canonical one (`CPSC 121`) as two separate courses.
 
 ```bash
 uv run python -m hub.api          # starts the local API on http://localhost:8000

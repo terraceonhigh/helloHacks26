@@ -1,4 +1,10 @@
-"""E2E oracle: imported Workday courses must survive load() (Sample toggle).
+"""E2E oracle: an imported Workday schedule must survive load() (Sample toggle).
+
+Workday feeds the Schedule tab only, not the course list (no assignment
+data ever comes from it, so a Workday-only course card would be
+misleading) - this checks that the recurring class meetings load() a
+Workday .xlsx produces aren't wiped by a Sample-mode round trip, the same
+risk the courses used to carry before that changed.
 
 Drives the real built page. Builds with NEXT_PUBLIC_HUB_API pointed at a dead
 local port so the Sample-data toggle renders (it only shows in local mode);
@@ -43,27 +49,33 @@ def run_scenario(url):
         browser = p.chromium.launch()
         page = browser.new_page()
         page.goto(url)
-        expect(page.get_by_text("(Sample data.)")).to_be_visible()
+        page.get_by_role("button", name="Settings", exact=True).click()
+        # Checkbox state, not wording - immune to headline copy changes
+        # (this script previously broke silently when that copy changed
+        # elsewhere, unrelated to Workday - not what this oracle is for).
+        toggle = page.get_by_label("Sample data")
+        expect(toggle).to_be_checked()
 
         page.locator('input[type="file"]').set_input_files(str(FIXTURE))
-        expect(page.get_by_text("Imported 3 courses.")).to_be_visible()
-        page.get_by_role("button", name="Courses", exact=True).click()
-        expect(page.locator(".course-card h2", has_text="FAKE 100")).to_be_visible()
-        expect(page.locator(".course-card h2", has_text="CPSC 121")).to_be_visible()
+        expect(page.get_by_text("Loaded 4 class meetings.")).to_be_visible()
+        page.get_by_role("button", name="Schedule", exact=True).click()
+        expect(page.locator("text=BMEG 000").first).to_be_visible()
 
-        toggle = page.get_by_label("Sample data")
+        # Settings (and so the toggle) unmounts once we navigated to
+        # Schedule above - re-open it before touching the toggle again.
+        page.get_by_role("button", name="Settings", exact=True).click()
         toggle.uncheck()
-        expect(page.get_by_text("(Local mode")).to_be_visible()
+        expect(toggle).not_to_be_checked()
         toggle.check()
-        expect(page.get_by_text("(Sample data.)")).to_be_visible()
-        # Wait for the Sample load() to land before judging the Workday rows.
-        expect(page.locator(".course-card h2", has_text="CPSC 121")).to_be_visible()
+        expect(toggle).to_be_checked()
+        # Wait for the Sample load() to land, then back to Schedule to judge it.
         page.wait_for_timeout(500)
+        page.get_by_role("button", name="Schedule", exact=True).click()
 
-        codes = page.locator(".course-card h2").all_inner_texts()
+        courses = page.locator(".rounded-lg.border").all_inner_texts()
         browser.close()
-    missing = [c for c in ("FAKE 100", "FAKE 200", "FAKE 300") if not any(t.startswith(c) for t in codes)]
-    print("course cards after Sample off/on:", codes)
+    missing = [c for c in ("BMEG 000", "BMEG 001", "BMEG 002") if not any(c in t for t in courses)]
+    print("Schedule tab contents after Sample off/on:", courses)
     return missing
 
 
@@ -81,9 +93,9 @@ def main():
         server.terminate()
         server.wait(timeout=10)
     if missing:
-        print(f"FAIL: imported Workday courses wiped by load(): {missing}")
+        print(f"FAIL: imported Workday schedule wiped by load(): {missing}")
         return 1
-    print("PASS: imported Workday courses survived Sample off/on")
+    print("PASS: imported Workday schedule survived Sample off/on")
     return 0
 
 

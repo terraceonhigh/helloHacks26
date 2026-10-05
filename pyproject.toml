@@ -7,9 +7,9 @@ dependencies = [
     "streamlit",
     "requests",
     "beautifulsoup4",
-    "openpyxl",
     "icalendar",
     "playwright>=1.63.0",
+    "openpyxl>=3.1.5",
 ]
 
 [dependency-groups]

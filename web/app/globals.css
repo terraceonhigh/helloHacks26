@@ -20,9 +20,9 @@
   --muted-light: #aeb8b1;
   --line: #e4e9e5;
   --line-strong: #d3dad5;
-  --accent: #17765a;
-  --accent-dark: #155e49;
-  --accent-soft: #e5f2ed;
+  --accent: #b84028;
+  --accent-dark: #98331f;
+  --accent-soft: #f6e4d0;
   --success: #25845f;
   --success-soft: #e8f5ef;
   --purple: #7056b7;
@@ -50,9 +50,9 @@
   --muted-light: #93a1a1;
   --line: #ded7c3;
   --line-strong: #c8c1ae;
-  --accent: #007b83;
-  --accent-dark: #006d73;
-  --accent-soft: #dcecea;
+  --accent: #b84028;
+  --accent-dark: #98331f;
+  --accent-soft: #f6e4d0;
   --success: #859900;
   --success-soft: #edf0d2;
   --purple: #6c71c4;
@@ -75,9 +75,9 @@
   --muted-light: #a89984;
   --line: #d5c4a1;
   --line-strong: #bdae93;
-  --accent: #79740e;
+  --accent: #b84028;
   --accent-dark: #665c54;
-  --accent-soft: #e1dfb2;
+  --accent-soft: #f3d9c0;
   --success: #79740e;
   --success-soft: #e4e3b8;
   --purple: #8f3f71;
@@ -100,9 +100,9 @@
   --muted-light: #9ca0b0;
   --line: #dce0e8;
   --line-strong: #bcc0cc;
-  --accent: #8839ef;
-  --accent-dark: #6c2fc0;
-  --accent-soft: #eadcfb;
+  --accent: #b84028;
+  --accent-dark: #98331f;
+  --accent-soft: #f6e4d0;
   --success: #40a02b;
   --success-soft: #e1efdc;
   --purple: #7287fd;
@@ -125,9 +125,9 @@
   --muted-light: #9da9a0;
   --line: #ddd4bb;
   --line-strong: #c8bea5;
-  --accent: #3a6b52;
-  --accent-dark: #2d503d;
-  --accent-soft: #dce7d5;
+  --accent: #b84028;
+  --accent-dark: #98331f;
+  --accent-soft: #f4dcc4;
   --success: #6b872e;
   --success-soft: #e5ebd2;
   --purple: #8a6f9d;
@@ -165,13 +165,13 @@ button { cursor: pointer; }
 .logo-mark span:last-child { right: 0; bottom: 0; background: var(--warm); }
 .nav-item, .course-nav { display: flex; align-items: center; gap: .8rem; border-radius: .75rem; padding: .65rem .85rem; color: var(--muted); font-size: .875rem; font-weight: 600; text-align: left; transition: 150ms ease; }
 .nav-item:hover, .course-nav:hover { color: var(--ink); background: var(--surface-soft); }
-.nav-item-active { color: var(--accent); background: var(--accent-soft); }
-.course-nav-mark { display: inline-flex; width: 1.8rem; height: 1.8rem; flex: 0 0 auto; align-items: center; justify-content: center; border-radius: .55rem; background: var(--surface-soft); color: var(--accent); font-size: .58rem; font-weight: 800; }
+.nav-item-active { color: var(--accent-dark); background: var(--accent-soft); }
+.course-nav-mark { display: inline-flex; width: 1.8rem; height: 1.8rem; flex: 0 0 auto; align-items: center; justify-content: center; border-radius: .55rem; background: var(--surface-soft); color: var(--accent-dark); font-size: .58rem; font-weight: 800; }
 .nav-item-active .course-nav-mark { background: var(--surface); }
-.course-mark { display: inline-flex; width: 2.15rem; height: 2.15rem; flex: 0 0 auto; align-items: center; justify-content: center; border-radius: .7rem; background: var(--accent-soft); color: var(--accent); font-size: .67rem; font-weight: 800; letter-spacing: -.02em; }
+.course-mark { display: inline-flex; width: 2.15rem; height: 2.15rem; flex: 0 0 auto; align-items: center; justify-content: center; border-radius: .7rem; background: var(--accent-soft); color: var(--accent-dark); font-size: .67rem; font-weight: 800; letter-spacing: -.02em; }
 .theme-option { min-width: 0; border: 1px solid var(--line); border-radius: .7rem; padding: .5rem; color: var(--muted); text-align: left; }
 .theme-option:hover { border-color: var(--line-strong); color: var(--ink); }
-.theme-option-active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.theme-option-active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-dark); }
 .theme-swatch { display: block; width: .75rem; height: .75rem; border-radius: 50%; }
 .swatch-everforest-1 { background: #2d503d; }
 .swatch-everforest-2 { background: #a7c080; }
@@ -191,13 +191,17 @@ button { cursor: pointer; }
 .search-input::placeholder { color: var(--muted); }
 .icon-button { display: flex; width: 2.6rem; height: 2.6rem; flex: 0 0 auto; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: .8rem; background: var(--surface); }
 .view-toggle { border-radius: .55rem; padding: .45rem .9rem; color: var(--muted); font-size: .8rem; font-weight: 700; }
-.view-toggle-active { background: var(--accent-soft); color: var(--accent); }
+.view-toggle-active { background: var(--accent-soft); color: var(--accent-dark); }
 .stat-card { min-height: 8rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--surface); padding: 1.3rem; box-shadow: var(--shadow-card); }
 .stat-card-featured { border-color: var(--accent-dark); background: var(--accent-dark); color: white; }
 .filter-button { flex: 0 0 auto; border-radius: .55rem; padding: .42rem .7rem; color: var(--muted); font-size: .72rem; font-weight: 700; }
 .filter-button-active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 4px rgba(23, 33, 27, .08); }
 .assignment-row { display: flex; align-items: center; gap: .8rem; border-bottom: 1px solid var(--line); padding: 1rem 1.25rem; transition: background 150ms ease; }
 .assignment-row:hover { background: var(--surface-soft); }
+.item-link { position: relative; display: flex; flex: 0 0 auto; border-radius: .35rem; color: var(--muted-light); }
+.item-link:focus-visible, .settings-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.item-link-tip { position: absolute; right: 0; bottom: calc(100% + .4rem); z-index: 20; max-width: min(22rem, 70vw); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 1px solid var(--line); border-radius: .5rem; background: var(--ink); color: var(--surface); padding: .3rem .55rem; font-size: .7rem; font-weight: 600; box-shadow: var(--shadow-card); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 120ms ease; }
+.item-link:hover .item-link-tip, .item-link:focus-visible .item-link-tip { opacity: 1; visibility: visible; }
 .check-button { display: flex; width: 1.25rem; height: 1.25rem; flex: 0 0 auto; align-items: center; justify-content: center; border: 1.5px solid var(--line-strong); border-radius: 50%; color: white; }
 .check-button:hover { border-color: var(--accent); }
 .check-button-done { border-color: var(--accent); background: var(--accent); }
