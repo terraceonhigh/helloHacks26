@@ -76,6 +76,24 @@ def test_courses_and_by_course_grouping():
     assert [row[3] for row in grouped["ENGL 112"]] == ["Essay 1"]
 
 
+def test_textbooks_joins_course_code_and_orders_required_first():
+    conn = db.connect(":memory:")
+    optional_book = Textbook(course="CPSC 121", title="Companion Reader", isbn="999",
+                              required=False, price=None, url="")
+    db.save(conn, [COURSE], [], [optional_book, BOOK])
+    rows = db.textbooks(conn)
+    assert [r[1] for r in rows] == ["Discrete Math", "Companion Reader"]  # required first
+    assert rows[0] == ("CPSC 121", "Discrete Math", "123", True, 80.0, "https://x/b/1")
+
+
+def test_textbooks_filters_by_course_code():
+    conn = db.connect(":memory:")
+    other_book = Textbook(course="ENGL 112", title="Style Guide", isbn="456",
+                           required=True, price=40.0, url="https://x/b/2")
+    db.save(conn, [COURSE, OTHER_COURSE], [], [BOOK, other_book])
+    assert [r[0] for r in db.textbooks(conn, "CPSC 121")] == ["CPSC 121"]
+
+
 def test_canvas_long_code_joins_the_same_course_as_workday_short_code():
     conn = db.connect(":memory:")
     workday_course = Course(code="CPSC 121", section="", term="2026W1", title="Models of Computation")

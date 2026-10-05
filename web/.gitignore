@@ -1,3 +1,8 @@
 node_modules/
 .next/
 out/
+# Copied by the CI deploy step (.github/workflows/ci.yml) just before
+# `vercel build`, so web/api/feed.py's `from hub import ics` has a real
+# directory to import instead of vercel.json's rejected
+# includeFiles: "../hub/**". Never commit this copy.
+hub/

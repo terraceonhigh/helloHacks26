@@ -1,4 +1,4 @@
-# UBC Hub — web/
+# Lauds — web/
 
 Next.js frontend. Two modes:
 
