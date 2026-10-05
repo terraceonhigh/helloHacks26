@@ -1,0 +1,2023 @@
+[
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 5001,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w2.Wed@21:00}}",
+  "plannable": {
+   "id": 5001,
+   "title": "Problem Set 1"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/assignments/5001",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 5002,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w3.Wed@21:00}}",
+  "plannable": {
+   "id": 5002,
+   "title": "Problem Set 2"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/assignments/5002",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 5003,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w4.Wed@21:00}}",
+  "plannable": {
+   "id": 5003,
+   "title": "Problem Set 3"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/assignments/5003",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 5004,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:+1d@23:59}}",
+  "plannable": {
+   "id": 5004,
+   "title": "Problem Set 4"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/assignments/5004",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 5005,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w7.Wed@21:00}}",
+  "plannable": {
+   "id": 5005,
+   "title": "Problem Set 5"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/assignments/5005",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 5006,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w8.Wed@21:00}}",
+  "plannable": {
+   "id": 5006,
+   "title": "Problem Set 6"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/assignments/5006",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 5007,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w9.Wed@21:00}}",
+  "plannable": {
+   "id": 5007,
+   "title": "Problem Set 7"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/assignments/5007",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 5008,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w10.Wed@21:00}}",
+  "plannable": {
+   "id": 5008,
+   "title": "Problem Set 8"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/assignments/5008",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 5009,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w11.Wed@21:00}}",
+  "plannable": {
+   "id": 5009,
+   "title": "Problem Set 9"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/assignments/5009",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 5010,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w12.Wed@21:00}}",
+  "plannable": {
+   "id": 5010,
+   "title": "Problem Set 10"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/assignments/5010",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 6001,
+  "planner_override": null,
+  "plannable_type": "quiz",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:+3d@23:59}}",
+  "plannable": {
+   "id": 6001,
+   "title": "Quiz 3: Recursion"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/quizzes/6001",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 5011,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:+1d@23:59}}",
+  "plannable": {
+   "id": 5011,
+   "title": "Final project milestone 0: team formation"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/assignments/5011",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 5012,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w8.Fri@23:59}}",
+  "plannable": {
+   "id": 5012,
+   "title": "Final project milestone 1: proposal"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/assignments/5012",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 5013,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w10.Fri@23:59}}",
+  "plannable": {
+   "id": 5013,
+   "title": "Final project milestone 2: prototype"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/assignments/5013",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 5014,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w13.Fri@17:00}}",
+  "plannable": {
+   "id": 5014,
+   "title": "Final project milestone 3: final submission"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/assignments/5014",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 7001,
+  "planner_override": null,
+  "plannable_type": "calendar_event",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:+4d@18:00}}",
+  "plannable": {
+   "id": 7001,
+   "title": "Midterm 1 review session"
+  },
+  "html_url": "https://canvas.example.edu/calendar?event_id=7001&include_contexts=course_1001",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 7002,
+  "planner_override": null,
+  "plannable_type": "calendar_event",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w14.Wed@12:00}}",
+  "plannable": {
+   "id": 7002,
+   "title": "CPSC 110 Final Exam"
+  },
+  "html_url": "https://canvas.example.edu/calendar?event_id=7002&include_contexts=course_1001",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 8001,
+  "planner_override": null,
+  "plannable_type": "announcement",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:-1d@10:00}}",
+  "plannable": {
+   "id": 8001,
+   "title": "Midterm 1: book your CBTF slot this week"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/discussion_topics/8001",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1001,
+  "plannable_id": 8002,
+  "planner_override": null,
+  "plannable_type": "announcement",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:-3d@16:00}}",
+  "plannable": {
+   "id": 8002,
+   "title": "Problem Set 3 grades released"
+  },
+  "html_url": "https://canvas.example.edu/courses/1001/discussion_topics/8002",
+  "context_name": "CPSC 110 101 Intro to Program Design (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1006,
+  "plannable_id": 5015,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w2.Mon@16:00}}",
+  "plannable": {
+   "id": 5015,
+   "title": "Lab 1"
+  },
+  "html_url": "https://canvas.example.edu/courses/1006/assignments/5015",
+  "context_name": "CPSC 110 L1A Intro to Program Design (Demo) Lab"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1006,
+  "plannable_id": 5016,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w3.Mon@16:00}}",
+  "plannable": {
+   "id": 5016,
+   "title": "Lab 2"
+  },
+  "html_url": "https://canvas.example.edu/courses/1006/assignments/5016",
+  "context_name": "CPSC 110 L1A Intro to Program Design (Demo) Lab"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1006,
+  "plannable_id": 5017,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w4.Mon@16:00}}",
+  "plannable": {
+   "id": 5017,
+   "title": "Lab 3"
+  },
+  "html_url": "https://canvas.example.edu/courses/1006/assignments/5017",
+  "context_name": "CPSC 110 L1A Intro to Program Design (Demo) Lab"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1006,
+  "plannable_id": 5018,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w5.Mon@16:00}}",
+  "plannable": {
+   "id": 5018,
+   "title": "Lab 4"
+  },
+  "html_url": "https://canvas.example.edu/courses/1006/assignments/5018",
+  "context_name": "CPSC 110 L1A Intro to Program Design (Demo) Lab"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1006,
+  "plannable_id": 5019,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w6.Mon@16:00}}",
+  "plannable": {
+   "id": 5019,
+   "title": "Lab 5"
+  },
+  "html_url": "https://canvas.example.edu/courses/1006/assignments/5019",
+  "context_name": "CPSC 110 L1A Intro to Program Design (Demo) Lab"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1006,
+  "plannable_id": 5020,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w7.Mon@16:00}}",
+  "plannable": {
+   "id": 5020,
+   "title": "Lab 6"
+  },
+  "html_url": "https://canvas.example.edu/courses/1006/assignments/5020",
+  "context_name": "CPSC 110 L1A Intro to Program Design (Demo) Lab"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1006,
+  "plannable_id": 5021,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w8.Mon@16:00}}",
+  "plannable": {
+   "id": 5021,
+   "title": "Lab 7"
+  },
+  "html_url": "https://canvas.example.edu/courses/1006/assignments/5021",
+  "context_name": "CPSC 110 L1A Intro to Program Design (Demo) Lab"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1006,
+  "plannable_id": 5022,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w9.Mon@16:00}}",
+  "plannable": {
+   "id": 5022,
+   "title": "Lab 8"
+  },
+  "html_url": "https://canvas.example.edu/courses/1006/assignments/5022",
+  "context_name": "CPSC 110 L1A Intro to Program Design (Demo) Lab"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1006,
+  "plannable_id": 5023,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w10.Mon@16:00}}",
+  "plannable": {
+   "id": 5023,
+   "title": "Lab 9"
+  },
+  "html_url": "https://canvas.example.edu/courses/1006/assignments/5023",
+  "context_name": "CPSC 110 L1A Intro to Program Design (Demo) Lab"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1006,
+  "plannable_id": 5024,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w11.Mon@16:00}}",
+  "plannable": {
+   "id": 5024,
+   "title": "Lab 10"
+  },
+  "html_url": "https://canvas.example.edu/courses/1006/assignments/5024",
+  "context_name": "CPSC 110 L1A Intro to Program Design (Demo) Lab"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 5025,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w2.Thu@23:59}}",
+  "plannable": {
+   "id": 5025,
+   "title": "WeBWorK 1"
+  },
+  "html_url": "https://canvas.example.edu/courses/1002/assignments/5025",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 5026,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w3.Thu@23:59}}",
+  "plannable": {
+   "id": 5026,
+   "title": "WeBWorK 2"
+  },
+  "html_url": "https://canvas.example.edu/courses/1002/assignments/5026",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 5027,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w4.Thu@23:59}}",
+  "plannable": {
+   "id": 5027,
+   "title": "WeBWorK 3"
+  },
+  "html_url": "https://canvas.example.edu/courses/1002/assignments/5027",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 5028,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:-1d@23:59}}",
+  "plannable": {
+   "id": 5028,
+   "title": "WeBWorK 4"
+  },
+  "html_url": "https://canvas.example.edu/courses/1002/assignments/5028",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 5029,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:+1d@23:59}}",
+  "plannable": {
+   "id": 5029,
+   "title": "WeBWorK 5"
+  },
+  "html_url": "https://canvas.example.edu/courses/1002/assignments/5029",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 5030,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w7.Thu@23:59}}",
+  "plannable": {
+   "id": 5030,
+   "title": "WeBWorK 6"
+  },
+  "html_url": "https://canvas.example.edu/courses/1002/assignments/5030",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 5031,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w8.Thu@23:59}}",
+  "plannable": {
+   "id": 5031,
+   "title": "WeBWorK 7"
+  },
+  "html_url": "https://canvas.example.edu/courses/1002/assignments/5031",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 5032,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w9.Thu@23:59}}",
+  "plannable": {
+   "id": 5032,
+   "title": "WeBWorK 8"
+  },
+  "html_url": "https://canvas.example.edu/courses/1002/assignments/5032",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 5033,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w10.Thu@23:59}}",
+  "plannable": {
+   "id": 5033,
+   "title": "WeBWorK 9"
+  },
+  "html_url": "https://canvas.example.edu/courses/1002/assignments/5033",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 5034,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w11.Thu@23:59}}",
+  "plannable": {
+   "id": 5034,
+   "title": "WeBWorK 10"
+  },
+  "html_url": "https://canvas.example.edu/courses/1002/assignments/5034",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 5035,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w12.Thu@23:59}}",
+  "plannable": {
+   "id": 5035,
+   "title": "WeBWorK 11"
+  },
+  "html_url": "https://canvas.example.edu/courses/1002/assignments/5035",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 5036,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w13.Thu@23:59}}",
+  "plannable": {
+   "id": 5036,
+   "title": "WeBWorK 12"
+  },
+  "html_url": "https://canvas.example.edu/courses/1002/assignments/5036",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 7003,
+  "planner_override": null,
+  "plannable_type": "calendar_event",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w6.Tue@18:00}}",
+  "plannable": {
+   "id": 7003,
+   "title": "MATH 100 Midterm 1"
+  },
+  "html_url": "https://canvas.example.edu/calendar?event_id=7003&include_contexts=course_1002",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 7004,
+  "planner_override": null,
+  "plannable_type": "calendar_event",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w10.Tue@18:00}}",
+  "plannable": {
+   "id": 7004,
+   "title": "MATH 100 Midterm 2"
+  },
+  "html_url": "https://canvas.example.edu/calendar?event_id=7004&include_contexts=course_1002",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 7005,
+  "planner_override": null,
+  "plannable_type": "calendar_event",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w14.Mon@08:30}}",
+  "plannable": {
+   "id": 7005,
+   "title": "MATH 100 Final Exam"
+  },
+  "html_url": "https://canvas.example.edu/calendar?event_id=7005&include_contexts=course_1002",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1002,
+  "plannable_id": 8003,
+  "planner_override": null,
+  "plannable_type": "announcement",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:-2d@12:00}}",
+  "plannable": {
+   "id": 8003,
+   "title": "Midterm 1 room assignments posted"
+  },
+  "html_url": "https://canvas.example.edu/courses/1002/discussion_topics/8003",
+  "context_name": "MATH 100 104 Differential Calculus (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1003,
+  "plannable_id": 6002,
+  "planner_override": null,
+  "plannable_type": "quiz",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w1.Fri@23:59}}",
+  "plannable": {
+   "id": 6002,
+   "title": "Lab safety quiz"
+  },
+  "html_url": "https://canvas.example.edu/courses/1003/quizzes/6002",
+  "context_name": "PHYS 117 101 Dynamics and Waves (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1003,
+  "plannable_id": 5037,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w3.Fri@23:59}}",
+  "plannable": {
+   "id": 5037,
+   "title": "Lab 1 report: Measurement and uncertainty"
+  },
+  "html_url": "https://canvas.example.edu/courses/1003/assignments/5037",
+  "context_name": "PHYS 117 101 Dynamics and Waves (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1003,
+  "plannable_id": 5038,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:-3d@23:59}}",
+  "plannable": {
+   "id": 5038,
+   "title": "Lab 2 report: Projectile motion"
+  },
+  "html_url": "https://canvas.example.edu/courses/1003/assignments/5038",
+  "context_name": "PHYS 117 101 Dynamics and Waves (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1003,
+  "plannable_id": 5039,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w8.Fri@23:59}}",
+  "plannable": {
+   "id": 5039,
+   "title": "Lab 3 report: Springs and oscillation"
+  },
+  "html_url": "https://canvas.example.edu/courses/1003/assignments/5039",
+  "context_name": "PHYS 117 101 Dynamics and Waves (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1003,
+  "plannable_id": 5040,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w11.Fri@23:59}}",
+  "plannable": {
+   "id": 5040,
+   "title": "Lab 4 report: Standing waves"
+  },
+  "html_url": "https://canvas.example.edu/courses/1003/assignments/5040",
+  "context_name": "PHYS 117 101 Dynamics and Waves (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1003,
+  "plannable_id": 7006,
+  "planner_override": null,
+  "plannable_type": "calendar_event",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w6.Wed@19:00}}",
+  "plannable": {
+   "id": 7006,
+   "title": "PHYS 117 Midterm 1"
+  },
+  "html_url": "https://canvas.example.edu/calendar?event_id=7006&include_contexts=course_1003",
+  "context_name": "PHYS 117 101 Dynamics and Waves (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1003,
+  "plannable_id": 7007,
+  "planner_override": null,
+  "plannable_type": "calendar_event",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w10.Wed@19:00}}",
+  "plannable": {
+   "id": 7007,
+   "title": "PHYS 117 Midterm 2"
+  },
+  "html_url": "https://canvas.example.edu/calendar?event_id=7007&include_contexts=course_1003",
+  "context_name": "PHYS 117 101 Dynamics and Waves (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1003,
+  "plannable_id": 7008,
+  "planner_override": null,
+  "plannable_type": "calendar_event",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w15.Tue@15:30}}",
+  "plannable": {
+   "id": 7008,
+   "title": "PHYS 117 Final Exam"
+  },
+  "html_url": "https://canvas.example.edu/calendar?event_id=7008&include_contexts=course_1003",
+  "context_name": "PHYS 117 101 Dynamics and Waves (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1003,
+  "plannable_id": 8004,
+  "planner_override": null,
+  "plannable_type": "announcement",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:-4d@09:00}}",
+  "plannable": {
+   "id": 8004,
+   "title": "Tutorial problems for week 5 are up"
+  },
+  "html_url": "https://canvas.example.edu/courses/1003/discussion_topics/8004",
+  "context_name": "PHYS 117 101 Dynamics and Waves (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 9001,
+  "planner_override": {
+   "id": 9001,
+   "plannable_type": "wiki_page",
+   "marked_complete": true
+  },
+  "plannable_type": "wiki_page",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w1.Thu@12:30}}",
+  "plannable": {
+   "id": 9001,
+   "title": "Reading: Demo Story Anthology, ch. 1"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/pages/reading-9001",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 9002,
+  "planner_override": {
+   "id": 9002,
+   "plannable_type": "wiki_page",
+   "marked_complete": true
+  },
+  "plannable_type": "wiki_page",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w2.Tue@12:30}}",
+  "plannable": {
+   "id": 9002,
+   "title": "Reading: Demo Story Anthology, ch. 2"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/pages/reading-9002",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 9003,
+  "planner_override": {
+   "id": 9003,
+   "plannable_type": "wiki_page",
+   "marked_complete": true
+  },
+  "plannable_type": "wiki_page",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w3.Tue@12:30}}",
+  "plannable": {
+   "id": 9003,
+   "title": "Reading: Demo Story Anthology, ch. 3"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/pages/reading-9003",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 9004,
+  "planner_override": {
+   "id": 9004,
+   "plannable_type": "wiki_page",
+   "marked_complete": true
+  },
+  "plannable_type": "wiki_page",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w4.Tue@12:30}}",
+  "plannable": {
+   "id": 9004,
+   "title": "Reading: Demo Story Anthology, ch. 4"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/pages/reading-9004",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 9005,
+  "planner_override": null,
+  "plannable_type": "wiki_page",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:+1d@12:30}}",
+  "plannable": {
+   "id": 9005,
+   "title": "Reading: Demo Story Anthology, ch. 5"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/pages/reading-9005",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 9006,
+  "planner_override": null,
+  "plannable_type": "wiki_page",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w6.Tue@12:30}}",
+  "plannable": {
+   "id": 9006,
+   "title": "Reading: Demo Story Anthology, ch. 6"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/pages/reading-9006",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 9007,
+  "planner_override": null,
+  "plannable_type": "wiki_page",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w7.Tue@12:30}}",
+  "plannable": {
+   "id": 9007,
+   "title": "Reading: Demo Story Anthology, ch. 7"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/pages/reading-9007",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 9008,
+  "planner_override": null,
+  "plannable_type": "wiki_page",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w8.Tue@12:30}}",
+  "plannable": {
+   "id": 9008,
+   "title": "Reading: Demo Story Anthology, ch. 8"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/pages/reading-9008",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 9009,
+  "planner_override": null,
+  "plannable_type": "wiki_page",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w9.Tue@12:30}}",
+  "plannable": {
+   "id": 9009,
+   "title": "Reading: Demo Story Anthology, ch. 9"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/pages/reading-9009",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 9010,
+  "planner_override": null,
+  "plannable_type": "wiki_page",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w10.Tue@12:30}}",
+  "plannable": {
+   "id": 9010,
+   "title": "Reading: Demo Story Anthology, ch. 10"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/pages/reading-9010",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 9011,
+  "planner_override": null,
+  "plannable_type": "wiki_page",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w11.Tue@12:30}}",
+  "plannable": {
+   "id": 9011,
+   "title": "Reading: Demo Story Anthology, ch. 11"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/pages/reading-9011",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 9012,
+  "planner_override": null,
+  "plannable_type": "wiki_page",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w12.Tue@12:30}}",
+  "plannable": {
+   "id": 9012,
+   "title": "Reading: Demo Story Anthology, ch. 12"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/pages/reading-9012",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 8501,
+  "planner_override": null,
+  "plannable_type": "discussion_topic",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w2.Sun@23:59}}",
+  "plannable": {
+   "id": 8501,
+   "title": "Discussion post 1"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/discussion_topics/8501",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 8502,
+  "planner_override": null,
+  "plannable_type": "discussion_topic",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w3.Sun@23:59}}",
+  "plannable": {
+   "id": 8502,
+   "title": "Discussion post 2"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/discussion_topics/8502",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 8503,
+  "planner_override": null,
+  "plannable_type": "discussion_topic",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w4.Sun@23:59}}",
+  "plannable": {
+   "id": 8503,
+   "title": "Discussion post 3"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/discussion_topics/8503",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 8504,
+  "planner_override": null,
+  "plannable_type": "discussion_topic",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:-2d@23:59}}",
+  "plannable": {
+   "id": 8504,
+   "title": "Discussion post 4: Unreliable narrators"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/discussion_topics/8504",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 8505,
+  "planner_override": null,
+  "plannable_type": "discussion_topic",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:+1d@23:59}}",
+  "plannable": {
+   "id": 8505,
+   "title": "Discussion post 5: Setting as character"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/discussion_topics/8505",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 8506,
+  "planner_override": null,
+  "plannable_type": "discussion_topic",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w7.Sun@23:59}}",
+  "plannable": {
+   "id": 8506,
+   "title": "Discussion post 6"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/discussion_topics/8506",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 8507,
+  "planner_override": null,
+  "plannable_type": "discussion_topic",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w8.Sun@23:59}}",
+  "plannable": {
+   "id": 8507,
+   "title": "Discussion post 7"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/discussion_topics/8507",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 8508,
+  "planner_override": null,
+  "plannable_type": "discussion_topic",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w9.Sun@23:59}}",
+  "plannable": {
+   "id": 8508,
+   "title": "Discussion post 8"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/discussion_topics/8508",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 8509,
+  "planner_override": null,
+  "plannable_type": "discussion_topic",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w10.Sun@23:59}}",
+  "plannable": {
+   "id": 8509,
+   "title": "Discussion post 9"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/discussion_topics/8509",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 8510,
+  "planner_override": null,
+  "plannable_type": "discussion_topic",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w11.Sun@23:59}}",
+  "plannable": {
+   "id": 8510,
+   "title": "Discussion post 10"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/discussion_topics/8510",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 5041,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w6.Fri@12:00}}",
+  "plannable": {
+   "id": 5041,
+   "title": "Essay 1 draft"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/assignments/5041",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 5042,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w8.Fri@23:59}}",
+  "plannable": {
+   "id": 5042,
+   "title": "Essay 1 final"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/assignments/5042",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 5043,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w10.Fri@23:59}}",
+  "plannable": {
+   "id": 5043,
+   "title": "Essay 2 proposal"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/assignments/5043",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 5044,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w12.Fri@23:59}}",
+  "plannable": {
+   "id": 5044,
+   "title": "Essay 2"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/assignments/5044",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 5045,
+  "planner_override": null,
+  "plannable_type": "assignment",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w14.Fri@23:59}}",
+  "plannable": {
+   "id": 5045,
+   "title": "Final portfolio"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/assignments/5045",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1004,
+  "plannable_id": 8005,
+  "planner_override": null,
+  "plannable_type": "announcement",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:-1d@09:00}}",
+  "plannable": {
+   "id": 8005,
+   "title": "Thursday's class moves to room 200"
+  },
+  "html_url": "https://canvas.example.edu/courses/1004/discussion_topics/8005",
+  "context_name": "ENGL 110 003 Approaches to Stories (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1005,
+  "plannable_id": 6003,
+  "planner_override": null,
+  "plannable_type": "quiz",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w2.Sun@23:59}}",
+  "plannable": {
+   "id": 6003,
+   "title": "Chapter 1 quiz"
+  },
+  "html_url": "https://canvas.example.edu/courses/1005/quizzes/6003",
+  "context_name": "PSYC 102 003 Intro to Minds (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1005,
+  "plannable_id": 6004,
+  "planner_override": null,
+  "plannable_type": "quiz",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w3.Sun@23:59}}",
+  "plannable": {
+   "id": 6004,
+   "title": "Chapter 2 quiz"
+  },
+  "html_url": "https://canvas.example.edu/courses/1005/quizzes/6004",
+  "context_name": "PSYC 102 003 Intro to Minds (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1005,
+  "plannable_id": 6005,
+  "planner_override": null,
+  "plannable_type": "quiz",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w4.Sun@23:59}}",
+  "plannable": {
+   "id": 6005,
+   "title": "Chapter 3 quiz"
+  },
+  "html_url": "https://canvas.example.edu/courses/1005/quizzes/6005",
+  "context_name": "PSYC 102 003 Intro to Minds (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1005,
+  "plannable_id": 6006,
+  "planner_override": null,
+  "plannable_type": "quiz",
+  "new_activity": false,
+  "submissions": {
+   "submitted": true,
+   "excused": false,
+   "graded": true,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w5.Sun@23:59}}",
+  "plannable": {
+   "id": 6006,
+   "title": "Chapter 4 quiz"
+  },
+  "html_url": "https://canvas.example.edu/courses/1005/quizzes/6006",
+  "context_name": "PSYC 102 003 Intro to Minds (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1005,
+  "plannable_id": 6007,
+  "planner_override": null,
+  "plannable_type": "quiz",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:+6d@23:59}}",
+  "plannable": {
+   "id": 6007,
+   "title": "Chapter 5 quiz"
+  },
+  "html_url": "https://canvas.example.edu/courses/1005/quizzes/6007",
+  "context_name": "PSYC 102 003 Intro to Minds (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1005,
+  "plannable_id": 6008,
+  "planner_override": null,
+  "plannable_type": "quiz",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w7.Sun@23:59}}",
+  "plannable": {
+   "id": 6008,
+   "title": "Chapter 6 quiz"
+  },
+  "html_url": "https://canvas.example.edu/courses/1005/quizzes/6008",
+  "context_name": "PSYC 102 003 Intro to Minds (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1005,
+  "plannable_id": 6009,
+  "planner_override": null,
+  "plannable_type": "quiz",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w8.Sun@23:59}}",
+  "plannable": {
+   "id": 6009,
+   "title": "Chapter 7 quiz"
+  },
+  "html_url": "https://canvas.example.edu/courses/1005/quizzes/6009",
+  "context_name": "PSYC 102 003 Intro to Minds (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1005,
+  "plannable_id": 6010,
+  "planner_override": null,
+  "plannable_type": "quiz",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w9.Sun@23:59}}",
+  "plannable": {
+   "id": 6010,
+   "title": "Chapter 8 quiz"
+  },
+  "html_url": "https://canvas.example.edu/courses/1005/quizzes/6010",
+  "context_name": "PSYC 102 003 Intro to Minds (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1005,
+  "plannable_id": 6011,
+  "planner_override": null,
+  "plannable_type": "quiz",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w10.Sun@23:59}}",
+  "plannable": {
+   "id": 6011,
+   "title": "Chapter 9 quiz"
+  },
+  "html_url": "https://canvas.example.edu/courses/1005/quizzes/6011",
+  "context_name": "PSYC 102 003 Intro to Minds (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1005,
+  "plannable_id": 6012,
+  "planner_override": null,
+  "plannable_type": "quiz",
+  "new_activity": false,
+  "submissions": {
+   "submitted": false,
+   "excused": false,
+   "graded": false,
+   "late": false,
+   "missing": false,
+   "needs_grading": false
+  },
+  "plannable_date": "{{due:w11.Sun@23:59}}",
+  "plannable": {
+   "id": 6012,
+   "title": "Chapter 10 quiz"
+  },
+  "html_url": "https://canvas.example.edu/courses/1005/quizzes/6012",
+  "context_name": "PSYC 102 003 Intro to Minds (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1005,
+  "plannable_id": 7009,
+  "planner_override": null,
+  "plannable_type": "calendar_event",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w6.Thu@15:30}}",
+  "plannable": {
+   "id": 7009,
+   "title": "PSYC 102 Midterm 1"
+  },
+  "html_url": "https://canvas.example.edu/calendar?event_id=7009&include_contexts=course_1005",
+  "context_name": "PSYC 102 003 Intro to Minds (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1005,
+  "plannable_id": 7010,
+  "planner_override": null,
+  "plannable_type": "calendar_event",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w10.Thu@15:30}}",
+  "plannable": {
+   "id": 7010,
+   "title": "PSYC 102 Midterm 2"
+  },
+  "html_url": "https://canvas.example.edu/calendar?event_id=7010&include_contexts=course_1005",
+  "context_name": "PSYC 102 003 Intro to Minds (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1005,
+  "plannable_id": 7011,
+  "planner_override": null,
+  "plannable_type": "calendar_event",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:w15.Thu@19:00}}",
+  "plannable": {
+   "id": 7011,
+   "title": "PSYC 102 Final Exam"
+  },
+  "html_url": "https://canvas.example.edu/calendar?event_id=7011&include_contexts=course_1005",
+  "context_name": "PSYC 102 003 Intro to Minds (Demo)"
+ },
+ {
+  "context_type": "Course",
+  "course_id": 1005,
+  "plannable_id": 8006,
+  "planner_override": null,
+  "plannable_type": "announcement",
+  "new_activity": false,
+  "submissions": false,
+  "plannable_date": "{{due:-1d@08:00}}",
+  "plannable": {
+   "id": 8006,
+   "title": "Chapter 5 quiz is now open"
+  },
+  "html_url": "https://canvas.example.edu/courses/1005/discussion_topics/8006",
+  "context_name": "PSYC 102 003 Intro to Minds (Demo)"
+ }
+]

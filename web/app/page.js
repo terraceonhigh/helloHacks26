@@ -8,7 +8,13 @@ import {
   connectPrairieLearnOk,
   displayLabel,
   fetchAnnouncements,
+  fetchDemoMeetings,
+  connectCanvasFeed as postCanvasFeed,
+  refreshCanvasFeed,
+  disconnectCanvasFeed as deleteCanvasFeed,
+  migrateLegacyFeedUrl,
   fetchCourses,
+  fetchHostedStore,
   fetchUpcoming,
   formatDue,
   hasItemDueOn,
@@ -16,16 +22,29 @@ import {
   isDone,
   isLocalMode,
   isOverdue,
+  itemKey,
   mergeCourses,
+  mergeItems,
+  mergeMeetings,
+  monthGrid,
+  PREFERRED_KIND_OPTIONS,
+  pushToHostedStore,
+  readPreferredKindsCookie,
   selectActiveItems,
   selectConnections,
   selectCourseItems,
+  selectItemsDueOn,
+  selectCurrentTermMeetings,
+  selectDaySchedule,
   selectNextUp,
   selectVisibleCourses,
   selectVisibleItems,
+  startHostedSession,
+  syncKeyFromHash,
   weekDates,
+  writePreferredKindsCookie,
 } from "../lib/hub";
-import { parseWorkdayCourses } from "../lib/workday";
+import { meetingsToIcs, parseReminders, parseWorkdaySchedule } from "../lib/workday";
 
 function Icon({ name, className = "size-5" }) {
   const paths = {
@@ -38,26 +57,91 @@ function Icon({ name, className = "size-5" }) {
     check: <path d="m5 12 4 4L19 6" />,
     arrow: <><path d="M5 12h14M13 6l6 6-6 6" /></>,
     menu: <><path d="M4 7h16M4 12h16M4 17h16" /></>,
-    spark: <><path d="m12 3 1.3 4.2L17 9l-3.7 1.8L12 15l-1.3-4.2L7 9l3.7-1.8L12 3Z" /><path d="m5 14 .7 2.3L8 17l-2.3.7L5 20l-.7-2.3L2 17l2.3-.7L5 14Z" /></>,
-    settings: <><path d="M4 6h10M18 6h2M4 18h10M18 18h2M4 12h4M12 12h8" /><circle cx="16" cy="6" r="2" /><circle cx="10" cy="12" r="2" /><circle cx="16" cy="18" r="2" /></>,
+    settings: <><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></>,
+    link: <><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></>,
     material: <><path d="M7 3h7l4 4v14H7z" /><path d="M14 3v4h4M9 12h6M9 16h6" /></>,
     announcement: <><path d="M9 5 3 9v6h6l6 4V1z" /><path d="M16 8a4.5 4.5 0 0 1 0 8" /></>,
   };
   return <svg aria-hidden="true" className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
 }
 
-function AppButton({ children, className = "", onClick, ariaLabel, disabled }) {
-  return <button aria-label={ariaLabel} disabled={disabled} className={`app-button ${className}`} onClick={onClick}>{children}</button>;
+function AppButton({ children, className = "", onClick, ariaLabel, title, disabled }) {
+  return <button aria-label={ariaLabel} title={title} disabled={disabled} className={`app-button ${className}`} onClick={onClick}>{children}</button>;
+}
+
+// The item row's deep link: a chain-link icon whose hover/focus tooltip
+// shows the URL it opens. No URL, no icon.
+function ItemLink({ item }) {
+  if (!item.url) return null;
+  return (
+    <a href={item.url} className="item-link" aria-label={`Open in ${item.source || item.course}: ${item.url}`}>
+      <Icon name="link" className="size-4 shrink-0" />
+      <span className="item-link-tip" aria-hidden="true">{item.url}</span>
+    </a>
+  );
 }
 
 const NAV_ITEMS = [
   { label: "Overview", icon: "home", tab: "all" },
   { label: "Assignments", icon: "tasks", tab: "task" },
   { label: "Calendar", icon: "calendar", tab: "deadline" },
+  { label: "Schedule", icon: "clock", tab: "schedule" },
   { label: "Materials", icon: "material", tab: "material" },
   { label: "Announcements", icon: "announcement", tab: "announcements" },
   { label: "Courses", icon: "courses", tab: "courses" },
 ];
+
+const WEEKDAY_CODES = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
+const WEEKDAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+// A recurring weekly timetable (#85) - deliberately not tied to any specific
+// calendar week, unlike the Calendar tab's month grid: a Meeting has no
+// single date, just a day-of-week + time slot that repeats all term.
+function ScheduleView({ meetings, now }) {
+  if (meetings.length === 0) {
+    return (
+      <div className="p-10 text-center text-sm text-[var(--muted)]">
+        No class schedule yet - import your Workday &quot;Current Schedule&quot; export in Settings.
+      </div>
+    );
+  }
+  // A real Workday export carries every term the student's ever had a
+  // schedule for (Term 1 and Term 2 both show up in the same file) - only
+  // show what's actually running right now, or a Term 1 course that ended
+  // weeks ago stays mixed in with current Term 2 ones.
+  const currentMeetings = selectCurrentTermMeetings(meetings, now);
+  if (currentMeetings.length === 0) {
+    return (
+      <div className="p-10 text-center text-sm text-[var(--muted)]">
+        No classes running right now - {meetings.length} meeting{meetings.length === 1 ? "" : "s"} imported, but none in the current term.
+      </div>
+    );
+  }
+  return (
+    <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-7 sm:p-6">
+      {WEEKDAY_CODES.map((code, i) => {
+        const dayMeetings = currentMeetings
+          .filter((m) => m.days.includes(code))
+          .sort((a, b) => a.startTime.localeCompare(b.startTime));
+        return (
+          <div key={code}>
+            <div className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--muted)]">{WEEKDAY_NAMES[i]}</div>
+            <div className="space-y-2">
+              {dayMeetings.map((m, idx) => (
+                <div key={idx} className="rounded-lg border border-[var(--line)] bg-[var(--surface-soft)] p-2.5">
+                  <div className="truncate text-xs font-bold">{m.course}</div>
+                  <div className="mt-0.5 text-[0.7rem] text-[var(--muted)]">{m.kind} &middot; {m.startTime}&ndash;{m.endTime}</div>
+                  {m.location && <div className="truncate text-[0.7rem] text-[var(--muted)]">{m.location}</div>}
+                </div>
+              ))}
+              {dayMeetings.length === 0 && <div className="text-[0.7rem] text-[var(--muted-light)]">&mdash;</div>}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 const THEMES = [
   { id: "everforest", label: "Everforest" },
@@ -79,16 +163,199 @@ const CUSTOM_COLOR_FIELDS = [
 
 const WEEKDAY_LETTERS = ["M", "T", "W", "T", "F", "S", "S"];
 const MAX_WORKDAY_FILE_BYTES = 5_000_000;
+const MONTH_WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-function SettingsPage({ theme, setTheme, customColors, setCustomColors, connections, sampleMode, onSampleModeChange, onConnected, onWorkdayImported, allCourses, hiddenCourses, onToggleCourseHidden }) {
+// The Calendar nav tab's own page: a month grid of every active item's due
+// date, plus the clicked day's items below. Owns its own displayed-month and
+// selected-day state rather than lifting it into App(), since nothing else
+// in the app needs to know which day is selected here.
+function CalendarSection({ items, meetings, now, onToggleItemDone }) {
+  const [monthDate, setMonthDate] = useState(new Date(now.getFullYear(), now.getMonth(), 1));
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const weeks = useMemo(() => monthGrid(monthDate), [monthDate]);
+  const daySchedule = useMemo(() => (selectedDate ? selectDaySchedule(items, meetings, selectedDate) : []), [items, meetings, selectedDate]);
+
+  function shiftMonth(delta) {
+    setMonthDate((d) => new Date(d.getFullYear(), d.getMonth() + delta, 1));
+  }
+
+  function goToday() {
+    setMonthDate(new Date(now.getFullYear(), now.getMonth(), 1));
+  }
+
+  return (
+    <>
+      <div className="flex flex-col gap-4 border-b border-[var(--line)] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div>
+          <div className="text-xl font-bold tracking-tight">
+            {monthDate.toLocaleDateString("en-CA", { month: "long", year: "numeric" })}
+          </div>
+          <div className="mt-1 text-sm text-[var(--muted)]">Deadlines across every connected course</div>
+        </div>
+        <div className="flex items-center gap-1">
+          <AppButton ariaLabel="Previous month" onClick={() => shiftMonth(-1)} className="icon-button">
+            <Icon name="arrow" className="size-4 rotate-180" />
+          </AppButton>
+          <AppButton onClick={goToday} className="filter-button">Today</AppButton>
+          <AppButton ariaLabel="Next month" onClick={() => shiftMonth(1)} className="icon-button">
+            <Icon name="arrow" className="size-4" />
+          </AppButton>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-6 p-5 sm:flex-row sm:p-6">
+        <div className="min-w-0 flex-1">
+          <div className="grid grid-cols-7 gap-1 text-center">
+            {MONTH_WEEKDAY_LABELS.map((label) => (
+              <div key={label} className="pb-2 text-[0.65rem] font-bold text-[var(--muted)]">{label}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {weeks.flat().map(({ date, inMonth }) => {
+              const dueCount = selectItemsDueOn(items, date).length;
+              const isToday = date.toDateString() === now.toDateString();
+              const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString();
+              return (
+                <button
+                  key={date.toISOString()}
+                  type="button"
+                  aria-label={date.toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" })}
+                  onClick={() => setSelectedDate(date)}
+                  className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-lg text-sm font-semibold transition-colors hover:bg-[var(--surface-soft)] ${
+                    inMonth ? "text-[var(--ink)]" : "text-[var(--muted-light)]"
+                  } ${isToday ? "bg-[var(--accent-soft)] text-[var(--accent)]" : ""} ${
+                    isSelected ? "ring-2 ring-[var(--accent)] ring-inset" : ""
+                  }`}
+                >
+                  <span>{date.getDate()}</span>
+                  {dueCount > 0 && <span className="size-1.5 rounded-full bg-[var(--accent)]" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {selectedDate && (
+          <div className="w-full shrink-0 rounded-xl border border-[var(--line)] bg-[var(--surface-soft)] p-4 sm:w-64">
+            <div className="mb-3 flex items-start justify-between gap-2">
+              <div className="text-sm font-bold">
+                {selectedDate.toLocaleDateString("en-CA", { weekday: "long", month: "short", day: "numeric" })}
+              </div>
+              <AppButton ariaLabel="Close daily schedule" onClick={() => setSelectedDate(null)} className="icon-button">
+                <span className="block text-xs font-bold leading-none">&times;</span>
+              </AppButton>
+            </div>
+            <div className="space-y-2">
+              {daySchedule.length === 0 ? (
+                <div className="text-xs text-[var(--muted)]">Nothing scheduled or due this day.</div>
+              ) : (
+                daySchedule.map((entry, idx) =>
+                  entry.kind === "meeting" ? (
+                    <div key={idx} className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-2.5">
+                      <div className="truncate text-xs font-bold">{entry.meeting.course}</div>
+                      <div className="mt-0.5 text-[0.7rem] text-[var(--muted)]">{entry.meeting.kind} &middot; {entry.meeting.startTime}&ndash;{entry.meeting.endTime}</div>
+                      {entry.meeting.location && <div className="truncate text-[0.7rem] text-[var(--muted)]">{entry.meeting.location}</div>}
+                    </div>
+                  ) : (
+                    <div key={idx} className="flex items-start gap-2 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-2.5">
+                      <input
+                        type="checkbox"
+                        aria-label={`Mark "${entry.item.title}" as done`}
+                        onChange={() => onToggleItemDone(entry.item)}
+                        className="mt-0.5 size-4 shrink-0 cursor-pointer accent-[var(--accent)]"
+                      />
+                      <a href={entry.item.url} className="min-w-0 flex-1">
+                        <div className="truncate text-xs font-bold">{entry.item.title}</div>
+                        <div className="mt-0.5 text-[0.7rem] text-[var(--muted)]">{entry.item.kind} &middot; due {entry.time}</div>
+                        <div className="truncate text-[0.7rem] text-[var(--muted)]">{entry.item.course}</div>
+                      </a>
+                    </div>
+                  ),
+                )
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+const SOURCE_LABELS = {
+  canvas: "Canvas",
+  canvas_feed: "Canvas calendar feed",
+  prairielearn: "PrairieLearn",
+  prairielearn_ok: "PrairieLearn (Okanagan)",
+  prairielearn_custom: "PrairieLearn",
+  hosted: "Hub sync key",
+  "sync-all": "Sync everywhere",
+  push: "Push to hosted",
+};
+
+function SettingsPage({ theme, setTheme, customColors, setCustomColors, connections, sampleMode, onSampleModeChange, onConnected, onScheduleImported, meetings = [], allCourses, hiddenCourses, onToggleCourseHidden, feedConnected, feedItemCount, feedError, onConnectFeed, onDisconnectFeed, preferredKinds, onTogglePreferredKind, onConnectHosted, onSynced, hostedConnected, allItems, allCoursesForPush }) {
   const [term, setTerm] = useState("2026W1");
   const [workdayStatus, setWorkdayStatus] = useState(null);
+  const [reminderText, setReminderText] = useState("");
   const [customDomain, setCustomDomain] = useState("");
+  const [feedUrlInput, setFeedUrlInput] = useState("");
+  const [hostedKeyInput, setHostedKeyInput] = useState("");
+  const [extensionId, setExtensionId] = useState("");
+  const [syncResults, setSyncResults] = useState(null);
+  const [pushBase, setPushBase] = useState("https://hello-hacks26.vercel.app");
+  const [pushKeyInput, setPushKeyInput] = useState("");
+  const [pushStatus, setPushStatus] = useState(null);
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState(null);
   const byId = Object.fromEntries(connections.map((c) => [c.id, c]));
   const FIXED_IDS = new Set(["canvas", "prairielearn", "prairielearn_ok", "workday"]);
   const customConnections = connections.filter((c) => !FIXED_IDS.has(c.id));
+
+  useEffect(() => {
+    setExtensionId(localStorage.getItem("hub-extension-id") || "");
+  }, []);
+
+  async function syncEverywhere() {
+    const id = extensionId.trim();
+    if (!/^[a-p]{32}$/.test(id)) throw new Error("Paste the extension ID from chrome://extensions first.");
+    localStorage.setItem("hub-extension-id", id);
+    if (!globalThis.chrome?.runtime?.sendMessage) {
+      throw new Error("Extension unreachable. Load extension/ unpacked in Chrome and paste its ID from chrome://extensions.");
+    }
+    setSyncResults(null);
+    // Unpacked installs have different IDs; save this browser's ID instead of guessing one.
+    const progressTimer = setInterval(() => {
+      chrome.runtime.sendMessage(id, {type: "SYNC_STATUS"}, (response) => {
+        if (!chrome.runtime.lastError && response?.results?.length) setSyncResults(response.results);
+      });
+    }, 500);
+    let reply;
+    try {
+      reply = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage(id, {type: "SYNC_ALL"}, (response) => {
+          if (chrome.runtime.lastError) reject(new Error("Extension unreachable. Load extension/ unpacked in Chrome and check its ID."));
+          else resolve(response);
+        });
+      });
+    } finally {
+      clearInterval(progressTimer);
+    }
+    if (!reply?.ok) throw new Error(reply?.error || "Extension did not respond.");
+    setSyncResults(reply.results);
+    if (reply.results.some((result) => result.ok)) await onSynced();
+  }
+
+  // Same output as ubc-workday-ics: every imported class as a weekly
+  // recurring event, built and downloaded in the browser (nothing uploaded).
+  function downloadSchedule() {
+    const ics = meetingsToIcs(meetings, { reminders: parseReminders(reminderText) });
+    const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "lauds-classes.ics";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   async function handleFile(e) {
     const file = e.target.files[0];
@@ -105,9 +372,17 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
     }
     try {
       const buf = await file.arrayBuffer();
-      const imported = parseWorkdayCourses(buf, term);
-      onWorkdayImported(imported);
-      setWorkdayStatus(`Imported ${imported.length} course${imported.length === 1 ? "" : "s"}.`);
+      // Workday feeds the Schedule tab only, not the course list - Canvas/
+      // PrairieLearn are the only sources with real assignment data, and a
+      // Workday-only course (no items ever attached to it) showing up in
+      // the sidebar/Courses tab would be misleading, not useful.
+      const scheduleImported = parseWorkdaySchedule(buf, term);
+      onScheduleImported(scheduleImported);
+      setWorkdayStatus(
+        scheduleImported.length > 0
+          ? `Loaded ${scheduleImported.length} class meeting${scheduleImported.length === 1 ? "" : "s"}.`
+          : "No class meetings found in that file.",
+      );
     } catch (err) {
       setWorkdayStatus(null);
       setError(err.message);
@@ -121,7 +396,8 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
       await fn();
       await onConnected();
     } catch (e) {
-      setError(`${name}: ${e.message}`);
+      // A person reads this - a human label, never an internal source id.
+      setError(`${SOURCE_LABELS[name] ?? "Connect"}: ${e.message}`);
     } finally {
       setBusy(null);
     }
@@ -129,6 +405,25 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
 
   return (
     <div className="max-w-2xl space-y-6">
+      <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-card)]">
+        <div className="mb-1 text-xl font-bold tracking-tight">What matters to you</div>
+        <div className="mb-5 text-sm text-[var(--muted)]">
+          Pick the kinds of work you personally treat as most urgent. Matching items get a Priority badge and move to the front of their urgency group - it doesn&apos;t change the urgency itself.
+        </div>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {PREFERRED_KIND_OPTIONS.map((option) => (
+            <label key={option.id} className="toggle-pill">
+              <input
+                type="checkbox"
+                checked={preferredKinds.has(option.id)}
+                onChange={() => onTogglePreferredKind(option.id)}
+              />
+              {option.label}
+            </label>
+          ))}
+        </div>
+      </section>
+
       <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-card)]">
         <div className="mb-1 text-xl font-bold tracking-tight">Appearance</div>
         <div className="mb-5 text-sm text-[var(--muted)]">Pick a color scheme, or build your own.</div>
@@ -173,13 +468,68 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
         <div className="mb-5 text-sm text-[var(--muted)]">
           {isLocalMode()
             ? "What's actually feeding your dashboard right now."
-            : "This is the hosted demo, so Canvas and PrairieLearn can't connect here - run Hub locally to link a real account (see the README)."}
+            : "This is the hosted demo: Sample data is a made-up demo student, run through Hub's real adapters. Connect your hosted data with a sync key, then refresh signed-in providers through the browser extension."}
         </div>
 
         <label className="toggle-pill mb-5 flex w-full items-center justify-between">
           <span>Sample data</span>
           <input type="checkbox" checked={sampleMode} onChange={(e) => onSampleModeChange(e.target.checked)} />
         </label>
+
+        {!isLocalMode() && (
+          <div className="mb-5 rounded-xl border border-[var(--line)] bg-[var(--surface-soft)] p-4">
+            {hostedConnected ? (
+              <div className="text-sm font-bold text-[var(--success)]">Lauds connected - showing your synced data.</div>
+            ) : (
+              <>
+                <div className="mb-2 text-sm font-bold">Paste your Lauds sync key</div>
+                <div className="mb-3 text-xs text-[var(--muted)]">
+                  Open the Lauds browser extension&apos;s popup and copy its &quot;Lauds sync key&quot; field.
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={hostedKeyInput}
+                    onChange={(e) => setHostedKeyInput(e.target.value)}
+                    placeholder="Sync key from the extension"
+                    aria-label="Lauds sync key"
+                    className="min-w-0 flex-1 rounded-md border border-[var(--line)] bg-[var(--surface)] px-2 py-1 text-xs"
+                  />
+                  <AppButton
+                    disabled={busy !== null || !hostedKeyInput}
+                    onClick={() => run("hosted", async () => {
+                      const hasData = await onConnectHosted(hostedKeyInput.trim());
+                      setHostedKeyInput("");
+                      if (!hasData) setError("Connected, but no data has synced from the extension yet.");
+                    })}
+                    className="toggle-pill"
+                  >
+                    {busy === "hosted" ? "Connecting…" : "Connect"}
+                  </AppButton>
+                </div>
+              </>
+            )}
+            <div className="mt-4 border-t border-[var(--line)] pt-4">
+              <div className="mb-2 text-sm font-bold">Sync everywhere now</div>
+              <div className="mb-3 text-xs text-[var(--muted)]">Load extension/ unpacked in Chrome, then paste its ID from chrome://extensions. Keep each connected provider signed in and open.</div>
+              <div className="flex flex-wrap items-center gap-2">
+                <input type="text" value={extensionId} onChange={(e) => setExtensionId(e.target.value)}
+                  placeholder="Extension ID" aria-label="Extension ID"
+                  className="min-w-0 flex-1 rounded-md border border-[var(--line)] bg-[var(--surface)] px-2 py-1 text-xs" />
+                <AppButton disabled={busy !== null} onClick={() => run("sync-all", syncEverywhere)} className="toggle-pill">
+                  Sync everywhere now
+                </AppButton>
+              </div>
+              {busy === "sync-all" && <div className="mt-2 text-xs text-[var(--muted)]">Extension is syncing connected providers in sequence…</div>}
+              {syncResults && <div className="mt-2 text-xs" aria-live="polite">
+                {syncResults.length === 0 ? "No providers have synced through this extension yet. Connect one in its popup first." :
+                  syncResults.map((result) => <div key={result.provider}>
+                    {result.label}: {result.state === "pending" ? "Waiting" : result.state === "running" ? "Syncing" : result.ok || result.state === "done" && !result.error ? "Uploaded" : result.error}
+                  </div>)}
+              </div>}
+            </div>
+          </div>
+        )}
 
         <div className="divide-y divide-[var(--line)]">
           <div className="flex flex-wrap items-center justify-between gap-3 py-3">
@@ -196,6 +546,51 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
               </AppButton>
             )}
           </div>
+
+          {!sampleMode && (
+            <div className="py-3">
+              {feedConnected ? (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface-soft)] p-4">
+                  <div>
+                    <div className="text-sm font-bold">Calendar feed connected</div>
+                    <div className="text-xs text-[var(--muted)]">
+                      {feedError ? feedError : `${feedItemCount} item${feedItemCount === 1 ? "" : "s"} from your feed`}
+                    </div>
+                  </div>
+                  <AppButton onClick={onDisconnectFeed} className="toggle-pill">Disconnect</AppButton>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-soft)] p-4">
+                  <div className="mb-2 text-sm font-bold">No local install? Paste your Canvas calendar feed instead</div>
+                  <ol className="mb-3 list-decimal space-y-0.5 pl-4 text-xs text-[var(--muted)]">
+                    <li>In Canvas, open <strong className="text-[var(--ink)]">Calendar</strong></li>
+                    <li>Click <strong className="text-[var(--ink)]">Calendar Feed</strong> (bottom right)</li>
+                    <li>Copy the link it gives you</li>
+                  </ol>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={feedUrlInput}
+                      onChange={(e) => setFeedUrlInput(e.target.value)}
+                      placeholder="https://canvas.ubc.ca/feeds/calendars/....ics"
+                      aria-label="Canvas calendar feed URL"
+                      className="min-w-0 flex-1 rounded-md border border-[var(--line)] bg-[var(--surface)] px-2 py-1 text-xs"
+                    />
+                    <AppButton
+                      disabled={busy !== null || !feedUrlInput}
+                      onClick={() => run("canvas_feed", async () => { await onConnectFeed(feedUrlInput); setFeedUrlInput(""); })}
+                      className="toggle-pill"
+                    >
+                      {busy === "canvas_feed" ? "Connecting…" : "Connect"}
+                    </AppButton>
+                  </div>
+                  <div className="mt-2 text-[0.7rem] text-[var(--muted)]">
+                    Honest limits: the feed can&apos;t tell what you&apos;ve already submitted, and it skips assignments with no due date.
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="flex flex-wrap items-center justify-between gap-3 py-3">
             <div className="flex items-center gap-3">
@@ -274,7 +669,7 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
               <span className={`size-2.5 rounded-full ${byId.workday.connected ? "bg-[var(--success)]" : "bg-[var(--muted-light)]"}`} />
               <div>
                 <div className="font-bold">Workday</div>
-                <div className="text-xs text-[var(--muted)]">{byId.workday.connected ? "Imported" : "Not imported"} &middot; {byId.workday.detail}</div>
+                <div className="text-xs text-[var(--muted)]">{byId.workday.connected ? "Loaded" : "Not loaded"} &middot; {byId.workday.detail}</div>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -283,7 +678,24 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
                 Import .xlsx
                 <input type="file" accept=".xlsx" onChange={handleFile} className="sr-only" />
               </label>
+              <input type="text" value={reminderText} onChange={(e) => setReminderText(e.target.value)} size={6} placeholder="10,30" aria-label="Reminders, minutes before each class" title="Reminders, minutes before each class" className="rounded-md border border-[var(--line)] bg-[var(--surface-soft)] px-2 py-1 text-xs" />
+              <AppButton disabled={meetings.length === 0} onClick={downloadSchedule} className="toggle-pill" ariaLabel="Download your class schedule as a calendar file">
+                Download .ics
+              </AppButton>
             </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 py-3">
+            <div className="flex items-center gap-3">
+              <span className="size-2.5 rounded-full bg-[var(--muted-light)]" />
+              <div>
+                <div className="font-bold">Bookstore</div>
+                <div className="text-xs text-[var(--muted)]">The Bookstore lists the books for your courses after you sign in with CWL.</div>
+              </div>
+            </div>
+            <a href="https://the.bookstore.ubc.ca/books/personalize-my-book-list-using-cwl" target="_blank" rel="noopener noreferrer" className="toggle-pill">
+              Your textbooks →
+            </a>
           </div>
         </div>
         {isLocalMode() && sampleMode && (
@@ -291,6 +703,66 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
         )}
         {workdayStatus && <div className="mt-3 text-xs text-[var(--muted)]">{workdayStatus}</div>}
         {error && <div className="connect-error mt-3">{error}</div>}
+      </section>
+
+      <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-card)]">
+        <div className="mb-1 text-xl font-bold tracking-tight">Advanced: real Canvas / PrairieLearn login</div>
+        <div className="mb-5 text-sm text-[var(--muted)]">
+          This uses Playwright to open a real browser window on <strong className="text-[var(--ink)]">your own machine</strong> so you log in yourself - no website, including this one, can install software or open a browser for you. That has to run from a terminal.
+        </div>
+        <div className="mb-4 rounded-xl border border-[var(--line)] bg-[var(--surface-soft)] p-4">
+          <div className="mb-2 text-xs font-bold text-[var(--muted)]">
+            {isLocalMode() ? "✓ Detected: this page is running locally right now." : "One-liner, in a terminal (needs Homebrew's uv, nothing else - no repo clone):"}
+          </div>
+          {!isLocalMode() && (
+            <>
+              <pre className="overflow-x-auto rounded-md bg-[var(--surface)] p-3 text-[0.7rem] leading-relaxed">
+{`curl -fsSL https://raw.githubusercontent.com/terraceonhigh/helloHacks26/main/tools/sync.sh | bash`}
+              </pre>
+              <div className="mt-2 text-[0.7rem] text-[var(--muted)]">
+                Opens a browser window per provider for you to log into, scans Canvas and PrairieLearn, then prints a sync key - paste that into "Paste your hub sync key" above to see it here, same as the extension.
+              </div>
+            </>
+          )}
+        </div>
+        {isLocalMode() && (
+          <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-soft)] p-4">
+            <div className="mb-2 text-sm font-bold">Push what you just logged into onto your hosted dashboard</div>
+            <div className="mb-3 text-xs text-[var(--muted)]">
+              Connect Canvas/PrairieLearn above first, then send those real items to your hosted hub (the same sync key the extension popup shows) so they show up everywhere, not just here.
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                type="url"
+                value={pushBase}
+                onChange={(e) => setPushBase(e.target.value)}
+                placeholder="https://your-hub.vercel.app"
+                aria-label="Hosted hub URL"
+                className="min-w-0 flex-1 rounded-md border border-[var(--line)] bg-[var(--surface)] px-2 py-1 text-xs"
+              />
+              <input
+                type="text"
+                value={pushKeyInput}
+                onChange={(e) => setPushKeyInput(e.target.value)}
+                placeholder="Sync key from the extension"
+                aria-label="Sync key to push with"
+                className="min-w-0 flex-1 rounded-md border border-[var(--line)] bg-[var(--surface)] px-2 py-1 text-xs"
+              />
+              <AppButton
+                disabled={busy !== null || !pushKeyInput || !pushBase || allItems.length === 0}
+                onClick={() => run("push", async () => {
+                  const stored = await pushToHostedStore(pushBase.replace(/\/$/, ""), pushKeyInput.trim(), allItems, allCoursesForPush);
+                  setPushStatus(`Pushed ${stored} item${stored === 1 ? "" : "s"}.`);
+                })}
+                className="toggle-pill"
+              >
+                {busy === "push" ? "Pushing…" : "Push now"}
+              </AppButton>
+            </div>
+            {allItems.length === 0 && <div className="mt-2 text-[0.7rem] text-[var(--muted)]">Nothing real loaded yet - connect Canvas or PrairieLearn above first.</div>}
+            {pushStatus && <div className="mt-2 text-[0.7rem] text-[var(--muted)]">{pushStatus}</div>}
+          </div>
+        )}
       </section>
 
       <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-card)]">
@@ -323,12 +795,14 @@ function SettingsPage({ theme, setTheme, customColors, setCustomColors, connecti
 export default function App() {
   const [activeNav, setActiveNav] = useState("Overview");
   const [activeFilter, setActiveFilter] = useState("All");
+  const [courseMenuOpen, setCourseMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [mobileNav, setMobileNav] = useState(false);
   const [hideOverdue, setHideOverdue] = useState(false);
   const [showN, setShowN] = useState(10);
   const [theme, setTheme] = useState("everforest");
   const [customColors, setCustomColors] = useState(DEFAULT_CUSTOM_COLORS);
+  const [preferredKinds, setPreferredKinds] = useState(new Set());
 
   // First-time default: off in local mode (a local run means someone's about
   // to connect a real account, so show that path immediately rather than
@@ -339,10 +813,18 @@ export default function App() {
   const [items, setItems] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [fetchedCourses, setFetchedCourses] = useState([]);
-  const [importedCourses, setImportedCourses] = useState([]);
+  const [meetings, setMeetings] = useState([]);
+  const [demoMeetings, setDemoMeetings] = useState([]);
   const [loadError, setLoadError] = useState(null);
   const [hiddenCourses, setHiddenCourses] = useState([]);
+  const [manuallyDoneKeys, setManuallyDoneKeys] = useState([]);
+  const [feedConnected, setFeedConnected] = useState(false);
+  const [feedItems, setFeedItems] = useState([]);
+  const [feedError, setFeedError] = useState(null);
+  const [storeItems, setStoreItems] = useState([]);
+  const [storeCourses, setStoreCourses] = useState([]);
   const loadRequestId = useRef(0);
+  const feedRequestId = useRef(0);
 
   useEffect(() => {
     setTheme(localStorage.getItem("gather-theme") || "everforest");
@@ -364,7 +846,60 @@ export default function App() {
     } catch {
       // ignore malformed/missing storage - keep the default (nothing hidden)
     }
+    try {
+      // A student's own "I did this" checkbox (#98) - purely local, never
+      // sent anywhere, and never changes what Canvas/PrairieLearn/Workday
+      // themselves think happened.
+      const saved = JSON.parse(localStorage.getItem("gather-manually-done"));
+      if (Array.isArray(saved)) setManuallyDoneKeys(saved);
+    } catch {
+      // ignore malformed/missing storage - keep the default (nothing checked off)
+    }
+    setPreferredKinds(readPreferredKindsCookie());
+    // The feed URL is a secret (works like a password): it lives only in an
+    // httpOnly cookie the page can't read (see hub/ics.py's feed_request()).
+    // An older build kept it in localStorage - migrate that once, deleting
+    // it whatever happens, then refresh from the cookie on every load so a
+    // saved connection keeps working without re-pasting the link.
+    const requestId = ++feedRequestId.current;
+    migrateLegacyFeedUrl(window.localStorage)
+      .then(() => refreshCanvasFeed())
+      .then((nextFeedItems) => {
+        if (requestId !== feedRequestId.current) return; // superseded by a connect/disconnect since
+        setFeedConnected(nextFeedItems !== null);
+        setFeedItems(nextFeedItems ?? []);
+      })
+      .catch(() => {
+        if (requestId !== feedRequestId.current) return;
+        // Generic message only - a server error must never put the feed URL (a secret) on screen.
+        setFeedConnected(true);
+        setFeedError("Couldn't refresh your feed - it may have expired or changed.");
+      });
+    // Hosted store: a #sync=<key> link from the extension becomes an
+    // httpOnly cookie, and the fragment is dropped from the address bar
+    // before anything else happens. Any failure (503 until the store is
+    // provisioned, 401 with no session) silently leaves the dashboard as is.
+    if (!isLocalMode()) {
+      const syncKey = syncKeyFromHash(window.location.hash);
+      if (syncKey) {
+        history.replaceState(null, "", window.location.pathname + window.location.search);
+        connectHostedStore(syncKey).catch(() => {});
+      } else {
+        fetchHostedStore().then(applyHostedStore).catch(() => {});
+      }
+    }
   }, []);
+
+  function togglePreferredKind(kindId) {
+    setPreferredKinds((prev) => {
+      const next = new Set(prev);
+      if (next.has(kindId)) next.delete(kindId);
+      else next.add(kindId);
+      writePreferredKindsCookie(next);
+      return next;
+    });
+  }
+
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem("gather-theme", theme);
@@ -378,9 +913,40 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("gather-hidden-courses", JSON.stringify(hiddenCourses));
   }, [hiddenCourses]);
+  useEffect(() => {
+    localStorage.setItem("gather-manually-done", JSON.stringify(manuallyDoneKeys));
+  }, [manuallyDoneKeys]);
 
   function toggleCourseHidden(code, visible) {
     setHiddenCourses((prev) => (visible ? prev.filter((c) => c !== code) : [...prev, code]));
+  }
+
+  function toggleItemDone(item) {
+    const key = itemKey(item);
+    setManuallyDoneKeys((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
+  }
+
+  async function connectCanvasFeed(url) {
+    const requestId = ++feedRequestId.current;
+    let nextFeedItems;
+    try {
+      nextFeedItems = await postCanvasFeed(url);
+    } catch {
+      // Generic message only - a server error must never put the feed URL (a secret) on screen.
+      throw new Error("Couldn't load that feed - double check the link and try again.");
+    }
+    if (requestId !== feedRequestId.current) return; // superseded by a disconnect/another connect since
+    setFeedConnected(true); // the URL itself is now only in the httpOnly cookie
+    setFeedItems(nextFeedItems);
+    setFeedError(null);
+  }
+
+  function disconnectCanvasFeed() {
+    feedRequestId.current++; // invalidate any in-flight fetch, so it can't overwrite this afterward
+    setFeedConnected(false);
+    setFeedItems([]);
+    setFeedError(null);
+    deleteCanvasFeed(); // the server clears the cookie
   }
 
   async function load(useSample) {
@@ -410,10 +976,32 @@ export default function App() {
     } catch {
       setAnnouncements([]);
     }
+    // The demo student's class meetings (hosted Sample mode; [] otherwise).
+    // Kept apart from `meetings` (the student's own Workday import) so they
+    // never count as a real connection and vanish when Sample goes off.
+    const nextDemoMeetings = await fetchDemoMeetings(useSample);
+    if (requestId === loadRequestId.current) setDemoMeetings(nextDemoMeetings);
   }
 
-  function importWorkdayCourses(imported) {
-    setImportedCourses((prev) => mergeCourses(prev, imported));
+  function importWorkdaySchedule(imported) {
+    setMeetings((prev) => mergeMeetings(prev, imported));
+  }
+
+  function applyHostedStore(store) {
+    if (!store) return false;
+    setStoreItems(store.items);
+    setStoreCourses(store.courses);
+    // A real sync means there's real data to show - don't make the student
+    // also find and flip the Sample data toggle themselves.
+    const hasData = store.items.length > 0 || store.courses.length > 0;
+    if (hasData) setSampleMode(false);
+    return hasData;
+  }
+
+  async function connectHostedStore(key) {
+    const ok = await startHostedSession(key);
+    if (!ok) throw new Error("That sync key wasn't accepted.");
+    return applyHostedStore(await fetchHostedStore());
   }
 
   useEffect(() => {
@@ -422,10 +1010,11 @@ export default function App() {
   }, [sampleMode]);
 
   const now = new Date();
-  const allCourses = mergeCourses(fetchedCourses, importedCourses);
+  const allCourses = mergeCourses(fetchedCourses, storeCourses);
   const courses = selectVisibleCourses(allCourses, hiddenCourses);
-  const activeItems = hideCourseItems(selectActiveItems(items), hiddenCourses);
-  const doneCount = hideCourseItems(items, hiddenCourses).filter(isDone).length;
+  const allItems = mergeItems(mergeItems(items, storeItems), feedItems);
+  const activeItems = hideCourseItems(selectActiveItems(allItems, manuallyDoneKeys), hiddenCourses);
+  const doneCount = hideCourseItems(allItems, hiddenCourses).filter((item) => isDone(item, manuallyDoneKeys)).length;
   const overdueCount = activeItems.filter((item) => isOverdue(item, now)).length;
   const dueThisWeekCount = activeItems.filter((item) => {
     if (!item.due) return false;
@@ -442,7 +1031,7 @@ export default function App() {
   }, [activeItems, search]);
 
   const filteredByCourse = activeFilter === "All" ? searched : searched.filter((item) => item.course === activeFilter);
-  const visible = selectVisibleItems(filteredByCourse, { tab: activeNavTab, hideOverdue, showN, now });
+  const visible = selectVisibleItems(filteredByCourse, { tab: activeNavTab, hideOverdue, showN, now, preferredKinds });
 
   const searchedAnnouncements = useMemo(() => {
     const visibleAnnouncementsBase = hideCourseItems(announcements, hiddenCourses);
@@ -452,10 +1041,16 @@ export default function App() {
   }, [announcements, hiddenCourses, search]);
   const visibleAnnouncements = (activeFilter === "All" ? searchedAnnouncements : searchedAnnouncements.filter((item) => item.course === activeFilter)).slice(0, showN);
 
-  const topAssignments = selectVisibleItems(activeItems, { tab: "all", hideOverdue: false, showN: 5, now });
-  const nextUp = selectNextUp(activeItems);
+  const topAssignments = selectVisibleItems(activeItems, { tab: "all", hideOverdue: false, showN: 5, now, preferredKinds });
+  const nextUp = selectNextUp(activeItems, preferredKinds);
   const days = weekDates(now);
-  const connections = selectConnections(items, importedCourses);
+  // Sample/demo rows now carry a real `source` (the hosted demo runs the real
+  // adapters over a fake student), but nothing is actually connected - so
+  // outside local live mode only the hosted store's and the feed's items
+  // count toward Settings' Connections, never the sample/demo `items`.
+  const connectedItems = isLocalMode() && !sampleMode ? allItems : mergeItems(storeItems, feedItems);
+  const connections = selectConnections(connectedItems, meetings);
+  const shownMeetings = mergeMeetings(demoMeetings, meetings);
 
   const customStyle = theme === "custom"
     ? { "--page": customColors.page, "--surface": customColors.surface, "--ink": customColors.ink, "--accent": customColors.accent }
@@ -468,7 +1063,7 @@ export default function App() {
           <div className="flex-1 overflow-y-auto">
             <div className="flex items-center gap-3 px-6 py-7">
               <div className="logo-mark"><span /><span /><span /></div>
-              <div className="text-xl font-bold tracking-tight">UBC Hub</div>
+              <div className="text-xl font-bold tracking-tight">Lauds</div>
             </div>
 
             <nav className="mt-4 flex flex-col gap-1 px-3">
@@ -501,10 +1096,11 @@ export default function App() {
             </div>
             <AppButton
               ariaLabel="Settings"
+              title="Settings"
               onClick={() => { setActiveNav("Settings"); setMobileNav(false); }}
-              className={`icon-button ${activeNav === "Settings" ? "nav-item-active" : ""}`}
+              className={`icon-button settings-button ${activeNav === "Settings" ? "nav-item-active" : ""}`}
             >
-              <Icon name="settings" className="size-4" />
+              <Icon name="settings" />
             </AppButton>
           </div>
         </div>
@@ -532,17 +1128,37 @@ export default function App() {
               sampleMode={sampleMode}
               onSampleModeChange={setSampleMode}
               onConnected={() => load(false)}
-              onWorkdayImported={importWorkdayCourses}
+              onScheduleImported={importWorkdaySchedule}
+              meetings={shownMeetings}
               allCourses={allCourses}
               hiddenCourses={hiddenCourses}
               onToggleCourseHidden={toggleCourseHidden}
+              feedConnected={feedConnected}
+              feedItemCount={feedItems.length}
+              feedError={feedError}
+              onConnectFeed={connectCanvasFeed}
+              onDisconnectFeed={disconnectCanvasFeed}
+              preferredKinds={preferredKinds}
+              onTogglePreferredKind={togglePreferredKind}
+              onConnectHosted={connectHostedStore}
+              onSynced={async () => applyHostedStore(await fetchHostedStore())}
+              hostedConnected={storeItems.length > 0 || storeCourses.length > 0}
+              allItems={allItems}
+              allCoursesForPush={allCourses}
             />
+          ) : activeNav === "Schedule" ? (
+            <section className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface)] shadow-[var(--shadow-card)]">
+              <div className="border-b border-[var(--line)] p-5 sm:p-6">
+                <div className="text-xl font-bold tracking-tight">Weekly schedule</div>
+                <div className="mt-1 text-sm text-[var(--muted)]">Your recurring class meetings, from Workday</div>
+              </div>
+              <ScheduleView meetings={shownMeetings} now={now} />
+            </section>
           ) : (
           <>
           <section className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
             <div>
               <div className="mb-2 flex items-center gap-2 text-sm font-bold text-[var(--accent)]">
-                <Icon name="spark" className="size-4" />
                 {now.toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" })}
               </div>
               <div className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -556,35 +1172,37 @@ export default function App() {
 
           {loadError && <p className="connect-error mb-4">Couldn&apos;t load: {loadError}</p>}
 
-          <section className="mb-8 grid gap-4 sm:grid-cols-3">
-            <div className="stat-card stat-card-featured">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="text-sm font-semibold text-white/70">Due this week</div>
-                  <div className="mt-3 text-4xl font-bold tracking-tight">{dueThisWeekCount}</div>
+          {activeNav !== "Calendar" && (
+            <section className="mb-8 grid gap-4 sm:grid-cols-3">
+              <div className="stat-card stat-card-featured">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="text-sm font-semibold text-white/70">Due this week</div>
+                    <div className="mt-3 text-4xl font-bold tracking-tight">{dueThisWeekCount}</div>
+                  </div>
+                  <div className="rounded-xl bg-white/10 p-2.5"><Icon name="tasks" /></div>
                 </div>
-                <div className="rounded-xl bg-white/10 p-2.5"><Icon name="tasks" /></div>
               </div>
-            </div>
-            <div className="stat-card">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="text-sm font-semibold text-[var(--muted)]">Completed</div>
-                  <div className="mt-3 text-4xl font-bold tracking-tight">{doneCount}</div>
+              <div className="stat-card">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="text-sm font-semibold text-[var(--muted)]">Completed</div>
+                    <div className="mt-3 text-4xl font-bold tracking-tight">{doneCount}</div>
+                  </div>
+                  <div className="rounded-xl bg-[var(--success-soft)] p-2.5 text-[var(--success)]"><Icon name="check" /></div>
                 </div>
-                <div className="rounded-xl bg-[var(--success-soft)] p-2.5 text-[var(--success)]"><Icon name="check" /></div>
               </div>
-            </div>
-            <div className="stat-card">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="text-sm font-semibold text-[var(--muted)]">Overdue</div>
-                  <div className="mt-3 text-4xl font-bold tracking-tight">{overdueCount}</div>
+              <div className="stat-card">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="text-sm font-semibold text-[var(--muted)]">Overdue</div>
+                    <div className="mt-3 text-4xl font-bold tracking-tight">{overdueCount}</div>
+                  </div>
+                  <div className="rounded-xl bg-[var(--danger-soft)] p-2.5 text-[var(--danger)]"><Icon name="clock" /></div>
                 </div>
-                <div className="rounded-xl bg-[var(--danger-soft)] p-2.5 text-[var(--danger)]"><Icon name="clock" /></div>
               </div>
-            </div>
-          </section>
+            </section>
+          )}
 
           <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_19rem]">
             <section className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface)] shadow-[var(--shadow-card)]">
@@ -600,27 +1218,41 @@ export default function App() {
                   <div>
                     {topAssignments.map((item) => (
                       <div key={item.id} className="assignment-row">
+                        <input
+                          type="checkbox"
+                          aria-label={`Mark "${item.title}" as done`}
+                          onChange={() => toggleItemDone(item)}
+                          className="size-4 shrink-0 cursor-pointer accent-[var(--accent)]"
+                        />
                         <span className="course-mark">{item.course.slice(0, 2)}</span>
                         <div className="min-w-0 flex-1">
-                          <div className="truncate font-bold">{item.title}</div>
+                          <div className="truncate font-bold">
+                            {item.title}
+                            {preferredKinds.has(item.kind) && <span className="due-soon ml-2 rounded-md px-1.5 py-0.5 text-[0.65rem] font-bold align-middle">Priority</span>}
+                          </div>
                           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-[var(--muted)]">
                             <span>{item.course}</span><span>·</span><span>{item.kind}</span>
+                            {/* The boxed due-date badge below is sm:+ only - repeat it as
+                                plain text here so due dates aren't lost below that breakpoint. */}
+                            <span className={`sm:hidden ${isOverdue(item, now) ? "font-bold text-[var(--danger)]" : ""}`}>· {formatDue(item.due)}</span>
                           </div>
                         </div>
                         <div className={`hidden shrink-0 rounded-lg px-3 py-2 text-right sm:block ${isOverdue(item, now) ? "due-now" : ""}`}>
                           <div className="text-xs font-bold">{formatDue(item.due)}</div>
                           <div className="mt-0.5 text-[0.7rem] text-[var(--muted)]">{displayLabel(item.urgency)}</div>
                         </div>
-                        <a href={item.url} aria-label="Open"><Icon name="arrow" className="size-4 shrink-0 text-[var(--muted-light)]" /></a>
+                        <ItemLink item={item} />
                       </div>
                     ))}
                     {topAssignments.length === 0 && (
                       <div className="p-10 text-center text-sm text-[var(--muted)]">
-                        {sampleMode ? "Nothing upcoming." : "Nothing yet. Connect Canvas or PrairieLearn above."}
+                        {sampleMode ? "Nothing upcoming." : "Nothing yet. Connect Canvas or PrairieLearn in Settings."}
                       </div>
                     )}
                   </div>
                 </>
+              ) : activeNav === "Calendar" ? (
+                <CalendarSection items={activeItems} meetings={shownMeetings} now={now} onToggleItemDone={toggleItemDone} />
               ) : (
               <>
               <div className="flex flex-col gap-4 border-b border-[var(--line)] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
@@ -630,10 +1262,29 @@ export default function App() {
                   </div>
                   <div className="mt-1 text-sm text-[var(--muted)]">Everything due across your connected platforms</div>
                 </div>
-                <div className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-[var(--surface-soft)] p-1">
-                  {[{ id: "All", label: "All courses" }, ...courses.map((c) => ({ id: c.code, label: c.code }))].map((filter) => (
-                    <AppButton key={filter.id} onClick={() => setActiveFilter(filter.id)} className={`filter-button ${activeFilter === filter.id ? "filter-button-active" : ""}`}>{filter.label}</AppButton>
-                  ))}
+                <div className="relative shrink-0">
+                  <AppButton
+                    onClick={() => setCourseMenuOpen((open) => !open)}
+                    ariaLabel="Filter courses"
+                    className="flex items-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2 text-xs font-bold"
+                  >
+                    <span>{activeFilter === "All" ? "All courses" : activeFilter}</span>
+                    <Icon name="arrow" className="size-3 rotate-90" />
+                  </AppButton>
+                  {courseMenuOpen && (
+                    <div className="absolute right-0 top-[calc(100%+8px)] z-10 w-48 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-1.5 shadow-[var(--shadow-card)]">
+                      {[{ id: "All", label: "All courses" }, ...courses.map((c) => ({ id: c.code, label: c.code }))].map((filter) => (
+                        <label key={filter.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-semibold hover:bg-[var(--surface-soft)]">
+                          <input
+                            type="checkbox"
+                            checked={activeFilter === filter.id}
+                            onChange={() => { setActiveFilter(filter.id); setCourseMenuOpen(false); }}
+                          />
+                          <span>{filter.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -655,7 +1306,7 @@ export default function App() {
                 {activeNavTab === "announcements" ? (
                   visibleAnnouncements.length === 0 ? (
                     <div className="p-10 text-center text-sm text-[var(--muted)]">
-                      {sampleMode ? "No announcements in sample data." : "Nothing yet. Connect Canvas above."}
+                      {sampleMode ? "No announcements in sample data." : "Nothing yet. Connect Canvas in Settings."}
                     </div>
                   ) : (
                     visibleAnnouncements.map((item) => (
@@ -665,14 +1316,14 @@ export default function App() {
                           <div className="truncate font-bold">{item.title}</div>
                           <div className="mt-1 text-xs font-medium text-[var(--muted)]">{item.course}</div>
                         </div>
-                        <a href={item.url} aria-label="Open"><Icon name="arrow" className="size-4 shrink-0 text-[var(--muted-light)]" /></a>
+                        <ItemLink item={item} />
                       </div>
                     ))
                   )
                 ) : activeNavTab === "courses" ? (
                   courses.length === 0 ? (
                     <div className="p-10 text-center text-sm text-[var(--muted)]">
-                      {sampleMode ? "No courses." : "Nothing yet. Connect Canvas above."}
+                      {sampleMode ? "No courses." : "Nothing yet. Connect Canvas in Settings."}
                     </div>
                   ) : (
                     courses.map((course) => (
@@ -683,11 +1334,20 @@ export default function App() {
                         <div className="mb-3 text-xs text-[var(--muted)]">
                           {course.term} &middot; Grade: {course.grade == null ? "—" : `${course.grade}%`}
                         </div>
-                        {selectCourseItems(activeItems, course.code).map((item) => (
+                        {selectCourseItems(activeItems, course.code, preferredKinds).map((item) => (
                           <div key={item.id} className={`assignment-row ${isOverdue(item, now) ? "due-now" : ""}`}>
+                            <input
+                              type="checkbox"
+                              aria-label={`Mark "${item.title}" as done`}
+                              onChange={() => toggleItemDone(item)}
+                              className="size-4 shrink-0 cursor-pointer accent-[var(--accent)]"
+                            />
                             <span className="course-mark">{item.course.slice(0, 2)}</span>
                             <div className="min-w-0 flex-1">
-                              <div className="truncate font-bold">{item.title}</div>
+                              <div className="truncate font-bold">
+                                {item.title}
+                                {preferredKinds.has(item.kind) && <span className="due-soon ml-2 rounded-md px-1.5 py-0.5 text-[0.65rem] font-bold align-middle">Priority</span>}
+                              </div>
                               <div className="text-xs text-[var(--muted)]">{item.kind} &middot; {displayLabel(item.urgency)} &middot; {formatDue(item.due)}</div>
                             </div>
                             <a href={item.url} className="text-xs font-bold text-[var(--accent)]">open</a>
@@ -700,9 +1360,18 @@ export default function App() {
                   <>
                     {visible.map((item) => (
                       <div key={item.id} className="assignment-row">
+                        <input
+                          type="checkbox"
+                          aria-label={`Mark "${item.title}" as done`}
+                          onChange={() => toggleItemDone(item)}
+                          className="size-4 shrink-0 cursor-pointer accent-[var(--accent)]"
+                        />
                         <span className="course-mark">{item.course.slice(0, 2)}</span>
                         <div className="min-w-0 flex-1">
-                          <div className="truncate font-bold">{item.title}</div>
+                          <div className="truncate font-bold">
+                            {item.title}
+                            {preferredKinds.has(item.kind) && <span className="due-soon ml-2 rounded-md px-1.5 py-0.5 text-[0.65rem] font-bold align-middle">Priority</span>}
+                          </div>
                           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-[var(--muted)]">
                             <span>{item.course}</span><span>·</span><span>{item.kind}</span>
                             {/* The boxed due-date badge below is sm:+ only - repeat it as
@@ -714,12 +1383,12 @@ export default function App() {
                           <div className="text-xs font-bold">{formatDue(item.due)}</div>
                           <div className="mt-0.5 text-[0.7rem] text-[var(--muted)]">{displayLabel(item.urgency)}</div>
                         </div>
-                        <a href={item.url} aria-label="Open"><Icon name="arrow" className="size-4 shrink-0 text-[var(--muted-light)]" /></a>
+                        <ItemLink item={item} />
                       </div>
                     ))}
                     {visible.length === 0 && (
                       <div className="p-10 text-center text-sm text-[var(--muted)]">
-                        {sampleMode ? "Nothing upcoming." : "Nothing yet. Connect Canvas or PrairieLearn above."}
+                        {sampleMode ? "Nothing upcoming." : "Nothing yet. Connect Canvas or PrairieLearn in Settings."}
                       </div>
                     )}
                   </>

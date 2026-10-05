@@ -1,0 +1,116 @@
+[
+ {
+  "id": 1001,
+  "name": "CPSC 110 101 Intro to Program Design (Demo)",
+  "course_code": "CPSC_V 110-101 2026W1",
+  "workflow_state": "available",
+  "enrollment_term_id": 1,
+  "term": {
+   "id": 1,
+   "name": "2026 Winter Term 1"
+  },
+  "enrollments": [
+   {
+    "type": "student",
+    "role": "StudentEnrollment",
+    "enrollment_state": "active",
+    "computed_current_score": 86.4
+   }
+  ]
+ },
+ {
+  "id": 1006,
+  "name": "CPSC 110 L1A Intro to Program Design (Demo) Lab",
+  "course_code": "CPSC_V 110-L1A 2026W1",
+  "workflow_state": "available",
+  "enrollment_term_id": 1,
+  "term": {
+   "id": 1,
+   "name": "2026 Winter Term 1"
+  },
+  "enrollments": [
+   {
+    "type": "student",
+    "role": "StudentEnrollment",
+    "enrollment_state": "active",
+    "computed_current_score": null
+   }
+  ]
+ },
+ {
+  "id": 1002,
+  "name": "MATH 100 104 Differential Calculus (Demo)",
+  "course_code": "MATH_V 100-104 2026W1",
+  "workflow_state": "available",
+  "enrollment_term_id": 1,
+  "term": {
+   "id": 1,
+   "name": "2026 Winter Term 1"
+  },
+  "enrollments": [
+   {
+    "type": "student",
+    "role": "StudentEnrollment",
+    "enrollment_state": "active",
+    "computed_current_score": 72.0
+   }
+  ]
+ },
+ {
+  "id": 1003,
+  "name": "PHYS 117 101 Dynamics and Waves (Demo)",
+  "course_code": "PHYS_V 117-101 2026W1",
+  "workflow_state": "available",
+  "enrollment_term_id": 1,
+  "term": {
+   "id": 1,
+   "name": "2026 Winter Term 1"
+  },
+  "enrollments": [
+   {
+    "type": "student",
+    "role": "StudentEnrollment",
+    "enrollment_state": "active",
+    "computed_current_score": 78.5
+   }
+  ]
+ },
+ {
+  "id": 1004,
+  "name": "ENGL 110 003 Approaches to Stories (Demo)",
+  "course_code": "ENGL_V 110-003 2026W1",
+  "workflow_state": "available",
+  "enrollment_term_id": 1,
+  "term": {
+   "id": 1,
+   "name": "2026 Winter Term 1"
+  },
+  "enrollments": [
+   {
+    "type": "student",
+    "role": "StudentEnrollment",
+    "enrollment_state": "active",
+    "computed_current_score": null
+   }
+  ]
+ },
+ {
+  "id": 1005,
+  "name": "PSYC 102 003 Intro to Minds (Demo)",
+  "course_code": "PSYC_V 102-003 2026W1",
+  "workflow_state": "available",
+  "enrollment_term_id": 1,
+  "term": {
+   "id": 1,
+   "name": "2026 Winter Term 1"
+  },
+  "enrollments": [
+   {
+    "type": "student",
+    "role": "StudentEnrollment",
+    "enrollment_state": "active",
+    "computed_current_score": 91.2
+   }
+  ]
+ }
+]

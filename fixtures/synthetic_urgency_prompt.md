@@ -5,7 +5,7 @@ per call to stay within output limits.
 ---
 
 You are generating synthetic training data for a urgency classifier used in
-UBC Hub, a university student task dashboard (Canvas, Workday, syllabi).
+Lauds, a university student task dashboard (Canvas, Workday, syllabi).
 Every description must be a plausible UNIVERSITY STUDENT task — a specific
 course assignment, exam, admin deadline, payment, or student-life task
 (scholarship, co-op, housing, registration). No generic office/work tasks,

@@ -2,7 +2,7 @@ Prompt for generating a synthetic TITLE-ONLY urgency test set (paste into
 gpt-4o-mini or similar; run in batches of 50).
 
 Unlike the earlier synthetic_urgency_prompt.md set, this matches what UBC
-Hub actually has at inference time for most items: just the assignment
+Lauds actually has at inference time for most items: just the assignment
 TITLE as it appears in Canvas/PrairieLearn/a syllabus table, plus a due
 date. No stated grade weight, late policy, or "optional"/"required" wording
 - because real titles almost never say that.

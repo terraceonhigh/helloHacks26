@@ -1259,7 +1259,7 @@ dev = [
 requires-dist = [
     { name = "beautifulsoup4" },
     { name = "icalendar" },
-    { name = "openpyxl" },
+    { name = "openpyxl", specifier = ">=3.1.5" },
     { name = "playwright", specifier = ">=1.63.0" },
     { name = "requests" },
     { name = "streamlit" },
