@@ -1,0 +1,139 @@
+{
+ "user.status": {
+  "result": {
+   "id": "demouser",
+   "name": "Stu Dent",
+   "networks": [
+    {
+     "id": "demo110cpsc",
+     "name": "Intro to Program Design (Demo) Q&A",
+     "term": "Winter Term 1 2026",
+     "course_number": "CPSC 110",
+     "status": "active",
+     "prof_hash": {}
+    },
+    {
+     "id": "demo117phys",
+     "name": "Dynamics and Waves (Demo) Q&A",
+     "term": "Winter Term 1 2026",
+     "course_number": "PHYS 117",
+     "status": "active",
+     "prof_hash": {}
+    }
+   ]
+  },
+  "error": null,
+  "aid": "demoaid0"
+ },
+ "network.get_my_feed": {
+  "demo110cpsc": {
+   "result": {
+    "feed": [
+     {
+      "id": "p110a"
+     },
+     {
+      "id": "p110b"
+     }
+    ]
+   },
+   "error": null,
+   "aid": "demoaid0"
+  },
+  "demo117phys": {
+   "result": {
+    "feed": [
+     {
+      "id": "p117a"
+     },
+     {
+      "id": "p117b"
+     }
+    ]
+   },
+   "error": null,
+   "aid": "demoaid0"
+  }
+ },
+ "content.get": {
+  "p110a": {
+   "result": {
+    "id": "p110a",
+    "type": "note",
+    "tags": [
+     "pin",
+     "instructor-note"
+    ],
+    "bucket_name": "Pinned",
+    "history": [
+     {
+      "subject": "Problem Set 4 clarification: helper functions are allowed",
+      "content": "<p>(demo)</p>",
+      "uid": "demo"
+     }
+    ]
+   },
+   "error": null,
+   "aid": "demoaid0"
+  },
+  "p110b": {
+   "result": {
+    "id": "p110b",
+    "type": "question",
+    "tags": [
+     "hw4",
+     "student"
+    ],
+    "bucket_name": "Today",
+    "history": [
+     {
+      "subject": "Why does my template fail the check-expect?",
+      "content": "<p>(demo)</p>",
+      "uid": "demo"
+     }
+    ]
+   },
+   "error": null,
+   "aid": "demoaid0"
+  },
+  "p117a": {
+   "result": {
+    "id": "p117a",
+    "type": "note",
+    "tags": [
+     "instructor-note"
+    ],
+    "bucket_name": "Pinned",
+    "history": [
+     {
+      "subject": "Midterm 1 formula sheet posted",
+      "content": "<p>(demo)</p>",
+      "uid": "demo"
+     }
+    ]
+   },
+   "error": null,
+   "aid": "demoaid0"
+  },
+  "p117b": {
+   "result": {
+    "id": "p117b",
+    "type": "question",
+    "tags": [
+     "lab2",
+     "student"
+    ],
+    "bucket_name": "Today",
+    "history": [
+     {
+      "subject": "Lab 2 uncertainty question",
+      "content": "<p>(demo)</p>",
+      "uid": "demo"
+     }
+    ]
+   },
+   "error": null,
+   "aid": "demoaid0"
+  }
+ }
+}

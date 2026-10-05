@@ -7,7 +7,6 @@ import json
 import time
 from pathlib import Path
 
-from playwright.sync_api import sync_playwright
 from requests.utils import parse_header_links
 
 
@@ -26,6 +25,8 @@ def login(site, base, headless=False, timeout_ms=300_000):
     whatever the site uses) - true for Canvas and PrairieLearn today, since
     UBC fronts both with the same CWL flow.
     """
+    from playwright.sync_api import sync_playwright
+
     path = state_path(site)
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=headless)
@@ -65,6 +66,8 @@ def get_all(req, url, params, unwrap=json.loads):
 def fetch_with_session(site, base, run):
     """Ensure a saved session exists, run `run(request_context)`, and log in
     again (once) if the session turns out to be expired."""
+    from playwright.sync_api import sync_playwright
+
     path = state_path(site)
     if not path.exists():
         login(site, base)

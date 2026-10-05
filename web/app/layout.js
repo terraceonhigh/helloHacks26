@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "UBC Hub",
-  description: "Sample-data preview of UBC Hub, hosted on Vercel",
+  title: "Lauds",
+  description: "Lauds: the first thing you check in the morning.",
 };
 
 export default function RootLayout({ children }) {

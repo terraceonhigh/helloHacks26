@@ -76,6 +76,46 @@ def test_courses_and_by_course_grouping():
     assert [row[3] for row in grouped["ENGL 112"]] == ["Essay 1"]
 
 
+def test_textbooks_joins_course_code_and_orders_required_first():
+    conn = db.connect(":memory:")
+    optional_book = Textbook(course="CPSC 121", title="Companion Reader", isbn="999",
+                              required=False, price=None, url="")
+    db.save(conn, [COURSE], [], [optional_book, BOOK])
+    rows = db.textbooks(conn)
+    assert [r[1] for r in rows] == ["Discrete Math", "Companion Reader"]  # required first
+    assert rows[0] == ("CPSC 121", "Discrete Math", "123", True, 80.0, "https://x/b/1")
+
+
+def test_textbooks_filters_by_course_code():
+    conn = db.connect(":memory:")
+    other_book = Textbook(course="ENGL 112", title="Style Guide", isbn="456",
+                           required=True, price=40.0, url="https://x/b/2")
+    db.save(conn, [COURSE, OTHER_COURSE], [], [BOOK, other_book])
+    assert [r[0] for r in db.textbooks(conn, "CPSC 121")] == ["CPSC 121"]
+
+
+def test_canvas_long_code_joins_the_same_course_as_workday_short_code():
+    conn = db.connect(":memory:")
+    workday_course = Course(code="CPSC 121", section="", term="2026W1", title="Models of Computation")
+    canvas_item = Item(course="CPSC 121 101 2026W1", category="task", kind="assignment", title="PS3",
+                        due=datetime(2026, 9, 28), url="https://canvas/1", source="canvas")
+    db.save(conn, [workday_course], [canvas_item])
+    assert [c[0] for c in db.courses(conn)] == ["CPSC 121"]  # one course, not two
+    rows = db.upcoming(conn)
+    assert rows == [("CPSC 121", "task", "assignment", "PS3", "2026-09-28T00:00:00", "https://canvas/1", None, "canvas")]
+
+
+def test_item_with_unmatched_course_still_shows_up():
+    conn = db.connect(":memory:")
+    orphan = Item(course="PHIL 100", category="task", kind="assignment", title="Essay",
+                  due=datetime(2026, 9, 28), url="https://x/orphan", source="canvas")
+    db.save(conn, [], [orphan])  # no matching course this call
+    rows = db.upcoming(conn)
+    assert len(rows) == 1  # never silently dropped by the course join
+    assert rows[0][0] == "(unknown course)"
+    assert rows[0][3] == "Essay"
+
+
 def test_connect_migrates_a_db_from_before_done_existed(tmp_path):
     import sqlite3
 

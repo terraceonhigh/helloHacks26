@@ -1,6 +1,6 @@
 """Shared model every adapter returns. Keep it tiny (see issue #1)."""
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, time, timedelta, timezone
 from typing import Literal
 
 Category = Literal["task", "deadline", "material"]
@@ -141,3 +141,31 @@ class Textbook:
     required: bool
     price: float | None
     url: str
+
+
+# ISO weekday codes, Monday first - the same shorthand iCalendar's RRULE
+# BYDAY uses, so a Meeting can be turned into a recurring VEVENT without a
+# translation table.
+Weekday = Literal["MO", "TU", "WE", "TH", "FR", "SA", "SU"]
+
+
+@dataclass
+class Meeting:
+    """A recurring weekly class meeting (lecture, lab, seminar...) - distinct
+    from Item, which is a single deadline. Comes from a school's own
+    timetable/schedule export (hub/workday.py's Meeting Patterns column is
+    the first source), not from a calendar feed or an LMS "due date".
+
+    start_time/end_time are naive wall-clock times, not tz-aware datetimes:
+    a Meeting recurs every week for the whole term, so there's no single
+    instant to attach a timezone to - it's always interpreted in
+    America/Vancouver, the same as every other display in this app."""
+    course: str  # matches Course.code
+    kind: str  # "lecture", "lab", "seminar", "tutorial", "exam"... - free-form, like Item.kind
+    days: list[Weekday]
+    start_time: time
+    end_time: time
+    location: str
+    term_start: date
+    term_end: date
+    source: str
