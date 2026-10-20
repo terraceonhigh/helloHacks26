@@ -126,6 +126,64 @@ Researched 2026-09-26. **This is a research snapshot, not how we build.** The te
 | WeBWorK | **Verified 2026-09-26 against a real UBC course** (MATH_V 100A ALL SECTIONS 2026W1, `webwork.elearning.ubc.ca`). No student-facing API — it's a legacy Perl-rendered app, no JSON anywhere. At UBC, this deployment isn't reached via a standalone WeBWorK login at all: the session is established by launching the course's "WeBWorK" link from Brightspace (LTI SSO); once that cookie exists, plain GETs to the course URL work fine on their own, no relaunch needed. The Assignments page is `<li data-set-status="open"\|"not-open"\|"past-due">` items (not a table): only an *open* set's status line ("Open. Due October 1, 2026, 11:59:00 PM PDT.") carries a real due date — a not-yet-open set only shows when it opens, and a past-due set's "Answers available for review[ on ...]" date is when *answers* unlock, not the original due date. No score/grade shows anywhere on this page (a separate Grades page exists, not yet explored). Also confirmed separately: WeBWorK sets *are* embedded in this same course's Canvas-equivalent (Brightspace) as an LTI "WeBWorK" tool link, but their due dates are typed in by hand on that side and can drift from WeBWorK's own. `hub/webwork.py` is a small standalone browser-session adapter (`hub/site.py`'s login/session core) that reads WeBWorK's own due dates for that drift-correction case, and for schools that run WeBWorK standalone with no LMS in front of it at all. | Via our own browser-session adapter (`hub/site.py`) — verified |
 | Kaltura | Kaltura Session from a partner secret or appToken [docs](https://developer.kaltura.com/api-docs/VPaaS-API-Getting-Started/Kaltura_API_Authentication_and_Security.html) | No |
 
+## Google Classroom, detail
+
+The one candidate in this table that's a genuinely complete, documented REST
+API a student can self-serve end to end - no admin, no scrape, real OAuth2.
+Real, current facts below were fetched from developers.google.com on
+2026-09-26; anything not independently re-confirmed this pass is marked
+**[unverified]**.
+
+- **Style:** REST/JSON at `https://classroom.googleapis.com/v1/`.
+  [courses](https://developers.google.com/workspace/classroom/reference/rest/v1/courses),
+  [courses.courseWork](https://developers.google.com/workspace/classroom/reference/rest/v1/courses.courseWork),
+  [courses.courseWork.studentSubmissions](https://developers.google.com/workspace/classroom/reference/rest/v1/courses.courseWork.studentSubmissions)
+- **Auth:** OAuth2, "installed app" / loopback-IP-redirect flow (Google's own
+  flow for a desktop/CLI app - open a browser to a consent URL, catch the
+  redirect on `http://127.0.0.1:<port>`, exchange the code for tokens).
+  Authorization endpoint `https://accounts.google.com/o/oauth2/v2/auth`,
+  token endpoint `https://oauth2.googleapis.com/token`.
+  [native-app flow](https://developers.google.com/identity/protocols/oauth2/native-app)
+  - The student creates their own "Desktop app" OAuth client in Google Cloud
+    Console (own `client_id`/`client_secret`) - same "bring your own
+    credentials" rule this project already applies to Canvas PATs.
+  - `access_type=offline` at consent time returns a `refresh_token`, so the
+    student doesn't re-consent every run.
+  - Scopes: `classroom.courses.readonly`, `classroom.coursework.me.readonly`.
+    [auth guide](https://developers.google.com/workspace/classroom/guides/auth)
+- **Endpoints used:**
+
+  | Need | Path |
+  |---|---|
+  | Courses | `GET /v1/courses` |
+  | Coursework (assignments, due dates) | `GET /v1/courses/{courseId}/courseWork` |
+  | The student's own submission status, in one call for the whole course | `GET /v1/courses/{courseId}/courseWork/-/studentSubmissions?userId=me` (the `-` wildcard for `courseWorkId` spans every coursework item in that course) |
+
+- **Due dates:** `dueDate` is a `google.type.Date` (`year`/`month`/`day`);
+  `dueTime` is a `google.type.TimeOfDay` (`hours`/`minutes`/`seconds`/`nanos`).
+  Classroom's own docs describe `dueTime` as being in UTC - not the course's
+  own timezone, and not a single ISO datetime string.
+- **Submission state -> done:** `state` is a documented enum -
+  `TURNED_IN`/`RETURNED` map to done, `CREATED`/`RECLAIMED_BY_STUDENT` to not
+  done, and `STUDENT_EDITED_AFTER_TURN_IN`/`STATE_UNSPECIFIED` map to unknown
+  (genuinely ambiguous, not guessed).
+- **Pagination:** `studentSubmissions.list` documents `pageToken` /
+  `nextPageToken`; `courses.list` and `courses.courseWork.list` are assumed
+  to share that shape since it's Google's standard list-method convention
+  across its APIs, but that specific assumption is **[unverified]** (not
+  independently fetched page-by-page this pass).
+- **[unverified]:** the exact `CourseWorkType` enum member spellings
+  (`ASSIGNMENT`, `SHORT_ANSWER_QUESTION`, `MULTIPLE_CHOICE_QUESTION`,
+  `COURSE_WORK_TYPE_UNSPECIFIED`) - the reference page confirms the field but
+  didn't return its enum list on fetch.
+- **Implementation:** `hub/google_classroom.py`. Unlike Canvas/PrairieLearn,
+  it does not go through `hub/site.py` (that's a browser-cookie pattern;
+  Classroom needs a real Bearer token) - it's its own small OAuth2 client
+  using `requests` plus a short-lived stdlib `http.server` to catch the
+  redirect, saving the token to `~/.ubc-hub/google_classroom-token.json`
+  (same directory and 0600 permission convention as `hub/site.py`'s saved
+  sessions).
+
 ### D2L Brightspace, detail (requested outside the normal issue-tracked roadmap, 2026-09-26)
 
 **Not a tracked target for UBC** in the sense of having its own issue (compare: WeBWorK #23, Macmillan Achieve #24, Moodle #25) -- but it turned out one real course this project has access to runs partly through Brightspace, so the section below is **verified live** (Terrace, 2026-09-26), not a guess from public docs the way the first draft was.
