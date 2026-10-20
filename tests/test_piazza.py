@@ -1,4 +1,4 @@
-"""Tests for hub/piazza.py's recent-activity sidebar feed (Post/to_post/
+"""Tests for hub/piazza.py's recent-activity adapter (Item/to_post/
 recent_posts). Every fixture is SYNTHETIC, built from the real field names
 cited in hub/piazza.py's own module docstring (the piazza-api source and its
 Piazza_API_Post_Data_Dictionary.md) - not captured from a live Piazza
@@ -8,8 +8,8 @@ untested adapter.
 import json
 
 from hub import piazza, site
-from hub.models import Course
-from hub.piazza import Post, _canonical_course_code, _post_text, recent_posts, to_course, to_post
+from hub.models import Course, Item
+from hub.piazza import _canonical_course_code, recent_posts, to_course, to_post
 
 NETWORK = {
     "name": "Models of Computation",
@@ -58,27 +58,19 @@ def test_canonical_course_code_collapses_to_the_shared_dbs_form():
     # "CPSC121" (no space) -> "CPSC 121" - the same canonical form
     # hub.db._canonical_code uses, so a Piazza-only post lines up with the
     # same course card Canvas/Workday built ("associate that with our data").
-    assert _canonical_course_code(to_course(NETWORK)) == "CPSC 121"
+    assert to_course(NETWORK).code == "CPSC 121"
 
 
 def test_canonical_course_code_parses_a_number_even_with_trailing_words():
     # normalise_course_code matches faculty+number and ignores the rest -
     # "MATH 200 Discussion" still canonicalises to "MATH 200", the same
     # shortened form hub.db._canonical_code would produce.
-    assert _canonical_course_code(to_course(OTHER_NETWORK)) == "MATH 200"
+    assert to_course(OTHER_NETWORK).code == "MATH 200"
 
 
 def test_canonical_course_code_falls_back_when_it_doesnt_parse_at_all():
     unparseable = Course(code="???", section="", term="", title="")
-    assert _canonical_course_code(unparseable) == "???"
-
-
-def test_post_text_strips_html_from_the_real_content_field():
-    assert _post_text(ORDINARY_POST) == "Is part (b) asking for a proof or just an example?"
-
-
-def test_post_text_empty_when_no_history_at_all():
-    assert _post_text(POST_WITH_NO_HISTORY) == ""
+    assert _canonical_course_code(unparseable.code) == "???"
 
 
 def test_to_post_includes_ordinary_non_pinned_posts():
@@ -86,17 +78,17 @@ def test_to_post_includes_ordinary_non_pinned_posts():
     # pinned/instructor status at all - "most recent messages" wants
     # ordinary class activity too.
     post = to_post(ORDINARY_POST, "CPSC 121", nid="hl5qm84dl4t3x2")
-    assert isinstance(post, Post)
+    assert isinstance(post, Item)
     assert (post.course, post.title) == ("CPSC 121", "Question about Q3")
-    assert post.text == "Is part (b) asking for a proof or just an example?"
-    assert post.created == "2026-10-03T15:00:00Z"
+    assert post.kind == "post"
+    assert post.due is None
+    assert post.source == "piazza"
     assert "kz1ghi890j" in post.url
 
 
 def test_to_post_missing_title_falls_back_rather_than_crashing():
     post = to_post(POST_WITH_NO_HISTORY, "CPSC 121", nid="hl5qm84dl4t3x2")
     assert post.title == "(untitled post)"
-    assert post.text == ""
 
 
 class _FakeResponse:
@@ -221,8 +213,118 @@ def test_recent_posts_lets_not_logged_in_propagate_for_fetch_with_sessions_own_r
             run(FakeReq())
         except site.NotLoggedIn:
             seen.append("caught")
-        return []
+        return [], []
 
     monkeypatch.setattr(piazza.site, "fetch_with_session", fake_fetch_with_session)
     recent_posts()
     assert seen == [1, "caught"]
+
+
+def _mock_posts(monkeypatch, posts, networks=None):
+    calls = []
+
+    def call(req, method, data=None, nid=None):
+        calls.append((method, data))
+        if method == "user.status":
+            return {"networks": networks if networks is not None else [NETWORK]}
+        if method == "network.get_my_feed":
+            return {"feed": [{"id": post["id"]} for post in posts]}
+        return next(post for post in posts if post["id"] == data["cid"])
+
+    monkeypatch.setattr(piazza, "_call", call)
+    monkeypatch.setattr(site, "fetch_with_session", lambda name, base, run: run(None))
+    return calls
+
+
+def test_recent_order_compares_instants_not_iso_strings(monkeypatch):
+    posts = [
+        {**ORDINARY_POST, "id": "offset", "created": "2026-10-03T16:00:00+02:00"},
+        {**ORDINARY_POST, "id": "utc", "created": "2026-10-03T15:00:00Z"},
+        {**ORDINARY_POST, "id": "fraction", "created": "2026-10-03T15:00:00.100+00:00"},
+        {**ORDINARY_POST, "id": "invalid", "created": "unknown"},
+        {**ORDINARY_POST, "id": "naive", "created": "2026-10-04T15:00:00"},
+        {**ORDINARY_POST, "id": "missing", "created": None},
+    ]
+    _mock_posts(monkeypatch, posts)
+    result = recent_posts()
+    assert [p.url.split("cid=")[1] for p in result] == [
+        "fraction", "utc", "offset", "invalid", "naive", "missing"]
+    assert all(p.due is None for p in result)
+
+
+def test_fetch_recent_items_persist_through_shared_db(monkeypatch):
+    from hub import db
+
+    _mock_posts(monkeypatch, [ORDINARY_POST, PINNED_POST])
+    courses, items = piazza.fetch(include_recent=True)
+    assert {c.code for c in courses} == {i.course for i in items} == {"CPSC 121"}
+    assert [i.kind for i in items] == ["post", "announcement"]
+    conn = db.connect(":memory:")
+    try:
+        db.save(conn, courses, items)
+        db.save(conn, courses, items)
+        assert len(db.undated(conn)) == 2  # repeated fetch upserts, never duplicates
+        assert len(db.courses(conn)) == 1
+    finally:
+        conn.close()
+
+
+def test_default_fetch_keeps_announcement_only_contract(monkeypatch):
+    _mock_posts(monkeypatch, [ORDINARY_POST, PINNED_POST])
+    courses, items = piazza.fetch()
+    assert [i.kind for i in items] == ["announcement"]
+    assert items[0].course == courses[0].code == "CPSC 121"
+
+
+def test_capture_uses_same_course_codes_as_fetch(monkeypatch):
+    _mock_posts(monkeypatch, [PINNED_POST])
+    courses, items = piazza.fetch()
+    captured_courses, captured_items = piazza.parse_capture({
+        "source": "piazza", "networks": [{**NETWORK, "posts": [PINNED_POST]}]})
+    assert captured_courses == courses
+    assert captured_items == items
+
+
+def test_malformed_class_and_post_do_not_discard_good_items(monkeypatch):
+    _mock_posts(monkeypatch, [
+        {**ORDINARY_POST, "id": "bad", "history": [None]}, PINNED_POST,
+    ], networks=[None, {**NETWORK, "course_number": 42}, NETWORK])
+    assert [i.title for i in recent_posts()] == ["Midterm 1 room assignments"]
+
+
+def test_limit_is_bounded_and_nonpositive_skips_login(monkeypatch):
+    calls = _mock_posts(monkeypatch, [ORDINARY_POST])
+    assert recent_posts(0) == []
+    assert recent_posts(-1) == []
+    assert calls == []
+    recent_posts(10000)
+    assert next(data["limit"] for method, data in calls if method == "network.get_my_feed") == piazza.DEFAULT_POST_LIMIT
+
+
+def test_missing_post_identity_is_not_persistable():
+    assert to_post({"history": [{"subject": "No ID"}]}, "CPSC121", NETWORK["id"]) is None
+    assert to_post(ORDINARY_POST, "CPSC121") is None
+
+
+def test_post_auth_failure_reaches_session_retry(monkeypatch):
+    import pytest
+
+    def call(req, method, data=None, nid=None):
+        if method == "user.status":
+            return {"networks": [NETWORK]}
+        if method == "network.get_my_feed":
+            return {"feed": [{"id": "expired"}]}
+        raise site.NotLoggedIn
+
+    seen = []
+
+    def session(name, base, run):
+        with pytest.raises(site.NotLoggedIn):
+            run(None)
+        seen.append("retry")
+        return [], []
+
+    monkeypatch.setattr(piazza, "_call", call)
+    monkeypatch.setattr(site, "fetch_with_session", session)
+    assert recent_posts() == []
+    assert seen == ["retry"]
