@@ -156,6 +156,7 @@ future improvement, not attempted here.
 Try it:  uv run python -m hub.piazza
 """
 import json
+from datetime import datetime, timezone
 from random import random as _random
 from string import ascii_letters as _ascii_letters
 from string import digits as _digits
@@ -164,6 +165,7 @@ from time import time as _time
 import requests
 
 from hub import site
+from hub.logic import normalise_course_code
 from hub.models import Course, Item, category_for
 
 BASE = "https://piazza.com"
@@ -232,7 +234,7 @@ def to_course(network):
     # course still gets a usable code rather than an empty one.
     """
     return Course(
-        code=network.get("course_number") or network.get("name", ""),
+        code=_canonical_course_code(network.get("course_number") or network.get("name", "")),
         section="",
         term=network.get("term", ""),
         title=network.get("name", ""),
@@ -331,58 +333,77 @@ def _call(req, method, data=None, nid=None, nid_key="nid", api_type="logic"):
     return result.get("result")
 
 
-def _posts_for_network(req, nid, course_code, limit):
-    """Real feed -> full-post-per-id -> Items, per the module docstring's
-    "only gives you an id" section. `get_my_feed`'s real params
-    (rpc.py:388-412): `limit`, `offset`, `sort` (only documented value is
-    `"updated"`)."""
+def _created_at(post):
+    """Sort valid aware timestamps as instants; unknown dates sort last."""
+    try:
+        value = datetime.fromisoformat(post.get("created", "").replace("Z", "+00:00"))
+        if value.tzinfo is not None and value.utcoffset() is not None:
+            return value.astimezone(timezone.utc)
+    except (AttributeError, TypeError, ValueError, OverflowError):
+        pass
+    return datetime.min.replace(tzinfo=timezone.utc)
+
+
+def _posts_for_network(req, nid, course_code, limit, include_recent=False):
+    """Read one bounded feed page using Piazza's documented updated sort.
+
+    # ponytail: one content.get per post, capped at DEFAULT_POST_LIMIT per
+    # class. Add caching/pagination when live usage justifies more requests.
+    # This is a recent-activity window, not the newest-created posts across
+    # the entire history: an old thread with a new reply can enter the page.
+    """
     feed = _call(req, "network.get_my_feed", nid=nid, data={"limit": limit, "offset": 0, "sort": "updated"})
-    cids = [p.get("id") for p in (feed or {}).get("feed", []) if p.get("id")][:limit]
+    cids = list(dict.fromkeys(p.get("id") for p in (feed or {}).get("feed", [])
+                             if isinstance(p, dict) and isinstance(p.get("id"), str) and p["id"]))[:limit]
     items = []
     for cid in cids:
-        # Real params, cited from `PiazzaRPC.content_get` (rpc.py:126-142):
-        # {"cid": cid, "student_view": None}.
-        post = _call(req, "content.get", nid=nid, data={"cid": cid, "student_view": None})
-        item = to_item(post or {}, course_code, nid) if post else None
-        if item is not None:
-            items.append(item)
+        try:
+            post = _call(req, "content.get", nid=nid, data={"cid": cid, "student_view": None})
+            if not isinstance(post, dict):
+                continue
+            item = to_post(post, course_code, nid) if include_recent else to_item(post, course_code, nid)
+            if item is not None:
+                items.append((_created_at(post), item))
+        except site.NotLoggedIn:
+            raise
+        except Exception:
+            continue  # retain valid posts when one response is malformed
     return items
 
 
-def _run(req, limit):
-    # Real params for user.status: none beyond the implicit nid=None
-    # (Piazza.get_user_status calls self.request(method="user.status")
-    # with no nid - piazza_api/piazza.py:56-64, rpc.py:517-523).
+def _run(req, limit, include_recent=False):
     status = _call(req, "user.status", nid=None) or {}
-    networks = status.get("networks", [])
-    courses = [to_course(n) for n in networks]
-    items = []
-    for n in networks:
-        code = to_course(n).code
-        nid = n.get("id")
-        if not nid:
-            continue
+    courses, items = [], []
+    for network in status.get("networks", []):
         try:
-            items += _posts_for_network(req, nid, code, limit)
+            nid = network.get("id")
+            if not isinstance(nid, str) or not nid:
+                continue
+            course = to_course(network)
+            courses.append(course)
+            items += _posts_for_network(req, nid, course.code, limit, include_recent)
         except site.NotLoggedIn:
-            raise  # a genuine session expiry: let fetch_with_session retry the whole run
+            raise  # let the shared session core retry authentication
         except Exception:
-            # One network's feed/post call failing (a malformed response, a
-            # transient error) must not drop every other network's courses
-            # and items along with it - the same "one bad entity nukes
-            # everything" bug just found and fixed in this same review pass
-            # for hub/google_classroom.py and hub/ed_discussion.py.
-            continue
-    return courses, items
+            continue  # one malformed class must not discard other classes
+    if include_recent:
+        items.sort(key=lambda entry: entry[0], reverse=True)
+        items = items[:limit]
+    return courses, [item for _, item in items]
 
 
-def fetch(limit=DEFAULT_POST_LIMIT):
-    """Return (courses, items) for the student's own Piazza classes. Logs
-    in (opens a browser window) if there's no saved session. Never raises:
-    any login/parse/network failure returns ([], []), same as every other
-    adapter here (AGENTS.md, "handle failure without crashing")."""
+def fetch(limit=DEFAULT_POST_LIMIT, *, include_recent=False):
+    """Return shared courses/items, optionally including ordinary posts.
+
+    Recent activity is sorted by creation time within a bounded updated-feed
+    window. Creation times stay inside this adapter: they are not deadlines.
+    Callers can persist either mode with db.save(conn, courses, items).
+    """
+    if not isinstance(limit, int) or isinstance(limit, bool) or limit <= 0:
+        return [], []
+    limit = min(limit, DEFAULT_POST_LIMIT)
     try:
-        return site.fetch_with_session(SITE, BASE, lambda req: _run(req, limit))
+        return site.fetch_with_session(SITE, BASE, lambda req: _run(req, limit, include_recent))
     except Exception:
         return [], []
 
@@ -412,6 +433,40 @@ def parse_capture(capture):
             if item is not None:
                 items.append(item)
     return courses, items
+
+
+def _canonical_course_code(code):
+    faculty, number, _section = normalise_course_code(code)
+    return f"{faculty} {number}" if faculty and number else code
+
+
+def to_post(post, course_code, nid=""):
+    """Map activity to the existing Item ontology, with no invented due date.
+
+    # ponytail: Item has no body or creation-time fields. Keep the title/link
+    # and sort inside this adapter; a richer cross-provider activity model
+    # needs a separate shared-model proposal before adding those fields.
+    """
+    cid = post.get("id")
+    if not isinstance(cid, str) or not cid or not nid:
+        return None  # missing identity would overwrite unrelated posts
+    announcement = to_item(post, _canonical_course_code(course_code), nid)
+    if announcement is not None:
+        return announcement
+    return Item(
+        course=_canonical_course_code(course_code),
+        category=category_for("post"),
+        kind="post",
+        title=_history_subject(post) or "(untitled post)",
+        due=None,
+        url=f"{BASE}/class/{nid}?cid={cid}",
+        source=SITE,
+    )
+
+
+def recent_posts(limit=10):
+    """Shared Items from the bounded activity window; see fetch()."""
+    return fetch(limit, include_recent=True)[1]
 
 
 # --- Fallback path: piazza-api's real direct email+password flow ----------
@@ -456,7 +511,13 @@ def login_with_credentials(email, password):
 if __name__ == "__main__":
     from hub import db
 
-    courses, items = fetch()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Sync Piazza to the local shared store")
+    parser.add_argument("--recent", action="store_true", help="include ordinary discussion posts")
+    parser.add_argument("--limit", type=int, default=DEFAULT_POST_LIMIT)
+    args = parser.parse_args()
+    courses, items = fetch(args.limit, include_recent=args.recent)
     db.save(db.connect(), courses, items)
     for c in courses:
         print(f"{c.code:15} {c.title}")
