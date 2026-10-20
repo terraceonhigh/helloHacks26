@@ -61,7 +61,7 @@ def push(hosted_base, key, source, courses, items):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--hosted-base", default="https://hello-hacks26-one.vercel.app",
+    parser.add_argument("--hosted-base", default="https://hello-hacks26.vercel.app",
                          help="the hosted dashboard to sync into")
     parser.add_argument("--only", nargs="+", choices=sorted(PROVIDERS),
                          help="scan only these providers (default: all of them)")

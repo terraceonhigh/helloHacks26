@@ -243,7 +243,7 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
 chrome.runtime.onMessageExternal.addListener((message, sender, respond) => {
   if (message?.type !== "SYNC_ALL" && message?.type !== "SYNC_STATUS") return;
   const origin = sender.url && new URL(sender.url).origin;
-  if (!["https://hello-hacks26.vercel.app", "https://hello-hacks26-one.vercel.app",
+  if (!["https://hello-hacks26.vercel.app", "https://hello-hacks26-terraceonhigh.vercel.app",
         "http://localhost:3000"].includes(origin)) return;
   if (message.type === "SYNC_STATUS") {
     respond({results: syncProgress});

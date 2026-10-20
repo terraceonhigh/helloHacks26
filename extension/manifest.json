@@ -9,12 +9,12 @@
     "https://piazza.com/*",
     "https://us.prairielearn.com/*",
     "https://hello-hacks26.vercel.app/*",
-    "https://hello-hacks26-one.vercel.app/*"
+    "https://hello-hacks26-terraceonhigh.vercel.app/*"
   ],
   "optional_host_permissions": ["https://*/*"],
   "externally_connectable": {"matches": [
     "https://hello-hacks26.vercel.app/*",
-    "https://hello-hacks26-one.vercel.app/*",
+    "https://hello-hacks26-terraceonhigh.vercel.app/*",
     "http://localhost/*"
   ]},
   "background": {"service_worker": "background.js"},
