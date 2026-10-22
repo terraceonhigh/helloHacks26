@@ -45,7 +45,7 @@ Try it:  uv run python -m hub.webwork <course-url> <course-code>
 """
 import re
 from datetime import datetime, timedelta, timezone
-from urllib.parse import quote, urljoin
+from urllib.parse import quote, urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
@@ -90,8 +90,28 @@ def _get_soup(req, url):
     r = req.get(url)
     if r.status == 401:
         raise site.NotLoggedIn
+    # A logged-out WeBWorK behind SSO answers 200, NOT 401: the request is
+    # redirected away to the school's identity provider and we get that login
+    # page's HTML back with a success status. Verified live against the real
+    # UBC course (2026-09-27) -- logged out, the final URL is
+    # authentication.ubc.ca/idp/profile/SAML2/...; logged in it's still
+    # webwork.elearning.ubc.ca. Leaving the host behind is the signal, since
+    # both cases are a 200.
+    #
+    # Without this, a logged-out response parses as a page with zero
+    # <li data-set-status> and fetch() returns [] -- the dashboard shows
+    # "connected, nothing due" -- and because nothing raised, hub.site's
+    # re-login path never runs, so the student is never asked to sign in
+    # again. That's the bug this catches.
+    if urlparse(r.url).netloc != urlparse(url).netloc:
+        raise site.NotLoggedIn
     if not r.ok:
         raise RuntimeError(f"{url} -> {r.status}")
+    # ponytail: only an off-host bounce is detected. A school whose WeBWorK
+    # serves its OWN login form at the same host (no external IdP) would
+    # still parse as zero sets -- that deployment is unverified here, same
+    # caveat as the module docstring's login note. Upgrade path: once such a
+    # school is seen, add a check for that page's actual login markup.
     return BeautifulSoup(r.text(), "html.parser")
 
 

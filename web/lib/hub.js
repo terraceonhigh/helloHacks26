@@ -193,6 +193,24 @@ export async function fetchAnnouncements(useSample) {
   return rows.map(normaliseApiItem);
 }
 
+// Real work with no due date to rank by, but not an announcement -
+// hub/webwork.py is the clearest real case: its problem-set page only ever
+// shows a due date for a *currently open* set, so a real, successfully-
+// connected account's items can legitimately ALL come back due=None.
+// Merged into the same item list everything else uses (see mergeItems in
+// App()) rather than kept as its own separate feed, so a course's due-less
+// work shows up right alongside its dated work wherever items already
+// render (Courses tab, Assignments, Overview) - unlike announcements,
+// which are informational, not something to actually merge in as a task.
+export async function fetchUndatedTasks(useSample) {
+  const base = apiBase();
+  if (!base || useSample) return [];
+  const res = await fetch(`${base}/api/undated-tasks`);
+  if (!res.ok) throw new Error(`GET /api/undated-tasks failed: ${res.status}`);
+  const rows = await res.json();
+  return rows.map(normaliseApiItem);
+}
+
 export async function fetchCourses(useSample) {
   const base = apiBase();
   if (!base) return useSample ? ((await fetchDemo())?.courses ?? SAMPLE_COURSES) : [];
@@ -260,6 +278,43 @@ export async function connectPrairieLearnCustom(domain) {
   });
   const body = await res.json();
   if (!res.ok) throw new Error(body.error || `POST /api/connect/prairielearn_custom failed: ${res.status}`);
+  return body;
+}
+
+// Brightspace is multi-tenant (hub/brightspace.py) - every institution runs
+// its own subdomain, so there's no single quick-connect button; the student
+// pastes their own institution's Brightspace URL, same shape as
+// connectPrairieLearnCustom above. Real courses only - hub/brightspace.py's
+// fetch() always returns an empty item list today (no plain JSON due-date
+// endpoint was found live), explained in its own module docstring.
+export async function connectBrightspace(base) {
+  const apiBaseUrl = apiBase();
+  if (!apiBaseUrl) throw new Error("connectBrightspace() only works in local mode");
+  const res = await fetch(`${apiBaseUrl}/api/connect/brightspace`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ base }),
+  });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.error || `POST /api/connect/brightspace failed: ${res.status}`);
+  return body;
+}
+
+// WeBWorK (hub/webwork.py) has no student-facing course-catalogue join key
+// on its own problem-set page, so the student supplies both their course's
+// WeBWorK URL and its course code (to match against the same course from
+// Canvas/Workday) - the backend builds the Course record itself from
+// course_code, matching hub/webwork.py's own __main__ block.
+export async function connectWebWork(base, courseCode) {
+  const apiBaseUrl = apiBase();
+  if (!apiBaseUrl) throw new Error("connectWebWork() only works in local mode");
+  const res = await fetch(`${apiBaseUrl}/api/connect/webwork`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ base, course_code: courseCode }),
+  });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body.error || `POST /api/connect/webwork failed: ${res.status}`);
   return body;
 }
 
@@ -671,6 +726,15 @@ const KNOWN_PROVIDERS = [
   { id: "prairielearn", label: "PrairieLearn" },
   { id: "prairielearn_ok", label: "PrairieLearn (Okanagan)" },
 ];
+// WeBWorK isn't here despite having a real `source` on its items, unlike
+// Canvas/PrairieLearn: an item-count signal only counts what /api/upcoming
+// returns, which requires a due date - but hub/webwork.py's own module
+// docstring is explicit that a due date only exists for a *currently open*
+// set. Verified live: a real account connected successfully (7 real
+// problem sets saved), but every one was closed or not-yet-open, so the
+// item count was 0 and this row would show "Not connected" regardless -
+// same problem Brightspace already has by design, tracked the same way
+// (page.js's own connect-response count, not this selector).
 
 function countOf(n, noun) {
   return `${n} ${noun}${n === 1 ? "" : "s"}`;
@@ -684,7 +748,10 @@ export function selectConnections(items, meetings) {
   // directly (hub/prairielearn.py's resolve_campus() accepts one) - a
   // hardcoded list can never cover every self-hosted instance, so these
   // show up dynamically instead of needing their own KNOWN_PROVIDERS entry.
-  const knownIds = new Set(KNOWN_PROVIDERS.map((p) => p.id));
+  // "webwork" is excluded here too even though it's not in KNOWN_PROVIDERS -
+  // it's a real source, just tracked in page.js instead (see the comment
+  // above KNOWN_PROVIDERS), not an unrecognized PrairieLearn instance.
+  const knownIds = new Set([...KNOWN_PROVIDERS.map((p) => p.id), "webwork"]);
   const customSources = [...new Set(items.map((item) => item.source))].filter((s) => s && !knownIds.has(s));
   for (const source of customSources) {
     // hub/prairielearn.py's resolve_campus() keys a pasted instance

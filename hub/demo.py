@@ -130,6 +130,10 @@ def _render_xlsx(name, now):
 class _Response:
     def __init__(self, body, status=200):
         self.status, self.ok, self.headers, self._body = status, 200 <= status < 300, {}, body
+        # The URL this answers, like a real Playwright response carries -
+        # stamped by _FixtureRequest below. Adapters read it to tell a real
+        # page from an SSO login page they were redirected to (hub/webwork.py).
+        self.url = ""
 
     def text(self):
         return self._body
@@ -156,6 +160,14 @@ class _FixtureRequest:
         return _Response(_render(name, fmt, self.now))
 
     def get(self, url):
+        # A fixture never redirects, so the answer is always for the URL that
+        # was asked for - stamp it so adapters that compare the two (checking
+        # they weren't bounced to a login page) see a match.
+        r = self._get(url)
+        r.url = url
+        return r
+
+    def _get(self, url):
         parsed = urlparse(url)
         host, path = parsed.hostname, parsed.path.rstrip("/")
         if host == urlparse(canvas.BASE).hostname:
@@ -183,6 +195,11 @@ class _FixtureRequest:
         return _Response("not in the demo fixtures", status=404)
 
     def post(self, url, data=None, headers=None):
+        r = self._post(url, data=data, headers=headers)
+        r.url = url
+        return r
+
+    def _post(self, url, data=None, headers=None):
         """Piazza's RPC endpoint: the method (and nid/cid) is in the JSON body."""
         if urlparse(url).hostname != urlparse(piazza.BASE).hostname:
             return _Response("not in the demo fixtures", status=404)
